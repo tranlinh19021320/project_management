@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "977583032008",
+    "firebase_url": "https://project-management-89017-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "project-management-89017",
+    "storage_bucket": "project-management-89017.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:977583032008:android:fad93d3f8f4ed792e647fd",
+        "android_client_info": {
+          "package_name": "com.example.project_management"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "977583032008-u66pc7ls21uuahpm9ecovh0glkgl8s24.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChOV7hLKReVdsIu_TUFDfaR5xDSHXzK7k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "977583032008-u66pc7ls21uuahpm9ecovh0glkgl8s24.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "977583032008-58amfiafo5rrse5poh50vcsq5d4ucv7m.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.projectManagement"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
