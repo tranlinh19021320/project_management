@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class CurrentUser {
   final String email;
   final String username;
@@ -19,18 +21,16 @@ class CurrentUser {
       required this.userId,
       required this.managerId,
       required this.managerEmail});
-  
-  Map<String, dynamic> toJson() => {
-    'email' : email,
-    'username' : username,
-    'password' : password,
-    'isManager' : isManager,
-    'nameDetails' : nameDetails,
-    'role' : role,
-    'userId' : userId,
-    'managerId' : managerId,
-    'managerEmail' : managerEmail,
-  };
 
-  
+  Map<String, dynamic> toJson() => {
+        'email': email,
+        'username': username,
+        'password': password,
+        'isManager': isManager,
+        'nameDetails': nameDetails,
+        'role': role,
+        'userId': userId,
+        'managerId': managerId,
+        'managerEmail': managerEmail,
+      };
 }

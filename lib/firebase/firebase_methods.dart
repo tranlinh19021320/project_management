@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_management/stateparams/utils.dart';
@@ -53,12 +52,10 @@ class FirebaseMethods {
   Future<String> loginWithUserId(
       {required String userId, required String password}) async {
     String res = "error";
-    String email = "";
-
     try {
       var snap = await _firestore.collection("users").doc(userId).get();
       String email = snap.data()!['email'];
-      if (email == "" ) email = snap.data()!["managerId"];
+      if (email == "") email = snap.data()!["managerId"];
       await _auth.signInWithEmailAndPassword(email: email, password: password);
 
       res = "success";
@@ -74,24 +71,102 @@ class FirebaseMethods {
     await _auth.signOut();
   }
 
+  Future<CurrentUser> getCurrentUserByUserId(String userId) async {
+    var snap = await _firestore.collection("users").doc(userId).get();
+    return CurrentUser(
+        email: (snap.data()!)['email'],
+        username: (snap.data()!)['username'],
+        password: (snap.data()!)['password'],
+        isManager: (snap.data()!)['isManager'],
+        nameDetails: (snap.data()!)['nameDetails'],
+        role: (snap.data()!)['role'],
+        userId: (snap.data()!)['userId'],
+        managerId: (snap.data()!)['managerId'],
+        managerEmail: (snap.data()!)['managerEmail']);
+  }
+
+  //update user profile
+  Future<String> updateProfile(
+      String userId, String email, String nameDetails) async {
+    String res = "error";
+
+    try {
+      await _firestore.collection("users").doc(userId).update({
+        'email': email,
+        'nameDetails': nameDetails,
+      });
+      res = "success";
+    } catch (e) {
+      res = e.toString();
+    }
+    return res;
+  }
+
   // get userId from username or email
   Future<String> getUserIdFromAccount(String account) async {
     String userId = '';
 
     try {
-      var snap;
+      QuerySnapshot<Map<String, dynamic>> snap;
       if (isValidEmail(account)) {
-      snap = await _firestore.collection("users").where("email", isEqualTo: account).get();
+        snap = await _firestore
+            .collection("users")
+            .where("email", isEqualTo: account)
+            .get();
       } else {
-      snap = await _firestore.collection("users").where("username", isEqualTo: account).get();
+        snap = await _firestore
+            .collection("users")
+            .where("username", isEqualTo: account)
+            .get();
       }
 
       if (snap.docs.isNotEmpty) {
         userId = snap.docs.first.data()['userId'];
       }
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
     }
     return userId;
+  }
+
+  // check state of email text field
+  Future<int> checkAlreadyEmail(String email) async {
+    int state = IS_DEFAULT_STATE;
+    if (email == "") {
+      state = IS_DEFAULT_STATE;
+    } else if (!isValidEmail(email)) {
+      // email is invalid format
+      state = IS_ERROR_FORMAT_STATE;
+    } else {
+      String userId = await FirebaseMethods().getUserIdFromAccount(email);
+
+      if (userId == "") {
+        // email not registered yet
+        state = IS_CORRECT_STATE;
+      } else {
+        // email registered
+        state = IS_ERROR_STATE;
+      }
+    }
+    return state;
+  }
+
+  // check state of account text field
+  Future<int> checkAlreadyAccount(String username) async {
+    int state = IS_DEFAULT_STATE;
+    if (username == "") {
+      state = IS_DEFAULT_STATE;
+    } else {
+      String userId = await FirebaseMethods().getUserIdFromAccount(username);
+
+      if (userId == "") {
+        //username not registered yet
+        state = IS_CORRECT_STATE;
+      } else {
+        //username registered
+        state = IS_ERROR_STATE;
+      }
+    }
+    return state;
   }
 }

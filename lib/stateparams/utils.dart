@@ -9,21 +9,29 @@ int IS_CORRECT_STATE = 1;
 int IS_ERROR_STATE = 0;
 int IS_ERROR_FORMAT_STATE = 3;
 
+int IS_PROJECTS_PAGE = 0;
+int IS_PERSONAL_PAGE = 1;
+int IS_NOTIFY_PAGE = 2;
+int IS_EVENT_PAGE = 3;
+
 // colors
+const Color backgroundWhiteColor = Colors.white;
 const Color buttonGreenColor = Color.fromARGB(233, 129, 206, 101);
 const Color textLightBlueColor = Color.fromARGB(214, 150, 178, 235);
-const Color notifErrorColor = Color.fromARGB(228, 255, 5, 5);
-const Color notifCorrectColor = Color.fromARGB(255, 91, 238, 54);
-const Color textErrorColor = Color.fromARGB(255, 234, 117, 117);
-Color defaultTextFieldColor = Colors.grey.shade300;
-Color focusTextFieldColor = Colors.blue;
+const Color errorRedColor = Color.fromARGB(228, 255, 5, 5);
+const Color correctGreenColor = Color.fromARGB(255, 91, 238, 54);
+const Color textErrorRedColor = Color.fromARGB(255, 234, 117, 117);
+const Color defaultColor = Color.fromARGB(255, 155, 155, 155);
+Color focusBlueColor = Colors.blue;
+Color darkblueAppbarColor = Colors.blue.shade800;
+const Color blueDrawerColor = Color.fromARGB(255, 33, 108, 169);
 
 // icon
 const Widget correctIcon = Icon(
   Icons.check,
-  color: notifCorrectColor,
+  color: correctGreenColor,
 );
-const Widget errorIcon = Icon(Icons.error, color: notifErrorColor);
+const Widget errorIcon = Icon(Icons.error, color: correctGreenColor);
 
 //funtions
 
@@ -37,12 +45,12 @@ showSnackBar(BuildContext context, String content, bool isError) {
               const Center(
                 child: Icon(
                   Icons.warning,
-                  color: notifErrorColor,
+                  color: errorRedColor,
                 ),
               ),
               Text(
                 " $content",
-                style: const TextStyle(color: notifErrorColor),
+                style: const TextStyle(color: errorRedColor),
               ),
             ],
           )
@@ -50,12 +58,12 @@ showSnackBar(BuildContext context, String content, bool isError) {
             const Center(
               child: Icon(
                 Icons.check_circle,
-                color: notifCorrectColor,
+                color: correctGreenColor,
               ),
             ),
             Text(
               " $content",
-              style: const TextStyle(color: notifCorrectColor),
+              style: const TextStyle(color: correctGreenColor),
             ),
           ]),
   ));

@@ -1,36 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/init_screen/home_screen.dart';
-import 'package:project_management/init_screen/signup.dart';
-import 'package:project_management/stateparams/utils.dart';
+import 'package:project_management/start_screen/home_screen.dart';
+import 'package:project_management/start_screen/login.dart';
+import '../model/user.dart';
+import '../stateparams/utils.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class Signup extends StatefulWidget {
+  const Signup({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<Signup> createState() => _SignupState();
 }
 
-class _LoginState extends State<Login> {
+class _SignupState extends State<Signup> {
+  TextEditingController emailController = TextEditingController();
   TextEditingController accountController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  late FocusNode emailFocus;
   late FocusNode accountFocus;
   late FocusNode passwordFocus;
 
   bool isLockedPassword = true;
   bool isLoading = false;
 
+  int isEmailState = IS_DEFAULT_STATE;
   int isAccountState = IS_DEFAULT_STATE;
   int isPasswordState = IS_DEFAULT_STATE;
 
   @override
   void initState() {
     super.initState();
+    emailFocus = FocusNode();
+    emailFocus.addListener(() async {
+      if (!emailFocus.hasFocus) {
+        isEmailState =
+            await FirebaseMethods().checkAlreadyEmail(emailController.text);
+        setState(() {});
+      } else {
+        setState(() {
+          isEmailState = IS_DEFAULT_STATE;
+        });
+      }
+    });
     accountFocus = FocusNode();
-    accountFocus.addListener(() {
+    accountFocus.addListener(() async {
       if (!accountFocus.hasFocus) {
-        checkAlreadyAccount();
+        isAccountState =
+            await FirebaseMethods().checkAlreadyAccount(accountController.text);
+        setState(() {});
       } else {
         setState(() {
           isAccountState = IS_DEFAULT_STATE;
@@ -44,10 +62,6 @@ class _LoginState extends State<Login> {
         setState(() {
           isPasswordState = IS_DEFAULT_STATE;
         });
-      } else if (passwordController.text == "") {
-        setState(() {
-          isPasswordState = IS_ERROR_FORMAT_STATE;
-        });
       }
     });
   }
@@ -55,77 +69,61 @@ class _LoginState extends State<Login> {
   @override
   void dispose() {
     super.dispose();
+    emailController.dispose();
     accountController.dispose();
     passwordController.dispose();
 
+    emailFocus.dispose();
     accountFocus.dispose();
     passwordFocus.dispose();
   }
 
-// log in funtion
-  logIn() async {
+  signUp() async {
     passwordFocus.unfocus();
-    if (isAccountState == IS_CORRECT_STATE) {
+
+    if (isEmailState == IS_CORRECT_STATE &&
+        isAccountState == IS_CORRECT_STATE) {
       if (passwordController.text == "") {
         setState(() {
-          isPasswordState = IS_ERROR_FORMAT_STATE;
+          isPasswordState = IS_ERROR_STATE;
         });
       } else {
         setState(() {
           isLoading = true;
         });
+        String res = await FirebaseMethods().createUser(
+            email: emailController.text,
+            username: accountController.text,
+            password: passwordController.text,
+            isManager: true,
+            nameDetails: accountController.text,
+            role: "manager",
+            managerId: '', // managerId is equaq to userId
+            managerEmail: emailController.text);
         String userId = await FirebaseMethods()
             .getUserIdFromAccount(accountController.text);
-        String res = await FirebaseMethods()
-            .loginWithUserId(userId: userId, password: passwordController.text);
-
         setState(() {
           isLoading = false;
         });
         if (context.mounted) {
-          // log in completely
           if (res == "success") {
-            showSnackBar(context, "Đăng nhập thành công!", false);
+            showSnackBar(context, "Đăng ký thành công!", false);
 
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => const HomeScreen()));
-          }
-
-          // error password
-          else {
-            setState(() {
-              isPasswordState = IS_ERROR_STATE;
-            });
-            // showSnackBar(context, res, true);
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => HomeScreen(
+                     userId: userId,
+                    )));
+          } else {
+            showSnackBar(context, res, true);
           }
         }
       }
     }
   }
 
-  checkAlreadyAccount() async {
-    if (accountController.text == "") {
-      setState(() {
-        isAccountState = IS_DEFAULT_STATE;
-      });
-    } else {
-      String userId =
-          await FirebaseMethods().getUserIdFromAccount(accountController.text);
-      if (userId == "") {
-        setState(() {
-          isAccountState = IS_ERROR_STATE;
-        });
-      } else {
-        setState(() {
-          isAccountState = IS_CORRECT_STATE;
-        });
-      }
-    }
-  }
-
-  navigateToSignup() {
+  navigatrToLogin() {
     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const Signup()));
+        MaterialPageRoute(builder: (context) => const Login()));
   }
 
   @override
@@ -143,39 +141,76 @@ class _LoginState extends State<Login> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // account text field
+                  // email text field
                   TextFormField(
-                    controller: accountController,
-                    focusNode: accountFocus,
+                    controller: emailController,
+                    focusNode: emailFocus,
                     decoration: InputDecoration(
-                      labelText: "Tài khoản hoặc Email",
-
-                      // notify if error email
-                      helperText: isAccountState == IS_ERROR_STATE
-                          ? "Không tìm thấy tài khoản!"
-                          : "",
+                      labelText: "Email",
+                      //notify if email is error
+                      helperText: isEmailState == IS_ERROR_STATE
+                          ? "Email đã đăng ký!"
+                          : isEmailState == IS_ERROR_FORMAT_STATE
+                              ? "Lỗi định dạng Email!"
+                              : "",
                       helperStyle:
-                          const TextStyle(color: textErrorColor, fontSize: 14),
+                          const TextStyle(color: errorRedColor, fontSize: 14),
 
                       // outline boder
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                            color: isAccountState == IS_CORRECT_STATE
-                                ? notifCorrectColor
-                                : isAccountState == IS_ERROR_STATE
-                                    ? notifErrorColor
-                                    : defaultTextFieldColor),
+                            color: isEmailState == IS_CORRECT_STATE
+                                ? correctGreenColor
+                                : isEmailState == IS_DEFAULT_STATE
+                                    ? defaultColor
+                                    : errorRedColor),
                       ),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6)),
 
+                      suffixIcon: isEmailState == IS_DEFAULT_STATE
+                          ? null
+                          : isEmailState == IS_CORRECT_STATE
+                              ? correctIcon
+                              : errorIcon,
+                    ),
+                    autofocus: true,
+                    onEditingComplete: () =>
+                        FocusScope.of(context).requestFocus(accountFocus),
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+
+                  //account text field
+                  TextFormField(
+                    controller: accountController,
+                    focusNode: accountFocus,
+                    decoration: InputDecoration(
+                      labelText: "Tài khoản",
+                      // notify if username is error
+                      helperText: isAccountState == IS_ERROR_STATE
+                          ? "Tài khoản đã đăng ký!"
+                          : "",
+                      helperStyle:
+                          const TextStyle(color: errorRedColor, fontSize: 14),
+                      // outline boder
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: isAccountState == IS_CORRECT_STATE
+                                ? correctGreenColor
+                                : isAccountState == IS_ERROR_STATE
+                                    ? errorRedColor
+                                    : defaultColor),
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6)),
                       suffixIcon: isAccountState == IS_DEFAULT_STATE
                           ? null
                           : isAccountState == IS_CORRECT_STATE
                               ? correctIcon
                               : errorIcon,
                     ),
-                    autofocus: true,
                     onEditingComplete: () =>
                         FocusScope.of(context).requestFocus(passwordFocus),
                   ),
@@ -189,26 +224,24 @@ class _LoginState extends State<Login> {
                     focusNode: passwordFocus,
                     decoration: InputDecoration(
                       labelText: "Mật khẩu",
-                      // notify if password is error
-                      helperText: isPasswordState == IS_ERROR_STATE
-                          ? "Sai mật khẩu!"
-                          : isPasswordState == IS_ERROR_FORMAT_STATE
-                              ? "Vui lòng nhập mật khẩu"
-                              : '',
-                      helperStyle:
-                          const TextStyle(color: textErrorColor, fontSize: 14),
 
+                      //notify if password is empty
+                      helperText: isPasswordState == IS_ERROR_STATE
+                          ? "Vui lòng nhập mật khẩu!"
+                          : "",
+                      helperStyle:
+                          const TextStyle(color: errorRedColor, fontSize: 14),
                       //outline border
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                            color: isPasswordState == IS_ERROR_STATE ||
-                                    isPasswordState == IS_ERROR_FORMAT_STATE
-                                ? notifErrorColor
-                                : defaultTextFieldColor),
+                            color: isPasswordState == IS_ERROR_STATE
+                                ? errorRedColor
+                                : defaultColor),
                       ),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6)),
 
+                      //icon lock
                       suffixIcon: IconButton(
                         icon: isLockedPassword
                             ? const Icon(Icons.lock_outline)
@@ -221,32 +254,32 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     obscureText: isLockedPassword,
-                    onEditingComplete: () => logIn(),
+                    onEditingComplete: () => signUp(),
                   ),
                   const SizedBox(
                     height: 16,
                   ),
 
-                  // login button
+                  // sign up button
                   InkWell(
-                    onTap: logIn,
+                    onTap: signUp,
                     child: Container(
                       width: double.infinity,
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       decoration: ShapeDecoration(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(8)),
                         color: buttonGreenColor,
                       ),
                       child: isLoading
                           ? const Center(
                               child: CircularProgressIndicator(
-                                color: notifCorrectColor,
+                                color: correctGreenColor,
                               ),
                             )
                           : const Text(
-                              "Đăng nhập",
+                              "Đăng ký",
                               style: TextStyle(fontSize: 18),
                             ),
                     ),
@@ -264,12 +297,22 @@ class _LoginState extends State<Login> {
                   ),
 
                   // navigator to sign up
-                  InkWell(
-                    onTap: navigateToSignup,
-                    child: const Text(
-                      "Đăng ký như người quản lý",
-                      style: TextStyle(color: textLightBlueColor, fontSize: 20),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Đã có tài khoản? ",
+                        style: TextStyle(fontSize: 19),
+                      ),
+                      InkWell(
+                        onTap: navigatrToLogin,
+                        child: const Text(
+                          "Đăng nhập",
+                          style: TextStyle(
+                              color: textLightBlueColor, fontSize: 20),
+                        ),
+                      ),
+                    ],
                   )
                 ],
               ),
