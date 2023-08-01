@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:project_management/admin/personal_screen.dart';
-import 'package:project_management/model/user.dart';
-import 'package:project_management/admin/drawer_bar.dart';
+import 'package:project_management/home/admin/drawer_bar.dart';
+import 'package:provider/provider.dart';
 
-import '../stateparams/utils.dart';
+import '../../utils/utils.dart';
 
 class NotifyScreen extends StatefulWidget {
-  final String userId;
-  const NotifyScreen({super.key, required this.userId, });
+  const NotifyScreen({
+    super.key,
+  });
 
   @override
   State<NotifyScreen> createState() => _NotifyScreenState();
 }
 
 class _NotifyScreenState extends State<NotifyScreen> {
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -27,7 +28,7 @@ class _NotifyScreenState extends State<NotifyScreen> {
           backgroundColor: darkblueAppbarColor,
           title: const Text("Thông báo"),
         ),
-        drawer: DrawerBar(page: IS_NOTIFY_PAGE, userId: widget.userId),
+        drawer: const DrawerBar(),
         body: const Center(child: Text('...')),
       ),
     );

@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:project_management/admin/personal_screen.dart';
-import 'package:project_management/model/user.dart';
-import 'package:project_management/admin/drawer_bar.dart';
-
-import '../stateparams/utils.dart';
+import 'package:project_management/home/admin/drawer_bar.dart';
+import '../../utils/utils.dart';
 
 class AdminHomeScreen extends StatefulWidget {
-  final String userId;
-  const AdminHomeScreen({super.key, required this.userId, });
+  const AdminHomeScreen({
+    super.key,
+  });
 
   @override
   State<AdminHomeScreen> createState() => _AdminHomeScreenState();
@@ -27,7 +25,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           backgroundColor: darkblueAppbarColor,
           title: const Text("Dự án"),
         ),
-        drawer: DrawerBar(page: IS_PROJECTS_PAGE, userId: widget.userId),
+        drawer: const DrawerBar(),
         body: const Center(child: Text('...')),
       ),
     );

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 class StaffHomeScreen extends StatefulWidget {
-  final String userId;
-  const StaffHomeScreen({super.key, r, required this.userId});
+  const StaffHomeScreen({super.key,});
 
   @override
   State<StaffHomeScreen> createState() => _StaffHomeScreenState();

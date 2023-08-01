@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:project_management/model/user.dart';
-
-import '../stateparams/utils.dart';
+import '../../utils/utils.dart';
 import 'drawer_bar.dart';
 
 class PersonalScreen extends StatefulWidget {
-  final String userId;
-  const PersonalScreen({super.key, required this.userId,});
+  const PersonalScreen({
+    super.key,
+  });
 
   @override
   State<PersonalScreen> createState() => _PersonalScreenState();
 }
 
 class _PersonalScreenState extends State<PersonalScreen> {
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,11 +22,11 @@ class _PersonalScreenState extends State<PersonalScreen> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-          appBar: AppBar(
-            backgroundColor: darkblueAppbarColor,
-            title: const Text("Nhân sự"),
-          ),
-          drawer: DrawerBar(page: IS_PERSONAL_PAGE, userId: widget.userId),
+        appBar: AppBar(
+          backgroundColor: darkblueAppbarColor,
+          title: const Text("Nhân sự"),
+        ),
+        drawer: const DrawerBar(),
         body: const Center(child: Text('...')),
       ),
     );

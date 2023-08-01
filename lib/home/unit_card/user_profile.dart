@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:project_management/model/user.dart';
-import 'package:project_management/stateparams/utils.dart';
-
-import '../firebase/firebase_methods.dart';
+import 'package:project_management/utils/utils.dart';
+import 'package:provider/provider.dart';
+import '../../firebase/firebase_methods.dart';
+import '../../provider/user_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final String userId;
-  const ProfileScreen({super.key, required this.userId, });
+  const ProfileScreen({
+    super.key,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late CurrentUser currentUser;
   TextEditingController emailController = TextEditingController();
   TextEditingController detailNameController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
@@ -30,31 +30,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    getCurrentUser();
-
-    emailController.text = currentUser.email;
-    detailNameController.text = currentUser.nameDetails;
-    usernameController.text = currentUser.username;
-    roleController.text = currentUser.role;
+    emailController.text = context.read<UserProvider>().getEmail();
+    detailNameController.text = context.read<UserProvider>().getDetailName();
+    usernameController.text = context.read<UserProvider>().getUsername();
+    roleController.text = context.read<UserProvider>().getRole();
 
     emailFocus = FocusNode();
     emailFocus.addListener(() async {
       if (!emailFocus.hasFocus) {
+        setState(() {
+          isUpdateEmail = false;
+        });
         isEmailState =
             await FirebaseMethods().checkAlreadyEmail(emailController.text);
-        if (emailController.text == currentUser.email) {
+        if (!isChangedEmail()) {
           isEmailState = IS_CORRECT_STATE;
         }
         if (isEmailState == IS_ERROR_STATE) {
           // showBottomSheet(context: context, builder: (context)=> Text("Email đã có người sử dụng"));
         }
-        setState(() {
-          isUpdateEmail = false;
-        });
-      } else {
-        setState(() {
-          isEmailState = IS_DEFAULT_STATE;
-        });
+        setState(() {});
       }
     });
 
@@ -80,31 +75,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
     detailNameFocus.dispose();
   }
 
-  getCurrentUser() async {
-    currentUser = await FirebaseMethods().getCurrentUserByUserId(widget.userId);
+  isChangedEmail() {
+    return (emailController.text != context.read<UserProvider>().getEmail());
   }
 
-  isUpdated() {
-    return (emailController.text == currentUser.email ||
-        detailNameController.text == currentUser.nameDetails);
+  isUpdate() {
+    return (isChangedEmail() ||
+        detailNameController.text !=
+            context.watch<UserProvider>().getCurrentUser.nameDetails);
   }
 
   updateProfile() async {
-    if (isEmailState == IS_CORRECT_STATE || isEmailState == IS_DEFAULT_STATE) {
-      String res = await FirebaseMethods().updateProfile(
-          currentUser.userId,
-          emailController.text,
-          detailNameController.text);
-          if (res == 'success') {
-            showDialog(context: context, builder: (context) => AlertDialog(
-              backgroundColor: backgroundWhiteColor,
-              title: Text('Cập nhật thành công!', style: TextStyle(color: correctGreenColor, fontWeight: FontWeight.bold, fontSize: 26),),
-              icon: Icon(Icons.check, color: correctGreenColor,),
-              actions: [
-
-              ],
-            ));
-          }
+    if (isEmailState == IS_CORRECT_STATE ||
+        isEmailState == IS_DEFAULT_STATE && isUpdate()) {
+      String res = await context
+          .read<UserProvider>()
+          .updateUser(emailController.text, detailNameController.text);
+      if (context.mounted) {
+        if (res == 'success') {
+          Navigator.pop(context);
+          showSnackBar(context, "Cập nhật thành công!", false);
+        } else {
+          showSnackBar(context, res, true);
+        }
+      }
     }
   }
 

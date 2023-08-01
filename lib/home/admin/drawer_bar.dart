@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:project_management/admin/admin_home.dart';
-import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/model/user.dart';
-import 'package:project_management/unit_card/notify_screen.dart';
-import 'package:project_management/unit_card/user_profile.dart';
+import 'package:project_management/home/admin/admin_home.dart';
+import 'package:project_management/home/unit_card/notify_screen.dart';
+import 'package:project_management/home/unit_card/user_profile.dart';
+import 'package:provider/provider.dart';
 
+import '../../provider/page_provider.dart';
+import '../../provider/user_provider.dart';
 import 'personal_screen.dart';
-import '../stateparams/utils.dart';
+import '../../utils/utils.dart';
 
 class DrawerBar extends StatefulWidget {
-  final int page;
-  final String userId;
-  const DrawerBar({super.key, required this.page, required this.userId,});
+  const DrawerBar({
+    super.key,
+  });
 
   @override
   State<DrawerBar> createState() => _DrawerBarState();
@@ -19,18 +20,6 @@ class DrawerBar extends StatefulWidget {
 
 class _DrawerBarState extends State<DrawerBar> {
   bool isOpenProfile = false;
-  late CurrentUser currentUser;
-  
-  @override
-  void initState() {
-    super.initState();
-
-    getCurrentUser();
-  }
-  
-  getCurrentUser() async {
-    currentUser = await FirebaseMethods().getCurrentUserByUserId(widget.userId);
-  }
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -42,8 +31,10 @@ class _DrawerBarState extends State<DrawerBar> {
               Icons.face,
               size: 64,
             ),
-            accountName: Text(currentUser.nameDetails),
-            accountEmail: Text(currentUser.email),
+            accountName:
+                Text(context.watch<UserProvider>().getCurrentUser.nameDetails),
+            accountEmail:
+                Text(context.watch<UserProvider>().getCurrentUser.email),
             onDetailsPressed: () {
               setState(() {
                 isOpenProfile = !isOpenProfile;
@@ -52,55 +43,74 @@ class _DrawerBarState extends State<DrawerBar> {
           ),
           Expanded(
               child: isOpenProfile
-                  ? ProfileScreen(userId: widget.userId,)
+                  ? const ProfileScreen()
                   : Scaffold(
                       backgroundColor: Colors.transparent,
                       body: ListView(
                         padding: const EdgeInsets.only(top: 4),
                         children: [
                           ListTile(
-                            selected: (widget.page == IS_PROJECTS_PAGE),
+                            selected: (context.watch<PageProvider>().page ==
+                                IS_PROJECTS_PAGE),
                             selectedColor: buttonGreenColor,
-                            leading: Icon(Icons.work_rounded),
+                            leading: const Icon(Icons.work_rounded),
                             title: const Text(
                               "Dự án",
                               style: TextStyle(fontSize: 18),
                             ),
-                            onTap: () => Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (_) => AdminHomeScreen(
-                                        userId: widget.userId))),
+                            onTap: () {
+                              context
+                                  .read<PageProvider>()
+                                  .changePage(IS_PROJECTS_PAGE);
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const AdminHomeScreen()));
+                            },
                           ),
                           ListTile(
-                            selected: (widget.page == IS_PERSONAL_PAGE),
+                            selected: (context.watch<PageProvider>().page ==
+                                IS_PERSONAL_PAGE),
                             selectedColor: buttonGreenColor,
                             leading: const Icon(Icons.person),
-                            title: const  Text(
+                            title: const Text(
                               "Nhân sự",
                               style: TextStyle(fontSize: 18),
                             ),
-                            onTap: () => Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (_) => PersonalScreen(
-                                        userId: widget.userId))),
+                            onTap: () {
+                              context
+                                  .read<PageProvider>()
+                                  .changePage(IS_PERSONAL_PAGE);
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PersonalScreen()));
+                            },
                           ),
                           ListTile(
-                            selected: (widget.page == IS_NOTIFY_PAGE),
+                            selected: (context.watch<PageProvider>().page ==
+                                IS_NOTIFY_PAGE),
                             selectedColor: buttonGreenColor,
                             leading: const Icon(Icons.notifications),
                             title: const Text(
                               "Thông báo",
                               style: TextStyle(fontSize: 18),
                             ),
-                            onTap: () => Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (_) => NotifyScreen(
-                                        userId: widget.userId))),
+                            onTap: () {
+                              context
+                                  .read<PageProvider>()
+                                  .changePage(IS_NOTIFY_PAGE);
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const NotifyScreen()));
+                            },
                           ),
                           ListTile(
-                            selected: (widget.page == IS_EVENT_PAGE),
+                            selected: (context.watch<PageProvider>().page ==
+                                IS_EVENT_PAGE),
                             selectedColor: buttonGreenColor,
-                            leading:const  Icon(Icons.event),
+                            leading: const Icon(Icons.event),
                             title: const Text(
                               "Sự kiện",
                               style: TextStyle(fontSize: 18),

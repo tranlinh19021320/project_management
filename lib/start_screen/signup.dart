@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/start_screen/home_screen.dart';
+import 'package:project_management/home/home_screen.dart';
 import 'package:project_management/start_screen/login.dart';
+import 'package:provider/provider.dart';
 import '../model/user.dart';
-import '../stateparams/utils.dart';
+import '../provider/user_provider.dart';
+import '../utils/utils.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -102,18 +104,24 @@ class _SignupState extends State<Signup> {
             managerEmail: emailController.text);
         String userId = await FirebaseMethods()
             .getUserIdFromAccount(accountController.text);
+
         setState(() {
           isLoading = false;
         });
-        if (context.mounted) {
-          if (res == "success") {
-            showSnackBar(context, "Đăng ký thành công!", false);
 
+        if (res == "success") {
+          CurrentUser currentUser =
+              await FirebaseMethods().getCurrentUserByUserId(userId);
+          if (context.mounted) {
+            showSnackBar(context, "Đăng ký thành công!", false);
+            initStateProvider(context, userId);
             Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => HomeScreen(
-                     userId: userId,
+                      isManager: currentUser.isManager,
                     )));
-          } else {
+          }
+        } else {
+          if (context.mounted) {
             showSnackBar(context, res, true);
           }
         }

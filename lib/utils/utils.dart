@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../provider/page_provider.dart';
+import '../provider/user_provider.dart';
 
 // images path
 String backgroundImage = "assets/images/background_image.jpg";
@@ -75,3 +79,9 @@ bool isValidEmail(String email) {
           r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
       .hasMatch(email);
 }
+
+// reset state provider
+initStateProvider(BuildContext context, String userId) async {
+    context.read<UserProvider>().getUserById(userId);
+    context.read<PageProvider>().refreshPage();
+  }

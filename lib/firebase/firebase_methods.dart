@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:project_management/stateparams/utils.dart';
+import 'package:project_management/utils/utils.dart';
 import 'package:uuid/uuid.dart';
 import 'package:project_management/model/user.dart';
 
@@ -55,7 +55,7 @@ class FirebaseMethods {
     try {
       var snap = await _firestore.collection("users").doc(userId).get();
       String email = snap.data()!['email'];
-      if (email == "") email = snap.data()!["managerId"];
+      if (email == "") await _auth.signInAnonymously();
       await _auth.signInWithEmailAndPassword(email: email, password: password);
 
       res = "success";
