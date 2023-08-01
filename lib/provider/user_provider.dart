@@ -47,4 +47,8 @@ class UserProvider extends ChangeNotifier {
   bool getIsManager() {
     return _user!.isManager;
   }
+
+  String getPassword() {
+    return _user!.password;
+  }
 }

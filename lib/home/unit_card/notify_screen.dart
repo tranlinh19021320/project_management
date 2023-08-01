@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/home/admin/drawer_bar.dart';
-import 'package:provider/provider.dart';
-
 import '../../utils/utils.dart';
 
 class NotifyScreen extends StatefulWidget {

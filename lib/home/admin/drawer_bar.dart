@@ -49,15 +49,27 @@ class _DrawerBarState extends State<DrawerBar> {
                       body: ListView(
                         padding: const EdgeInsets.only(top: 4),
                         children: [
+                          // project select
                           ListTile(
-                            selected: (context.watch<PageProvider>().page ==
-                                IS_PROJECTS_PAGE),
-                            selectedColor: buttonGreenColor,
-                            leading: const Icon(Icons.work_rounded),
+                            tileColor: (context.watch<PageProvider>().page ==
+                                IS_PROJECTS_PAGE) ? focusBlueColor : Colors.transparent,
+                            shape:RoundedRectangleBorder(
+                              side: BorderSide(
+                                color: focusBlueColor
+                              ),
+                              borderRadius: BorderRadius.circular(12)
+                            ),
+                            leading: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: projectIcon,
+                            ),
+                            trailing:(context.watch<PageProvider>().page ==
+                                IS_PROJECTS_PAGE) ? rightArrorIcon : null,
                             title: const Text(
                               "Dự án",
                               style: TextStyle(fontSize: 18),
                             ),
+
                             onTap: () {
                               context
                                   .read<PageProvider>()
@@ -68,11 +80,22 @@ class _DrawerBarState extends State<DrawerBar> {
                                           const AdminHomeScreen()));
                             },
                           ),
+                          // personal select
                           ListTile(
-                            selected: (context.watch<PageProvider>().page ==
-                                IS_PERSONAL_PAGE),
-                            selectedColor: buttonGreenColor,
-                            leading: const Icon(Icons.person),
+                            tileColor: (context.watch<PageProvider>().page ==
+                                IS_PERSONAL_PAGE) ? focusBlueColor : Colors.transparent,
+                            shape:RoundedRectangleBorder(
+                              side: BorderSide(
+                                color: focusBlueColor
+                              ),
+                              borderRadius: BorderRadius.circular(12)
+                            ),
+                            leading: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: staffIcon,
+                            ),
+                            trailing:(context.watch<PageProvider>().page ==
+                                IS_PERSONAL_PAGE) ? rightArrorIcon : null,
                             title: const Text(
                               "Nhân sự",
                               style: TextStyle(fontSize: 18),
@@ -87,11 +110,22 @@ class _DrawerBarState extends State<DrawerBar> {
                                           const PersonalScreen()));
                             },
                           ),
+                          // notification select
                           ListTile(
-                            selected: (context.watch<PageProvider>().page ==
-                                IS_NOTIFY_PAGE),
-                            selectedColor: buttonGreenColor,
-                            leading: const Icon(Icons.notifications),
+                            tileColor: (context.watch<PageProvider>().page ==
+                                IS_NOTIFY_PAGE) ? focusBlueColor : Colors.transparent,
+                            shape:RoundedRectangleBorder(
+                              side: BorderSide(
+                                color: focusBlueColor
+                              ),
+                              borderRadius: BorderRadius.circular(12)
+                            ),
+                            leading: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: notifyIcon,
+                            ),
+                            trailing:(context.watch<PageProvider>().page ==
+                                IS_NOTIFY_PAGE) ? rightArrorIcon : null,
                             title: const Text(
                               "Thông báo",
                               style: TextStyle(fontSize: 18),
@@ -106,17 +140,30 @@ class _DrawerBarState extends State<DrawerBar> {
                                           const NotifyScreen()));
                             },
                           ),
+                          //event select
                           ListTile(
-                            selected: (context.watch<PageProvider>().page ==
-                                IS_EVENT_PAGE),
-                            selectedColor: buttonGreenColor,
-                            leading: const Icon(Icons.event),
+                            tileColor: (context.watch<PageProvider>().page ==
+                                IS_EVENT_PAGE) ? focusBlueColor : Colors.transparent,
+                            shape:RoundedRectangleBorder(
+                              side: BorderSide(
+                                color: focusBlueColor
+                              ),
+                              borderRadius: BorderRadius.circular(12)
+                            ),
+                            leading: Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: eventIcon,
+                            ),
+                            trailing:(context.watch<PageProvider>().page ==
+                                IS_EVENT_PAGE) ? rightArrorIcon : null,
                             title: const Text(
                               "Sự kiện",
                               style: TextStyle(fontSize: 18),
                             ),
                             onTap: () {
-                              setState(() {});
+                              context
+                                  .read<PageProvider>()
+                                  .changePage(IS_EVENT_PAGE);
                             },
                           )
                         ],

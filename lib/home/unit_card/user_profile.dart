@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:project_management/home/unit_card/reset_password.dart';
+import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
 import 'package:provider/provider.dart';
 import '../../firebase/firebase_methods.dart';
@@ -25,7 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isUpdateEmail = false;
   bool isUpdateDetailName = false;
 
-  int isEmailState = IS_CORRECT_STATE;
+  int isEmailState = IS_DEFAULT_STATE;
 
   @override
   void initState() {
@@ -41,15 +43,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           isUpdateEmail = false;
         });
-        isEmailState =
-            await FirebaseMethods().checkAlreadyEmail(emailController.text);
         if (!isChangedEmail()) {
-          isEmailState = IS_CORRECT_STATE;
+          setState(() {
+            isEmailState = IS_DEFAULT_STATE;
+          });
+        } else {
+          isEmailState =
+              await FirebaseMethods().checkAlreadyEmail(emailController.text);
+              setState(() {
+            });
+          if (isEmailState == IS_ERROR_STATE) {
+            if (context.mounted) {
+              showDialog(
+                  context: context,
+                  builder: (_) => const NotifyDialog(
+                      content: ("Email đã đăng ký!"), isError: true));
+            } 
+            
+          } else if (isEmailState == IS_ERROR_FORMAT_STATE){
+            if (context.mounted) {
+              showDialog(
+                  context: context,
+                  builder: (_) => const NotifyDialog(
+                      content: ("Lỗi định dạng Email!"), isError: true));
+            } 
+          }
+
+          
         }
-        if (isEmailState == IS_ERROR_STATE) {
-          // showBottomSheet(context: context, builder: (context)=> Text("Email đã có người sử dụng"));
-        }
-        setState(() {});
       }
     });
 
@@ -82,19 +103,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   isUpdate() {
     return (isChangedEmail() ||
         detailNameController.text !=
-            context.watch<UserProvider>().getCurrentUser.nameDetails);
+            context.read<UserProvider>().getDetailName());
   }
 
   updateProfile() async {
-    if (isEmailState == IS_CORRECT_STATE ||
-        isEmailState == IS_DEFAULT_STATE && isUpdate()) {
+    if (isUpdate()) {
       String res = await context
           .read<UserProvider>()
           .updateUser(emailController.text, detailNameController.text);
       if (context.mounted) {
         if (res == 'success') {
           Navigator.pop(context);
-          showSnackBar(context, "Cập nhật thành công!", false);
+          showDialog(
+              context: context,
+              builder: (_) => const NotifyDialog(
+                  content: "Cập nhật thành công!", isError: false));
         } else {
           showSnackBar(context, res, true);
         }
@@ -114,7 +137,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             controller: emailController,
             focusNode: emailFocus,
             decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.email),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: emailIcon,
+                ),
                 prefixText: "Email: ",
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
@@ -122,15 +148,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     borderSide: BorderSide(
                         color: isEmailState == IS_ERROR_STATE ||
                                 isEmailState == IS_ERROR_FORMAT_STATE
-                            ? errorRedColor
+                            ? errorRedColor : isEmailState == IS_CORRECT_STATE ? correctGreenColor
                             : defaultColor)),
                 suffixIcon: IconButton(
                   icon: isUpdateEmail
-                      ? const Icon(Icons.update)
-                      : const Icon(Icons.update_disabled),
+                      ? const Icon(Icons.update, color: correctGreenColor,)
+                      : const Icon(Icons.update_disabled, color: defaultIconColor,),
                   onPressed: () {
                     setState(() {
                       isUpdateEmail = !isUpdateEmail;
+                      if (isUpdateEmail) {
+                      FocusScope.of(context).requestFocus(emailFocus);
+                      } else {
+                        emailFocus.unfocus();
+                      }
                     });
                   },
                 )),
@@ -145,7 +176,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             controller: detailNameController,
             focusNode: detailNameFocus,
             decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.person_search),
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: detailNameIcon,
+                ),
                 prefixText: "Họ và tên: ",
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(6),
@@ -154,11 +188,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     borderSide: BorderSide(color: defaultColor)),
                 suffixIcon: IconButton(
                   icon: isUpdateDetailName
-                      ? const Icon(Icons.update)
-                      : const Icon(Icons.update_disabled),
+                      ? const Icon(Icons.update, color: correctGreenColor,)
+                      : const Icon(Icons.update_disabled, color: defaultIconColor,),
                   onPressed: () {
                     setState(() {
                       isUpdateDetailName = !isUpdateDetailName;
+                      if (isUpdateDetailName) {
+                        FocusScope.of(context).requestFocus(detailNameFocus);
+                      } else {
+                        detailNameFocus.unfocus();
+                      }
                     });
                   },
                 )),
@@ -171,7 +210,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextField(
             controller: usernameController,
             decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.person),
+              prefixIcon:Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: usernameIcon,
+                ),
               prefixText: "Tài khoản: ",
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
@@ -187,7 +229,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextField(
             controller: roleController,
             decoration: InputDecoration(
-              prefixIcon: const Icon(Icons.groups_sharp),
+              prefixIcon: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: roleIcon,
+                ),
               prefixText: "Nhóm: ",
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
@@ -204,7 +249,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (_) => const ResetPasswordScreen());
+                },
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: ShapeDecoration(

@@ -12,6 +12,7 @@
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/signup_screenshot.png" alt="Singup">
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/slide_bar.png" alt="Slide Bar">
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/profile.png" alt="User Profile">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/reset_password.png" alt="Reset Password Dialog">
 </p>
 
 

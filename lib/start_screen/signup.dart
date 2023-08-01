@@ -155,6 +155,10 @@ class _SignupState extends State<Signup> {
                     focusNode: emailFocus,
                     decoration: InputDecoration(
                       labelText: "Email",
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: emailIcon,
+                      ),
                       //notify if email is error
                       helperText: isEmailState == IS_ERROR_STATE
                           ? "Email đã đăng ký!"
@@ -196,6 +200,10 @@ class _SignupState extends State<Signup> {
                     focusNode: accountFocus,
                     decoration: InputDecoration(
                       labelText: "Tài khoản",
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: usernameIcon,
+                      ),
                       // notify if username is error
                       helperText: isAccountState == IS_ERROR_STATE
                           ? "Tài khoản đã đăng ký!"
@@ -232,6 +240,10 @@ class _SignupState extends State<Signup> {
                     focusNode: passwordFocus,
                     decoration: InputDecoration(
                       labelText: "Mật khẩu",
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: passwordIcon,
+                      ),
 
                       //notify if password is empty
                       helperText: isPasswordState == IS_ERROR_STATE

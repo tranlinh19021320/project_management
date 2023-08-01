@@ -158,6 +158,10 @@ class _LoginState extends State<Login> {
                     focusNode: accountFocus,
                     decoration: InputDecoration(
                       labelText: "Tài khoản hoặc Email",
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: usernameIcon,
+                      ),
 
                       // notify if error email
                       helperText: isAccountState == IS_ERROR_STATE
@@ -198,6 +202,10 @@ class _LoginState extends State<Login> {
                     focusNode: passwordFocus,
                     decoration: InputDecoration(
                       labelText: "Mật khẩu",
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: passwordIcon,
+                      ),
                       // notify if password is error
                       helperText: isPasswordState == IS_ERROR_STATE
                           ? "Sai mật khẩu!"
@@ -220,8 +228,8 @@ class _LoginState extends State<Login> {
 
                       suffixIcon: IconButton(
                         icon: isLockedPassword
-                            ? const Icon(Icons.lock_outline)
-                            : const Icon(Icons.lock_open_outlined),
+                            ? viewPasswordIcon
+                            : hidePasswordIcon,
                         onPressed: () {
                           setState(() {
                             isLockedPassword = !isLockedPassword;

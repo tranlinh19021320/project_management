@@ -6,6 +6,38 @@ import '../provider/user_provider.dart';
 
 // images path
 String backgroundImage = "assets/images/background_image.jpg";
+// asset icon
+Image emailIcon = Image.asset("assets/icons/gmail.png", width: 20, height: 20, fit: BoxFit.fill,);
+Image detailNameIcon = Image.asset("assets/icons/business-card.png", width: 20, height: 20, fit: BoxFit.fill,);
+Image usernameIcon = Image.asset("assets/icons/user.png", width: 20, height: 20, fit: BoxFit.fill,);
+Image roleIcon = Image.asset("assets/icons/teamwork.png", width: 20, height: 20, fit: BoxFit.fill,);
+Image passwordIcon = Image.asset("assets/icons/password.png", width: 20, height: 20, fit: BoxFit.fill,);
+Image hidePasswordIcon = Image.asset("assets/icons/hide.png", width: 20, height: 20, fit: BoxFit.fill, color: defaultIconColor,);
+Image viewPasswordIcon = Image.asset("assets/icons/view.png", width: 20, height: 20, fit: BoxFit.fill, color: defaultIconColor,);
+Image createIcon = Image.asset("assets/icons/create.png", width: 20, height: 20, fit: BoxFit.fill,);
+Image keyIcon = Image.asset("assets/icons/key.png", width: 20, height: 20, fit: BoxFit.fill,);
+Image projectIcon = Image.asset("assets/icons/project-management.png", width: 36, height: 36, fit: BoxFit.fill,);
+Image staffIcon = Image.asset("assets/icons/staff.png", width: 36, height: 36, fit: BoxFit.fill,);
+Image notifyIcon = Image.asset("assets/icons/notify.png", width: 36, height: 36, fit: BoxFit.fill,);
+Image eventIcon = Image.asset("assets/icons/event.png", width: 36, height: 36, fit: BoxFit.fill,);
+Image rightArrorIcon = Image.asset("assets/icons/right-arrow.png", width: 28, height: 28, fit: BoxFit.fill,);
+
+
+
+
+const Icon correctIcon = Icon(
+  Icons.check,
+  color: correctGreenColor,
+);
+const Icon errorIcon = Icon(
+  Icons.error,
+  color: errorRedColor,
+);
+
+
+
+
+
 
 // state parameters
 int IS_DEFAULT_STATE = 2;
@@ -26,16 +58,12 @@ const Color errorRedColor = Color.fromARGB(228, 255, 5, 5);
 const Color correctGreenColor = Color.fromARGB(255, 91, 238, 54);
 const Color textErrorRedColor = Color.fromARGB(255, 234, 117, 117);
 const Color defaultColor = Color.fromARGB(255, 155, 155, 155);
+const Color defaultIconColor = Color.fromARGB(255, 207, 207, 207);
 Color focusBlueColor = Colors.blue;
 Color darkblueAppbarColor = Colors.blue.shade800;
 const Color blueDrawerColor = Color.fromARGB(255, 33, 108, 169);
+const Color notifyIconColor = Color.fromARGB(255, 247, 229, 70);
 
-// icon
-const Widget correctIcon = Icon(
-  Icons.check,
-  color: correctGreenColor,
-);
-const Widget errorIcon = Icon(Icons.error, color: correctGreenColor);
 
 //funtions
 
