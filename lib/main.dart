@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:project_management/provider/page_provider.dart';
 import 'package:project_management/provider/user_provider.dart';
 import 'package:project_management/start_screen/login.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +22,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProvider(create: (_) => PageProvider()),
       ],
       child: MaterialApp(
         title: 'QLDA',

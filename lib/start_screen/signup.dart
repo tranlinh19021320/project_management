@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/home_screen.dart';
 import 'package:project_management/start_screen/login.dart';
-import 'package:provider/provider.dart';
 import '../model/user.dart';
-import '../provider/user_provider.dart';
 import '../utils/utils.dart';
 
 class Signup extends StatefulWidget {
@@ -264,8 +262,8 @@ class _SignupState extends State<Signup> {
                       //icon lock
                       suffixIcon: IconButton(
                         icon: isLockedPassword
-                            ? const Icon(Icons.lock_outline)
-                            : const Icon(Icons.lock_open_outlined),
+                            ? hidePasswordIcon
+                            : viewPasswordIcon,
                         onPressed: () {
                           setState(() {
                             isLockedPassword = !isLockedPassword;

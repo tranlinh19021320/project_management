@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../provider/page_provider.dart';
 import '../provider/user_provider.dart';
 
 // images path
@@ -21,8 +20,7 @@ Image staffIcon = Image.asset("assets/icons/staff.png", width: 36, height: 36, f
 Image notifyIcon = Image.asset("assets/icons/notify.png", width: 36, height: 36, fit: BoxFit.fill,);
 Image eventIcon = Image.asset("assets/icons/event.png", width: 36, height: 36, fit: BoxFit.fill,);
 Image rightArrorIcon = Image.asset("assets/icons/right-arrow.png", width: 28, height: 28, fit: BoxFit.fill,);
-
-
+Image loudspeakerIcon = Image.asset("assets/icons/loudspeaker.png", width: 36, height: 36, );
 
 
 const Icon correctIcon = Icon(
@@ -40,15 +38,15 @@ const Icon errorIcon = Icon(
 
 
 // state parameters
-int IS_DEFAULT_STATE = 2;
-int IS_CORRECT_STATE = 1;
-int IS_ERROR_STATE = 0;
-int IS_ERROR_FORMAT_STATE = 3;
+const int IS_DEFAULT_STATE = 2;
+const int IS_CORRECT_STATE = 1;
+const int IS_ERROR_STATE = 0;
+const int IS_ERROR_FORMAT_STATE = 3;
 
-int IS_PROJECTS_PAGE = 0;
-int IS_PERSONAL_PAGE = 1;
-int IS_NOTIFY_PAGE = 2;
-int IS_EVENT_PAGE = 3;
+const int IS_PROJECTS_PAGE = 0;
+const int IS_PERSONAL_PAGE = 1;
+const int IS_NOTIFY_PAGE = 2;
+const int IS_EVENT_PAGE = 3;
 
 // colors
 const Color backgroundWhiteColor = Colors.white;
@@ -63,6 +61,7 @@ Color focusBlueColor = Colors.blue;
 Color darkblueAppbarColor = Colors.blue.shade800;
 const Color blueDrawerColor = Color.fromARGB(255, 33, 108, 169);
 const Color notifyIconColor = Color.fromARGB(255, 247, 229, 70);
+
 
 
 //funtions
@@ -111,5 +110,4 @@ bool isValidEmail(String email) {
 // reset state provider
 initStateProvider(BuildContext context, String userId) async {
     context.read<UserProvider>().getUserById(userId);
-    context.read<PageProvider>().refreshPage();
   }

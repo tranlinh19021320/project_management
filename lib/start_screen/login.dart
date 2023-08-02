@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/home_screen.dart';
 import 'package:project_management/model/user.dart';
-import 'package:project_management/provider/user_provider.dart';
 import 'package:project_management/start_screen/signup.dart';
 import 'package:project_management/utils/utils.dart';
-import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -82,9 +80,7 @@ class _LoginState extends State<Login> {
         String res = await FirebaseMethods()
             .loginWithUserId(userId: userId, password: passwordController.text);
         
-        setState(() {
-          isLoading = false;
-        });
+        
         if (context.mounted) {
           // log in completely
           if (res == "success") {
@@ -92,7 +88,10 @@ class _LoginState extends State<Login> {
             await FirebaseMethods().getCurrentUserByUserId(userId);
             if (context.mounted) {
             showSnackBar(context, "Đăng nhập thành công!", false);
-            initStateProvider(context, userId);
+            setState(() {
+              initStateProvider(context, userId);
+            });
+            
             Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => HomeScreen(
                       isManager: currentUser.isManager,
@@ -108,6 +107,10 @@ class _LoginState extends State<Login> {
             // showSnackBar(context, res, true);
           }
         }
+
+        setState(() {
+          isLoading = false;
+        });
       }
     }
   }

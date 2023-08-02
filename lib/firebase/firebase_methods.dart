@@ -129,6 +129,10 @@ class FirebaseMethods {
     return userId;
   }
 
+  deleteUser(String userId) {
+    _firestore.collection("users").doc(userId).delete();
+  }
+
   // check state of email text field
   Future<int> checkAlreadyEmail(String email) async {
     int state = IS_DEFAULT_STATE;
@@ -170,4 +174,47 @@ class FirebaseMethods {
     return state;
   }
 
+  Future<String> changePassword(String userId, String oldpassword, String newpassword) async {
+    String res = "error";
+    try {
+      CurrentUser user = await getCurrentUserByUserId(userId);
+      
+      await _firestore
+          .collection("users")
+          .doc(userId)
+          .update({'password': newpassword});
+          
+      if (user.email != '') {
+        final cred = EmailAuthProvider.credential(email: user.email, password: oldpassword);
+        _auth.currentUser!.reauthenticateWithCredential(cred).then((value) {
+          _auth.currentUser!.updatePassword(newpassword).then((value) {
+            res ="success";
+          }).catchError((onError) {
+            res = onError.toString();
+          });
+        }).catchError((onError) {
+          res = onError.toString();
+        });
+        res = "success";
+      }
+    } catch (e) {
+      res = e.toString();
+    }
+    return res;
+  }
+
+  updateEmail(String userId, String email) async {
+    CurrentUser user = await getCurrentUserByUserId(userId);
+    createUser(
+        email: email,
+        username: user.username,
+        password: user.password,
+        isManager: user.isManager,
+        nameDetails: user.nameDetails,
+        role: user.role,
+        managerId: user.managerId,
+        managerEmail: user.managerEmail);
+
+    deleteUser(userId);
+  }
 }

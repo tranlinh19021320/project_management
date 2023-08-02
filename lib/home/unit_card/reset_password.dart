@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:project_management/firebase/firebase_methods.dart';
+import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
 import 'package:provider/provider.dart';
 
@@ -64,7 +66,27 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   isCorrectPassword() {
-    return (oldPasswordController.text == context.read<UserProvider>().getPassword());
+    return (oldPasswordController.text ==
+        context.read<UserProvider>().getPassword());
+  }
+
+  updatePassword() async {
+    String res = await FirebaseMethods().changePassword(
+        context.read<UserProvider>().getUserId(),oldPasswordController.text,
+        newPasswordController.text);
+
+    if (res == "success") {
+      if (context.mounted) {
+      Navigator.pop(context);
+      showDialog(context: context, builder: (_) =>const  NotifyDialog(content: "Đổi mật khẩu thành công!", isError: false));
+      context.read<UserProvider>().getUserById(context.read<UserProvider>().getUserId());
+      }
+
+    } else {
+      if (context.mounted) {
+        showDialog(context: context, builder: (_) => NotifyDialog(content: res, isError: true));
+      }
+    }
   }
 
   @override
@@ -73,7 +95,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       scrollable: true,
       backgroundColor: darkblueAppbarColor,
       actionsAlignment: MainAxisAlignment.end,
-      actionsPadding:const EdgeInsets.only(bottom: 24, right: 12),
+      actionsPadding: const EdgeInsets.only(bottom: 24, right: 12),
       title: const Center(
         child: Text(
           "Đổi mật khẩu",
@@ -94,8 +116,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 padding: const EdgeInsets.all(12.0),
                 child: usernameIcon,
               ),
-              label:const  Text("Tài khoản "),
-              
+              label: const Text("Tài khoản "),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
               enabledBorder: const OutlineInputBorder(
@@ -133,18 +154,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               //outline border
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                    color: isPasswordState == IS_ERROR_STATE ? errorRedColor : 
-                            isPasswordState == IS_CORRECT_STATE
-                        ? correctGreenColor
-                        : defaultColor),
+                    color: isPasswordState == IS_ERROR_STATE
+                        ? errorRedColor
+                        : isPasswordState == IS_CORRECT_STATE
+                            ? correctGreenColor
+                            : defaultColor),
               ),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
 
               suffixIcon: IconButton(
-                icon: isLockedOldPassword
-                    ? hidePasswordIcon
-                    : viewPasswordIcon,
+                icon: isLockedOldPassword ? hidePasswordIcon : viewPasswordIcon,
                 onPressed: () {
                   setState(() {
                     isLockedOldPassword = !isLockedOldPassword;
@@ -153,7 +173,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               ),
             ),
             obscureText: isLockedOldPassword,
-            onEditingComplete:() => FocusScope.of(context).requestFocus(newPasswordFocus),
+            onEditingComplete: () =>
+                FocusScope.of(context).requestFocus(newPasswordFocus),
           ),
           const SizedBox(
             height: 8,
@@ -168,7 +189,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 child: createIcon,
               ),
               label: const Text("Mật khẩu mới"),
-              
+
               //outline border
               enabledBorder: const OutlineInputBorder(
                 borderSide: BorderSide(color: defaultColor),
@@ -177,9 +198,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
 
               suffixIcon: IconButton(
-                icon: isLockedNewPassword
-                    ? hidePasswordIcon
-                    : viewPasswordIcon,
+                icon: isLockedNewPassword ? hidePasswordIcon : viewPasswordIcon,
                 onPressed: () {
                   setState(() {
                     isLockedNewPassword = !isLockedNewPassword;
@@ -188,14 +207,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               ),
             ),
             obscureText: isLockedNewPassword,
-            onEditingComplete: () {},
+            onEditingComplete: () => newPasswordFocus.unfocus(),
+            onFieldSubmitted: (value) => newPasswordFocus.unfocus(),
           ),
         ],
       )),
-      
       actions: [
         InkWell(
-          onTap: () {},
+          onTap: updatePassword,
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: ShapeDecoration(

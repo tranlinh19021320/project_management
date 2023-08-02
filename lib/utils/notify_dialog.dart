@@ -15,8 +15,10 @@ class _NotifyDialogState extends State<NotifyDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       scrollable: true,
-      shadowColor: !widget.isError ? correctGreenColor : errorRedColor,
-      icon: const Icon(Icons.notification_important_sharp, color: notifyIconColor,),
+      icon: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: loudspeakerIcon,
+      ),
             // backgroundColor: backgroundWhiteColor,
       actionsAlignment: MainAxisAlignment.center,
       actionsPadding: const EdgeInsets.only(bottom: 12),
