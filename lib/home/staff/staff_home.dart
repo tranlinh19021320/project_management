@@ -13,10 +13,10 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("prpject"),
+        title: const Text("project"),
       ),
       
-      body: Center(child: Text('...')),
+      body: const Center(child: Text('...')),
     );
   }
 }

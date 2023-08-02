@@ -142,7 +142,7 @@ class _SignupState extends State<Signup> {
       child: Scaffold(
           backgroundColor: Colors.transparent,
           body: Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(28.0),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -162,7 +162,7 @@ class _SignupState extends State<Signup> {
                           ? "Email đã đăng ký!"
                           : isEmailState == IS_ERROR_FORMAT_STATE
                               ? "Lỗi định dạng Email!"
-                              : "",
+                              : null,
                       helperStyle:
                           const TextStyle(color: errorRedColor, fontSize: 14),
 
@@ -205,7 +205,7 @@ class _SignupState extends State<Signup> {
                       // notify if username is error
                       helperText: isAccountState == IS_ERROR_STATE
                           ? "Tài khoản đã đăng ký!"
-                          : "",
+                          : null,
                       helperStyle:
                           const TextStyle(color: errorRedColor, fontSize: 14),
                       // outline boder
@@ -246,7 +246,7 @@ class _SignupState extends State<Signup> {
                       //notify if password is empty
                       helperText: isPasswordState == IS_ERROR_STATE
                           ? "Vui lòng nhập mật khẩu!"
-                          : "",
+                          : null,
                       helperStyle:
                           const TextStyle(color: errorRedColor, fontSize: 14),
                       //outline border

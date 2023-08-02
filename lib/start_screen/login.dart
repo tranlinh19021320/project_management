@@ -150,148 +150,150 @@ class _LoginState extends State<Login> {
       child: Scaffold(
           backgroundColor: Colors.transparent,
           body: Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.all(28.0),
             child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // account text field
-                  TextFormField(
-                    controller: accountController,
-                    focusNode: accountFocus,
-                    decoration: InputDecoration(
-                      labelText: "Tài khoản hoặc Email",
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: usernameIcon,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // account text field
+                    TextFormField(
+                      controller: accountController,
+                      focusNode: accountFocus,
+                      decoration: InputDecoration(
+                        labelText: "Tài khoản hoặc Email",
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: usernameIcon,
+                        ),
+              
+                        // notify if error email
+                        helperText: isAccountState == IS_ERROR_STATE
+                            ? "Không tìm thấy tài khoản!"
+                            : null,
+                        helperStyle:
+                            const TextStyle(color: errorRedColor, fontSize: 14),
+              
+                        // outline boder
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: isAccountState == IS_CORRECT_STATE
+                                  ? correctGreenColor
+                                  : isAccountState == IS_ERROR_STATE
+                                      ? errorRedColor
+                                      : defaultColor),
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6)),
+              
+                        suffixIcon: isAccountState == IS_DEFAULT_STATE
+                            ? null
+                            : isAccountState == IS_CORRECT_STATE
+                                ? correctIcon
+                                : errorIcon,
                       ),
-
-                      // notify if error email
-                      helperText: isAccountState == IS_ERROR_STATE
-                          ? "Không tìm thấy tài khoản!"
-                          : "",
-                      helperStyle:
-                          const TextStyle(color: errorRedColor, fontSize: 14),
-
-                      // outline boder
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: isAccountState == IS_CORRECT_STATE
-                                ? correctGreenColor
-                                : isAccountState == IS_ERROR_STATE
-                                    ? errorRedColor
-                                    : defaultColor),
-                      ),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6)),
-
-                      suffixIcon: isAccountState == IS_DEFAULT_STATE
-                          ? null
-                          : isAccountState == IS_CORRECT_STATE
-                              ? correctIcon
-                              : errorIcon,
+                      autofocus: true,
+                      onEditingComplete: () =>
+                          FocusScope.of(context).requestFocus(passwordFocus),
                     ),
-                    autofocus: true,
-                    onEditingComplete: () =>
-                        FocusScope.of(context).requestFocus(passwordFocus),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-
-                  // password text field
-                  TextFormField(
-                    controller: passwordController,
-                    focusNode: passwordFocus,
-                    decoration: InputDecoration(
-                      labelText: "Mật khẩu",
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: passwordIcon,
-                      ),
-                      // notify if password is error
-                      helperText: isPasswordState == IS_ERROR_STATE
-                          ? "Sai mật khẩu!"
-                          : isPasswordState == IS_ERROR_FORMAT_STATE
-                              ? "Vui lòng nhập mật khẩu"
-                              : '',
-                      helperStyle:
-                          const TextStyle(color: errorRedColor, fontSize: 14),
-
-                      //outline border
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: isPasswordState == IS_ERROR_STATE ||
-                                    isPasswordState == IS_ERROR_FORMAT_STATE
-                                ? errorRedColor
-                                : defaultColor),
-                      ),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6)),
-
-                      suffixIcon: IconButton(
-                        icon: isLockedPassword
-                            ? viewPasswordIcon
-                            : hidePasswordIcon,
-                        onPressed: () {
-                          setState(() {
-                            isLockedPassword = !isLockedPassword;
-                          });
-                        },
-                      ),
+                    const SizedBox(
+                      height: 12,
                     ),
-                    obscureText: isLockedPassword,
-                    onEditingComplete: () => logIn(),
-                  ),
-                  const SizedBox(
-                    height: 16,
-                  ),
-
-                  // login button
-                  InkWell(
-                    onTap: logIn,
-                    child: Container(
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: ShapeDecoration(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                        color: buttonGreenColor,
+              
+                    // password text field
+                    TextFormField(
+                      controller: passwordController,
+                      focusNode: passwordFocus,
+                      decoration: InputDecoration(
+                        labelText: "Mật khẩu",
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: passwordIcon,
+                        ),
+                        // notify if password is error
+                        helperText: isPasswordState == IS_ERROR_STATE
+                            ? "Sai mật khẩu!"
+                            : isPasswordState == IS_ERROR_FORMAT_STATE
+                                ? "Vui lòng nhập mật khẩu"
+                                : null,
+                        helperStyle:
+                            const TextStyle(color: errorRedColor, fontSize: 14),
+              
+                        //outline border
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: isPasswordState == IS_ERROR_STATE ||
+                                      isPasswordState == IS_ERROR_FORMAT_STATE
+                                  ? errorRedColor
+                                  : defaultColor),
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(6)),
+              
+                        suffixIcon: IconButton(
+                          icon: isLockedPassword
+                              ? hidePasswordIcon
+                              : viewPasswordIcon,
+                          onPressed: () {
+                            setState(() {
+                              isLockedPassword = !isLockedPassword;
+                            });
+                          },
+                        ),
                       ),
-                      child: isLoading
-                          ? const Center(
-                              child: CircularProgressIndicator(
-                                color: correctGreenColor,
+                      obscureText: isLockedPassword,
+                      onEditingComplete: () => logIn(),
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+              
+                    // login button
+                    InkWell(
+                      onTap: logIn,
+                      child: Container(
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: ShapeDecoration(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          color: buttonGreenColor,
+                        ),
+                        child: isLoading
+                            ? const Center(
+                                child: CircularProgressIndicator(
+                                  color: correctGreenColor,
+                                ),
+                              )
+                            : const Text(
+                                "Đăng nhập",
+                                style: TextStyle(fontSize: 18),
                               ),
-                            )
-                          : const Text(
-                              "Đăng nhập",
-                              style: TextStyle(fontSize: 18),
-                            ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-
-                  const Text(
-                    "hoặc",
-                    style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-
-                  // navigator to sign up
-                  InkWell(
-                    onTap: navigateToSignup,
-                    child: const Text(
-                      "Đăng ký như người quản lý",
-                      style: TextStyle(color: textLightBlueColor, fontSize: 20),
+                    const SizedBox(
+                      height: 12,
                     ),
-                  )
-                ],
+              
+                    const Text(
+                      "hoặc",
+                      style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                    ),
+                    const SizedBox(
+                      height: 12,
+                    ),
+              
+                    // navigator to sign up
+                    InkWell(
+                      onTap: navigateToSignup,
+                      child: const Text(
+                        "Đăng ký như người quản lý",
+                        style: TextStyle(color: textLightBlueColor, fontSize: 20),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           )),

@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../utils/utils.dart';
 import 'drawer_bar.dart';
-
-class EventScreen extends StatefulWidget {
-  const EventScreen({super.key});
+class NotifyScreen extends StatefulWidget {
+  const NotifyScreen({
+    super.key,
+  });
 
   @override
-  State<EventScreen> createState() => _EventScreenState();
+  State<NotifyScreen> createState() => _NotifyScreenState();
 }
 
-class _EventScreenState extends State<EventScreen> {
+class _NotifyScreenState extends State<NotifyScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -21,7 +22,7 @@ class _EventScreenState extends State<EventScreen> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: darkblueAppbarColor,
-          title: const Text("Sự kiện"),
+          title: const Text("Thông báo"),
           actions: [
             Padding(
               padding: const EdgeInsets.all(12.0),
@@ -29,7 +30,7 @@ class _EventScreenState extends State<EventScreen> {
             )
           ],
         ),
-        drawer: const DrawerMenu(selectedPage: IS_EVENT_PAGE),
+        drawer: const DrawerMenu(selectedPage: IS_NOTIFY_PAGE),
         body: const Text("..."),
       ),
     );
