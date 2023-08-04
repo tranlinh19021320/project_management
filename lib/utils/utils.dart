@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../provider/user_provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:project_management/utils/notify_dialog.dart';
 
 // images path
 String backgroundImage = "assets/images/background_image.jpg";
+String defaultProfileImage = "assets/images/default-profile.jpg";
 // asset icon
 Image emailIcon = Image.asset(
   "assets/icons/gmail.png",
@@ -24,7 +24,7 @@ Image usernameIcon = Image.asset(
   height: 20,
   fit: BoxFit.fill,
 );
-Image roleIcon = Image.asset(
+Image groupIcon = Image.asset(
   "assets/icons/teamwork.png",
   width: 20,
   height: 20,
@@ -86,8 +86,20 @@ Image eventIcon = Image.asset(
   height: 30,
   fit: BoxFit.fill,
 );
-Image rightArrorIcon = Image.asset(
+Image rightArrowIcon = Image.asset(
   "assets/icons/right-arrow.png",
+  width: 30,
+  height: 30,
+  fit: BoxFit.fill,
+);
+Image leftArrowIcon = Image.asset(
+  "assets/icons/left-arrow.png",
+  width: 30,
+  height: 30,
+  fit: BoxFit.fill,
+);
+Image rightArrowPageIcon = Image.asset(
+  "assets/icons/right-arrow-page.png",
   width: 30,
   height: 30,
   fit: BoxFit.fill,
@@ -96,6 +108,16 @@ Image loudspeakerIcon = Image.asset(
   "assets/icons/loudspeaker.png",
   width: 36,
   height: 36,
+);
+Image addIcon = Image.asset(
+  "assets/icons/creaete-staff.png",
+  width: 36,
+  height: 36,
+);
+Image addImageIcon = Image.asset(
+  "assets/icons/add_image.png",
+  width: 28,
+  height: 28,
 );
 
 const Icon correctIcon = Icon(
@@ -119,7 +141,7 @@ Widget notifyIcon(int notificationsNumber) {
               width: 30,
               height: 30,
               alignment: Alignment.bottomRight,
-                margin: const EdgeInsets.only(bottom: 3),
+              margin: const EdgeInsets.only(bottom: 3),
               child: Container(
                 width: 15,
                 height: 15,
@@ -168,6 +190,7 @@ Color darkblueAppbarColor = Colors.blue.shade800;
 const Color blueDrawerColor = Color.fromARGB(255, 33, 108, 169);
 const Color notifyIconColor = Color.fromARGB(255, 247, 229, 70);
 
+String manager = "Manager";
 //funtions
 
 //funtion to show snack bar for events
@@ -211,7 +234,19 @@ bool isValidEmail(String email) {
       .hasMatch(email);
 }
 
-// reset state provider
-initStateProvider(BuildContext context, String userId) async {
-  context.read<UserProvider>().getUserById(userId);
+// pick image
+pickImage(BuildContext context, ImageSource source) async {
+  final ImagePicker imagePicker = ImagePicker();
+
+  XFile? file = await imagePicker.pickImage(source: source);
+
+  if (file != null) {
+    return await file.readAsBytes();
+  }
+  if (context.mounted) {
+    showDialog(
+        context: context,
+        builder: (_) =>
+            const NotifyDialog(content: "Không chọn ảnh", isError: true));
+  }
 }

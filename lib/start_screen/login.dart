@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/home_screen.dart';
-import 'package:project_management/model/user.dart';
-import 'package:project_management/start_screen/signup.dart';
+import 'package:project_management/start_screen/add_company.dart';
 import 'package:project_management/utils/utils.dart';
 
 class Login extends StatefulWidget {
@@ -84,17 +83,12 @@ class _LoginState extends State<Login> {
         if (context.mounted) {
           // log in completely
           if (res == "success") {
-            CurrentUser currentUser =
-            await FirebaseMethods().getCurrentUserByUserId(userId);
             if (context.mounted) {
             showSnackBar(context, "Đăng nhập thành công!", false);
-            setState(() {
-              initStateProvider(context, userId);
-            });
             
             Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => HomeScreen(
-                      isManager: currentUser.isManager,
+                      userId: userId,
                     )));
             }
           }
@@ -137,7 +131,7 @@ class _LoginState extends State<Login> {
 
   navigateToSignup() {
     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const Signup()));
+        MaterialPageRoute(builder: (context) => const AddCompany()));
   }
 
   @override

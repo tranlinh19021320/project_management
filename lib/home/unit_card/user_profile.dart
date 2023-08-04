@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:project_management/home/unit_card/reset_password.dart';
 import 'package:project_management/utils/notify_dialog.dart';
@@ -19,7 +20,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController detailNameController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
-  TextEditingController roleController = TextEditingController();
+  TextEditingController groupController = TextEditingController();
 
   late FocusNode emailFocus;
   late FocusNode detailNameFocus;
@@ -32,10 +33,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    emailController.text = context.read<UserProvider>().getEmail();
-    detailNameController.text = context.read<UserProvider>().getDetailName();
-    usernameController.text = context.read<UserProvider>().getUsername();
-    roleController.text = context.read<UserProvider>().getRole();
+    UserProvider user = Provider.of<UserProvider>(context, listen: false);
+    emailController.text = user.getCurrentUser.email;
+    detailNameController.text = user.getCurrentUser.nameDetails;
+    usernameController.text = user.getCurrentUser.username;
+    groupController.text = user.getCurrentUser.group;
 
     emailFocus = FocusNode();
     emailFocus.addListener(() async {
@@ -86,20 +88,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     emailController.dispose();
     detailNameController.dispose();
     usernameController.dispose();
-    roleController.dispose();
+    groupController.dispose();
 
     emailFocus.dispose();
     detailNameFocus.dispose();
   }
 
   isChangedEmail() {
-    return (emailController.text != context.read<UserProvider>().getEmail());
+    UserProvider user = Provider.of<UserProvider>(context, listen: false);
+    return (emailController.text != user.getCurrentUser.email);
   }
 
   isUpdate() {
+    UserProvider user = Provider.of<UserProvider>(context, listen: false);
     return (isChangedEmail() ||
-        detailNameController.text !=
-            context.read<UserProvider>().getDetailName());
+        detailNameController.text != user.getCurrentUser.nameDetails);
   }
 
   updateProfile() async {
@@ -138,8 +141,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: emailIcon,
                   ),
                   prefixText: "Email: ",
-                  border:
-                      OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(6)),
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                           color: isEmailState == IS_ERROR_STATE ||
@@ -239,13 +242,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(
               height: 12,
             ),
-            //role text
+            //group text
             TextField(
-              controller: roleController,
+              controller: groupController,
               decoration: InputDecoration(
                 prefixIcon: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: roleIcon,
+                  child: groupIcon,
                 ),
                 prefixText: "Nhóm: ",
                 border:
@@ -305,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-      
+
             //
           ],
         ),

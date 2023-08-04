@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_management/home/unit_card/create_staff.dart';
 
 import '../../utils/utils.dart';
 import 'drawer_bar.dart';
@@ -53,58 +54,76 @@ class _PersonalScreenState extends State<PersonalScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      controller: searchController,
-                      focusNode: searchFocus,
-                      decoration: InputDecoration(
-                        prefixIcon: const Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: Icon(Icons.search),
+                    
+                    child: SizedBox(
+                      height: 48,
+                      child: TextField(
+                        controller: searchController,
+                        focusNode: searchFocus,
+                        decoration: InputDecoration(
+                          prefixIcon: const Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: Icon(Icons.search),
+                          ),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6)),
+                          enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: defaultColor)),
                         ),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(6)),
-                        enabledBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: defaultColor)),
+                        onEditingComplete: () => searchFocus.unfocus(),
                       ),
-                      onEditingComplete: () => searchFocus.unfocus(),
                     ),
                   ),
                   const SizedBox(
                     width: 12,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  SizedBox(
+                    height: 48,
                     child: Stack(
                       children: [
-                        const Text("Nhóm:"),
-                        const SizedBox(
-                          height: 4,
+                        const Text(
+                          "Nhóm:",
+                          style:
+                              TextStyle(fontSize: 16),
                         ),
-                        DropdownButton(
-                          dropdownColor: Colors.transparent,
-                          hint: const Text("Nhóm"),
-                          value: roleSelect,
-                          style: TextStyle(fontSize: 12),
-                          underline: Container(
-                            height: 1,
-                            color: backgroundWhiteColor,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: DropdownButton(
+                            
+                            alignment: Alignment.center,
+                            value: roleSelect,
+                            style: const TextStyle(
+                              fontSize: 13,
+                            ),
+                            underline: Container(
+                              height: 1,
+                              color: backgroundWhiteColor,
+                            ),
+                            items: <String>[
+                              'Tất cả',
+                              'manager',
+                              'devs',
+                              'tester',
+                              '1',
+                              '2'
+                            ].map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: TextStyle(
+                                      color: (value == roleSelect)
+                                          ? focusBlueColor
+                                          : backgroundWhiteColor),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              setState(() {
+                                roleSelect = val!;
+                              });
+                            },
                           ),
-                          borderRadius: BorderRadius.circular(4),
-                          items: <String>['manager', 'devs', 'tester', '1', '2']
-                              .map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  height: 24,
-                                  child: Text(value)),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            setState(() {
-                              roleSelect = val!;
-                            });
-                          },
                         ),
                       ],
                     ),
@@ -112,9 +131,11 @@ class _PersonalScreenState extends State<PersonalScreen> {
                   Padding(
                     padding: const EdgeInsets.only(left: 2),
                     child: IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.add),
-                      highlightColor: correctGreenColor,
+                      onPressed: () {
+                        showDialog(context: context, builder: (_) => const  CreateStaff());
+                      },
+                      icon: addIcon,
+                      highlightColor: focusBlueColor,
                     ),
                   )
                 ],

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/model/user.dart';
@@ -24,31 +26,27 @@ class UserProvider extends ChangeNotifier {
     return res;
   }
 
-  String getEmail() {
-    return _user!.email;
+  Future<String> changePassword(String oldPassword, String newPassword)async {
+    String userId = _user!.userId;
+
+    String res = await _firebaseMethods.changePassword(userId, oldPassword, newPassword);
+
+    if (res == "success") {
+      getUserById(userId);
+    }
+
+    return res;
   }
 
-  String getDetailName() {
-    return _user!.nameDetails;
-  }
+  Future<String> changeImage(Uint8List image) async {
 
-  String getUserId() {
-    return _user!.userId;
-  }
+    String res = await _firebaseMethods.changeProfileImage(image, _user!.username, _user!.userId);
 
-  String getUsername() {
-    return _user!.username;
-  }
+    if (res == "success") {
+      getUserById(_user!.userId);
+    }
 
-  String getRole() {
-    return _user!.role;
+    return res;
   }
-
-  bool getIsManager() {
-    return _user!.isManager;
-  }
-
-  String getPassword() {
-    return _user!.password;
-  }
+  
 }

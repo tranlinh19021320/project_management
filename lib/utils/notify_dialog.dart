@@ -19,13 +19,21 @@ class _NotifyDialogState extends State<NotifyDialog> {
         padding: const EdgeInsets.all(8.0),
         child: loudspeakerIcon,
       ),
-            // backgroundColor: backgroundWhiteColor,
+      // backgroundColor: backgroundWhiteColor,
       actionsAlignment: MainAxisAlignment.center,
       actionsPadding: const EdgeInsets.only(bottom: 12),
       title: Center(
-        child: Text(widget.content, style: TextStyle(fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.bold,
-                color: widget.isError ? errorRedColor : correctGreenColor),),
+        child: (widget.content == 'loading')
+            ? const CircularProgressIndicator(
+                strokeWidth: 6,
+              )
+            : Text(
+                widget.content,
+                style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                    color: widget.isError ? errorRedColor : correctGreenColor),
+              ),
       ),
       actions: [
         InkWell(
@@ -41,12 +49,11 @@ class _NotifyDialogState extends State<NotifyDialog> {
             height: 36,
             child: const Center(
                 child: Text(
-              "Ok", 
+              "Ok",
             )),
           ),
         ),
       ],
-      
     );
   }
 }

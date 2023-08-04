@@ -26,10 +26,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool isLockedOldPassword = true;
   bool isLockedNewPassword = true;
 
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
-    usernameController.text = context.read<UserProvider>().getUsername();
+    UserProvider user = Provider.of<UserProvider>(context, listen: false);
+    usernameController.text = user.getCurrentUser.username;
 
     oldPasswordFocus = FocusNode();
     oldPasswordFocus.addListener(() {
@@ -66,25 +69,30 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   isCorrectPassword() {
-    return (oldPasswordController.text ==
-        context.read<UserProvider>().getPassword());
+    UserProvider user = Provider.of<UserProvider>(context, listen: false);
+    return (oldPasswordController.text == user.getCurrentUser.password);
   }
 
   updatePassword() async {
-    String res = await FirebaseMethods().changePassword(
-        context.read<UserProvider>().getUserId(),oldPasswordController.text,
-        newPasswordController.text);
-
+    showDialog(context: context, builder: (_) =>
+    const NotifyDialog(content: 'loading', isError: false));
+    String res = await context
+        .read<UserProvider>()
+        .changePassword(oldPasswordController.text, newPasswordController.text);
+    // Navigator.pop(context);    
     if (res == "success") {
       if (context.mounted) {
-      Navigator.pop(context);
-      showDialog(context: context, builder: (_) =>const  NotifyDialog(content: "Đổi mật khẩu thành công!", isError: false));
-      context.read<UserProvider>().getUserById(context.read<UserProvider>().getUserId());
+        Navigator.pop(context);
+        showDialog(
+            context: context,
+            builder: (_) => const NotifyDialog(
+                content: "Đổi mật khẩu thành công!", isError: false));
       }
-
     } else {
       if (context.mounted) {
-        showDialog(context: context, builder: (_) => NotifyDialog(content: res, isError: true));
+        showDialog(
+            context: context,
+            builder: (_) => NotifyDialog(content: res, isError: true));
       }
     }
   }

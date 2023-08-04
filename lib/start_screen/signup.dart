@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/home_screen.dart';
+import 'package:project_management/start_screen/add_company.dart';
 import 'package:project_management/start_screen/login.dart';
-import '../model/user.dart';
+import 'package:uuid/uuid.dart';
 import '../utils/utils.dart';
 
 class Signup extends StatefulWidget {
-  const Signup({super.key});
+  final String companyName;
+  const Signup({super.key, required this.companyName});
 
   @override
   State<Signup> createState() => _SignupState();
@@ -91,15 +93,18 @@ class _SignupState extends State<Signup> {
         setState(() {
           isLoading = true;
         });
-        String res = await FirebaseMethods().createUser(
+        String companyId = const Uuid().v1();
+        String res1 = await FirebaseMethods().createCompany(widget.companyName, companyId);
+        String res2 = await FirebaseMethods().createUser(
             email: emailController.text,
             username: accountController.text,
             password: passwordController.text,
-            isManager: true,
             nameDetails: accountController.text,
-            role: "manager",
-            managerId: '', // managerId is equaq to userId
-            managerEmail: emailController.text);
+            photoURL: '',
+            group: manager,
+            companyId: companyId,
+            companyName: widget.companyName,
+            );
         String userId = await FirebaseMethods()
             .getUserIdFromAccount(accountController.text);
 
@@ -107,27 +112,29 @@ class _SignupState extends State<Signup> {
           isLoading = false;
         });
 
-        if (res == "success") {
-          CurrentUser currentUser =
-              await FirebaseMethods().getCurrentUserByUserId(userId);
+        if (res1 == "success" && res2 == 'success') {
           if (context.mounted) {
             showSnackBar(context, "Đăng ký thành công!", false);
-            initStateProvider(context, userId);
+            
             Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => HomeScreen(
-                      isManager: currentUser.isManager,
+                      userId: userId,
                     )));
           }
         } else {
           if (context.mounted) {
-            showSnackBar(context, res, true);
+            showSnackBar(context, res1, true);
+            showSnackBar(context, res2, true);
           }
         }
       }
     }
   }
-
-  navigatrToLogin() {
+  navigateToAddCompany() {
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const AddCompany()));
+  }
+  navigateToLogin() {
     Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const Login()));
   }
@@ -323,7 +330,7 @@ class _SignupState extends State<Signup> {
                         style: TextStyle(fontSize: 19),
                       ),
                       InkWell(
-                        onTap: navigatrToLogin,
+                        onTap: navigateToLogin,
                         child: const Text(
                           "Đăng nhập",
                           style: TextStyle(
@@ -335,7 +342,10 @@ class _SignupState extends State<Signup> {
                 ],
               ),
             ),
-          )),
+          ),
+          floatingActionButton: IconButton(onPressed: navigateToAddCompany, icon: leftArrowIcon, highlightColor: correctGreenColor,),
+          floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+          ),
     );
   }
 }

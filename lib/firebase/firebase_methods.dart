@@ -1,5 +1,10 @@
+
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
+import 'package:project_management/firebase/storage_method.dart';
 import 'package:project_management/utils/utils.dart';
 import 'package:uuid/uuid.dart';
 import 'package:project_management/model/user.dart';
@@ -8,36 +13,59 @@ class FirebaseMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  //create a new company
+  Future<String> createCompany(String companyName, String companyId) async {
+    String res ="";
+    try {
+      await _firestore.collection("companies").doc(companyId).set({
+        'companyId' : companyId, 'companyName' : companyName, 'group' : [manager,]
+      });
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+    return res;
+  }
   // create a new user
   Future<String> createUser(
       {required String email,
       required String username,
       required String password,
-      required bool isManager,
       required String nameDetails,
-      required String role,
-      required String managerId,
-      required String managerEmail}) async {
+      required String photoURL,
+      required String group,
+      required String companyId,
+      required String companyName}) async {
+ 
     String res = "error";
     String userId = const Uuid().v1();
+    String url;
     try {
+      
+
       if (email != '') {
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
         userId = cred.user!.uid;
-        managerId = userId;
       }
+      if (photoURL == "") {
+      ByteData dataImage = await rootBundle.load(defaultProfileImage);
+      Uint8List image = dataImage.buffer.asUint8List();
+      url = await StorageMethods().uploadImageToStorage('profile', username, image);
+    } else {
+      url = photoURL;
+    }
 
       CurrentUser user = CurrentUser(
           email: email,
           username: username,
           password: password,
-          isManager: isManager,
           nameDetails: nameDetails,
-          role: role,
+          group: group,
+          photoURL: url,
           userId: userId,
-          managerId: managerId,
-          managerEmail: managerEmail);
+          companyId: companyId,
+          companyName: companyName);
 
       await _firestore.collection('users').doc(userId).set(user.toJson());
       res = "success";
@@ -71,18 +99,19 @@ class FirebaseMethods {
     await _auth.signOut();
   }
 
+  // get user
   Future<CurrentUser> getCurrentUserByUserId(String userId) async {
     var snap = await _firestore.collection("users").doc(userId).get();
     return CurrentUser(
         email: (snap.data()!)['email'],
         username: (snap.data()!)['username'],
         password: (snap.data()!)['password'],
-        isManager: (snap.data()!)['isManager'],
         nameDetails: (snap.data()!)['nameDetails'],
-        role: (snap.data()!)['role'],
+        photoURL: (snap.data()!)['photoURL'],
+        group: (snap.data()!)['group'],
         userId: (snap.data()!)['userId'],
-        managerId: (snap.data()!)['managerId'],
-        managerEmail: (snap.data()!)['managerEmail']);
+        companyId: (snap.data()!)['companyId'],
+        companyName: (snap.data()!)['companyName']);
   }
 
   //update user profile
@@ -129,10 +158,31 @@ class FirebaseMethods {
     return userId;
   }
 
+  //delete user use userId
   deleteUser(String userId) {
     _firestore.collection("users").doc(userId).delete();
   }
 
+  //check state of company
+  Future<int> isAlreadyCompany( String companyName) async {
+    int state = IS_DEFAULT_STATE;
+    try {
+      var snap = await _firestore.collection("companies").where('companyName', isEqualTo: companyName).get();
+
+      if (snap.size == 0) {
+        state = IS_CORRECT_STATE;
+      } else {
+        state = IS_ERROR_STATE;
+      }
+
+      if (companyName == '') {
+        state = IS_DEFAULT_STATE;
+      }
+    } catch(e) {
+      print(e.toString());
+    }
+    return state;
+  } 
   // check state of email text field
   Future<int> checkAlreadyEmail(String email) async {
     int state = IS_DEFAULT_STATE;
@@ -174,21 +224,24 @@ class FirebaseMethods {
     return state;
   }
 
-  Future<String> changePassword(String userId, String oldpassword, String newpassword) async {
+  //change password 
+  Future<String> changePassword(
+      String userId, String oldpassword, String newpassword) async {
     String res = "error";
     try {
       CurrentUser user = await getCurrentUserByUserId(userId);
-      
+
       await _firestore
           .collection("users")
           .doc(userId)
           .update({'password': newpassword});
-          
+
       if (user.email != '') {
-        final cred = EmailAuthProvider.credential(email: user.email, password: oldpassword);
+        final cred = EmailAuthProvider.credential(
+            email: user.email, password: oldpassword);
         _auth.currentUser!.reauthenticateWithCredential(cred).then((value) {
           _auth.currentUser!.updatePassword(newpassword).then((value) {
-            res ="success";
+            res = "success";
           }).catchError((onError) {
             res = onError.toString();
           });
@@ -203,18 +256,39 @@ class FirebaseMethods {
     return res;
   }
 
+  //update email if email is empty
   updateEmail(String userId, String email) async {
     CurrentUser user = await getCurrentUserByUserId(userId);
     createUser(
         email: email,
         username: user.username,
         password: user.password,
-        isManager: user.isManager,
         nameDetails: user.nameDetails,
-        role: user.role,
-        managerId: user.managerId,
-        managerEmail: user.managerEmail);
+        photoURL: user.photoURL,
+        group: user.group,
+        companyId: user.companyId,
+        companyName: user.companyName);
 
     deleteUser(userId);
   }
+
+  changeProfileImage(Uint8List image, String username, String userId) async {
+    String res = '';
+    try {
+    String photoURL = await StorageMethods().uploadImageToStorage('profile', username, image);
+    await _firestore.collection('users').doc(userId).update({
+      'photoURL' : photoURL,
+    });
+
+    res = "success";
+    } catch(e) {
+      res = e.toString();
+    }
+
+    return res;
+
+
+  }
+
+  
 }
