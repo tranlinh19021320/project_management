@@ -111,8 +111,8 @@ class _SignupState extends State<Signup> {
         setState(() {
           isLoading = false;
         });
-
-        if (res1 == "success" && res2 == 'success') {
+        String res3 = await FirebaseMethods().loginWithUserId(userId: userId, password: passwordController.text);
+        if (res1 == "success" && res2 == 'success' && res3 == 'sucess') {
           if (context.mounted) {
             showSnackBar(context, "Đăng ký thành công!", false);
             

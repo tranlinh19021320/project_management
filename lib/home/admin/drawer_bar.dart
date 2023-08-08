@@ -1,8 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:project_management/firebase/storage_method.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/home/admin/event_screen.dart';
 import 'package:project_management/home/admin/personal_screen.dart';
 import 'package:project_management/home/admin/projects_screen.dart';
@@ -26,6 +27,7 @@ class DrawerMenu extends StatefulWidget {
 
 class _DrawerMenuState extends State<DrawerMenu> {
   bool isOpenProfile = false;
+  bool isLoadingImage = false;
 
   signOut() {
     FirebaseMethods().signOut();
@@ -34,56 +36,62 @@ class _DrawerMenuState extends State<DrawerMenu> {
   }
 
   selectImage() async {
-    showDialog(context: context, builder: (_) => SimpleDialog(
-      backgroundColor: darkblueAppbarColor,
-      title: const Text("Chọn ảnh"),
-      surfaceTintColor: correctGreenColor,
-      children: [
-        SimpleDialogOption(
-          padding: const  EdgeInsets.all(18),
-          child:const Text("Camera"),
-          onPressed: () async {
-            Navigator.pop(context);
-            Uint8List imageFile = await pickImage(context,ImageSource.camera);
+    showDialog(
+        context: context,
+        builder: (_) => SimpleDialog(
+              backgroundColor: darkblueAppbarColor,
+              title: const Text("Chọn ảnh"),
+              surfaceTintColor: correctGreenColor,
+              children: [
+                SimpleDialogOption(
+                  padding: const EdgeInsets.all(18),
+                  child: const Text("Camera"),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    setState(() {
+                      isLoadingImage = true;
+                    });
+                    Uint8List imageFile =
+                        await pickImage(context, ImageSource.camera);
 
-            changeProfileImage(imageFile);
-            setState(() {
-              
-            });
-          },
-        ),
-        SimpleDialogOption(
-          padding: const  EdgeInsets.all(18),
-          child:const Text("Thư viện ảnh"),
-          onPressed: () async {
-            Navigator.pop(context);
-            Uint8List imageFile = await pickImage(context,ImageSource.gallery);
-            changeProfileImage(imageFile);
-            setState(() {
-            });
-          },
-        ),
-        SimpleDialogOption(
-          padding: const  EdgeInsets.all(18),
-          child:const Text("Hủy", style:  TextStyle(color: errorRedColor),),
-          onPressed: () async {
-            Navigator.pop(context);
-           
-          },
-        ),
-      ],
-    ));
+                    changeProfileImage(imageFile);
+                    setState(() {
+                      isLoadingImage = false;
+                    });
+                  },
+                ),
+                SimpleDialogOption(
+                  padding: const EdgeInsets.all(18),
+                  child: const Text("Thư viện ảnh"),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    setState(() {
+                      isLoadingImage = true;
+                    });
+                    Uint8List imageFile =
+                        await pickImage(context, ImageSource.gallery);
+                    changeProfileImage(imageFile);
+                    setState(() {
+                      isLoadingImage = false;
+                    });
+                  },
+                ),
+                SimpleDialogOption(
+                  padding: const EdgeInsets.all(18),
+                  child: const Text(
+                    "Hủy",
+                    style: TextStyle(color: errorRedColor),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ));
   }
 
-  changeProfileImage(Uint8List image) async{
-    try {
-   context.read<UserProvider>().changeImage(image);
-    setState(() {
-      
-    });
-    } catch(e) {
-      showDialog(context: context, builder: (_) =>const  NotifyDialog(content: "lỗi", isError: false));
-    }
+  changeProfileImage(Uint8List image) {
+      context.read<UserProvider>().changeImage(image);
   }
 
   @override
@@ -97,21 +105,38 @@ class _DrawerMenuState extends State<DrawerMenu> {
               children: [
                 InkWell(
                   onTap: () {
-                    (isOpenProfile) ? selectImage():null;
-
+                    (isOpenProfile) ? selectImage() : null;
                   },
-                  child:CircleAvatar(
-                    backgroundColor: backgroundWhiteColor,
-                    backgroundImage: NetworkImage(context.watch<UserProvider>().getCurrentUser.photoURL),
-                    radius: 64,
-                  ) ,
+                  child: (isLoadingImage)
+                      ? CircleAvatar(
+                          radius: 64,
+                          backgroundColor: Colors.transparent,
+                          child: LoadingAnimationWidget.discreteCircle(
+                              color: backgroundWhiteColor, size: 24),
+                        )
+                      : CircleAvatar(
+                          backgroundColor: backgroundWhiteColor,
+                          backgroundImage: NetworkImage(context
+                              .watch<UserProvider>()
+                              .getCurrentUser
+                              .photoURL),
+                          radius: 64,
+                        ),
                 ),
-                (isOpenProfile) ? Positioned(
-                  bottom: -15,
-                  left: 35,
-                  child: 
-                    IconButton(onPressed: selectImage, icon:const Icon(Icons.add_a_photo_outlined), color: backgroundWhiteColor, ),
-                ) : Container(),
+                (isOpenProfile)
+                    ? Positioned(
+                        bottom: -15,
+                        left: 35,
+                        child: IconButton(
+                          onPressed: selectImage,
+                          icon: const Icon(
+                            Icons.add_a_photo,
+                            size: 18,
+                          ),
+                          color: backgroundWhiteColor,
+                        ),
+                      )
+                    : Container(),
               ],
             ),
             accountName:

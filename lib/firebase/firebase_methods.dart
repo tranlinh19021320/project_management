@@ -1,4 +1,4 @@
-
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,10 +15,14 @@ class FirebaseMethods {
 
   //create a new company
   Future<String> createCompany(String companyName, String companyId) async {
-    String res ="";
+    String res = "";
     try {
       await _firestore.collection("companies").doc(companyId).set({
-        'companyId' : companyId, 'companyName' : companyName, 'group' : [manager,]
+        'companyId': companyId,
+        'companyName': companyName,
+        'group': [
+          manager,
+        ]
       });
       res = 'success';
     } catch (e) {
@@ -26,6 +30,7 @@ class FirebaseMethods {
     }
     return res;
   }
+
   // create a new user
   Future<String> createUser(
       {required String email,
@@ -36,25 +41,23 @@ class FirebaseMethods {
       required String group,
       required String companyId,
       required String companyName}) async {
- 
     String res = "error";
     String userId = const Uuid().v1();
     String url;
     try {
-      
-
       if (email != '') {
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
         userId = cred.user!.uid;
       }
       if (photoURL == "") {
-      ByteData dataImage = await rootBundle.load(defaultProfileImage);
-      Uint8List image = dataImage.buffer.asUint8List();
-      url = await StorageMethods().uploadImageToStorage('profile', username, image);
-    } else {
-      url = photoURL;
-    }
+        ByteData dataImage = await rootBundle.load(defaultProfileImage);
+        Uint8List image = dataImage.buffer.asUint8List();
+        url = await StorageMethods()
+            .uploadImageToStorage('profile', username, image);
+      } else {
+        url = photoURL;
+      }
 
       CurrentUser user = CurrentUser(
           email: email,
@@ -83,9 +86,10 @@ class FirebaseMethods {
     try {
       var snap = await _firestore.collection("users").doc(userId).get();
       String email = snap.data()!['email'];
-      if (email == "") await _auth.signInAnonymously();
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-
+      if (email != "") {
+        await _auth.signInWithEmailAndPassword(
+            email: email, password: password);
+      }
       res = "success";
     } catch (e) {
       res = e.toString();
@@ -164,10 +168,13 @@ class FirebaseMethods {
   }
 
   //check state of company
-  Future<int> isAlreadyCompany( String companyName) async {
+  Future<int> isAlreadyCompany(String companyName) async {
     int state = IS_DEFAULT_STATE;
     try {
-      var snap = await _firestore.collection("companies").where('companyName', isEqualTo: companyName).get();
+      var snap = await _firestore
+          .collection("companies")
+          .where('companyName', isEqualTo: companyName)
+          .get();
 
       if (snap.size == 0) {
         state = IS_CORRECT_STATE;
@@ -178,11 +185,12 @@ class FirebaseMethods {
       if (companyName == '') {
         state = IS_DEFAULT_STATE;
       }
-    } catch(e) {
+    } catch (e) {
       print(e.toString());
     }
     return state;
-  } 
+  }
+
   // check state of email text field
   Future<int> checkAlreadyEmail(String email) async {
     int state = IS_DEFAULT_STATE;
@@ -224,7 +232,7 @@ class FirebaseMethods {
     return state;
   }
 
-  //change password 
+  //change password
   Future<String> changePassword(
       String userId, String oldpassword, String newpassword) async {
     String res = "error";
@@ -275,20 +283,45 @@ class FirebaseMethods {
   changeProfileImage(Uint8List image, String username, String userId) async {
     String res = '';
     try {
-    String photoURL = await StorageMethods().uploadImageToStorage('profile', username, image);
-    await _firestore.collection('users').doc(userId).update({
-      'photoURL' : photoURL,
-    });
+      String photoURL = await StorageMethods()
+          .uploadImageToStorage('profile', username, image);
+      await _firestore.collection('users').doc(userId).update({
+        'photoURL': photoURL,
+      });
 
-    res = "success";
-    } catch(e) {
+      res = "success";
+    } catch (e) {
       res = e.toString();
     }
 
     return res;
-
-
   }
 
-  
+  updateGroup(String companyId, String groupName) async {
+    String res = "";
+    try {
+      await _firestore.collection('companies').doc(companyId).update({
+        'group': FieldValue.arrayUnion([groupName]),
+      });
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+    return res;
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>> searchSnapshot(
+      String groupSelect) async {
+    QuerySnapshot<Map<String, dynamic>> snap;
+    if (groupSelect == 'Tất cả') {
+      snap = await _firestore.collection('users').get();
+    } else {
+      snap = await _firestore
+          .collection('users')
+          .where('group', isEqualTo: groupSelect)
+          .get();
+    }
+
+    return snap;
+  }
 }

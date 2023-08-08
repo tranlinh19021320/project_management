@@ -13,6 +13,8 @@
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/slide_bar.png" alt="Slide Bar">
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/profile.png" alt="User Profile">
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/reset_password.png" alt="Reset Password Dialog">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/search.png" alt="Search Going">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/create_staff.png" alt="Create Staff">
 </p>
 
 
