@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
-import 'package:project_management/home/admin/projects_screen.dart';
-import 'package:project_management/home/staff/staff_home.dart';
+import 'package:project_management/home/admin/screens/projects_screen.dart';
+import 'package:project_management/home/staff/screens/staff_home.dart';
 import 'package:project_management/provider/user_provider.dart';
 import 'package:project_management/utils/utils.dart';
 import 'package:provider/provider.dart';

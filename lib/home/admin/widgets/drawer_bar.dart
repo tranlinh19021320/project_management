@@ -1,21 +1,19 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:project_management/home/admin/event_screen.dart';
-import 'package:project_management/home/admin/personal_screen.dart';
-import 'package:project_management/home/admin/projects_screen.dart';
-import 'package:project_management/home/admin/notify_screen.dart';
-import 'package:project_management/utils/notify_dialog.dart';
+import 'package:project_management/home/admin/screens/event_screen.dart';
+import 'package:project_management/home/admin/screens/personal_screen.dart';
+import 'package:project_management/home/admin/screens/projects_screen.dart';
+import 'package:project_management/home/admin/screens/notify_screen.dart';
 import 'package:provider/provider.dart';
 
-import '../../firebase/firebase_methods.dart';
-import '../../provider/user_provider.dart';
-import '../../start_screen/login.dart';
-import '../../utils/utils.dart';
-import '../unit_card/user_profile.dart';
+import '../../../firebase/firebase_methods.dart';
+import '../../../provider/user_provider.dart';
+import '../../../start_screen/login.dart';
+import '../../../utils/utils.dart';
+import '../../unit_card/user_profile.dart';
 
 class DrawerMenu extends StatefulWidget {
   final int selectedPage;
@@ -187,7 +185,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             shape: RoundedRectangleBorder(
                                 side: BorderSide(color: focusBlueColor),
                                 borderRadius: BorderRadius.circular(12)),
-                            leading: staffIcon,
+                            leading: resizedIcon(staffImage, 30),
                             trailing: (widget.selectedPage == IS_PERSONAL_PAGE)
                                 ? rightArrowPageIcon
                                 : null,

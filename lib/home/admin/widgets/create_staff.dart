@@ -4,8 +4,8 @@ import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
 import 'package:provider/provider.dart';
 
-import '../../firebase/firebase_methods.dart';
-import '../../provider/user_provider.dart';
+import '../../../firebase/firebase_methods.dart';
+import '../../../provider/user_provider.dart';
 
 class CreateStaff extends StatefulWidget {
   const CreateStaff({super.key});
@@ -27,8 +27,8 @@ class _CreateStaffState extends State<CreateStaff> {
 
   bool isLockedPassword = false;
   bool isCreateGroup = false;
-  List<String> groups = ['Tất cả'];
-  String groupSelect = 'Tất cả';
+  List<String> groups = [];
+  String groupSelect = 'Manager';
   bool isLoadingGroup = false;
 
   @override
@@ -70,7 +70,6 @@ class _CreateStaffState extends State<CreateStaff> {
   getListGroup() async {
     try {
       groups.clear();
-      groups.add('Tất cả');
       UserProvider user = Provider.of<UserProvider>(context, listen: false);
       var snap = await FirebaseFirestore.instance
           .collection('companies')
@@ -132,7 +131,7 @@ class _CreateStaffState extends State<CreateStaff> {
         if (res == 'success') {
           if (context.mounted) {
           Navigator.of(context).pop();
-          Navigator.of(context).pop(groups);
+          navigatePop();
           showDialog(context: context, builder: (_) =>const  NotifyDialog(content: "Tạo thành công!", isError: false));
           }
 
@@ -143,6 +142,10 @@ class _CreateStaffState extends State<CreateStaff> {
         }
       }
     }
+  }
+  navigatePop() {
+    groups.insert(0, 'Tất cả');
+    Navigator.of(context).pop(groups);
   }
 
   @override
@@ -370,7 +373,7 @@ class _CreateStaffState extends State<CreateStaff> {
           ),
         ),
         InkWell(
-          onTap: () => Navigator.of(context).pop(groups),
+          onTap: navigatePop,
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: ShapeDecoration(

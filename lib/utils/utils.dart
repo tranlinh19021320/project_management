@@ -5,6 +5,8 @@ import 'package:project_management/utils/notify_dialog.dart';
 // images path
 String backgroundImage = "assets/images/background_image.jpg";
 String defaultProfileImage = "assets/images/default-profile.jpg";
+String keyImage = "assets/icons/key.png";
+String staffImage = "assets/icons/staff.png";
 // asset icon
 Image emailIcon = Image.asset(
   "assets/icons/gmail.png",
@@ -56,20 +58,8 @@ Image createIcon = Image.asset(
   height: 20,
   fit: BoxFit.fill,
 );
-Image keyIcon = Image.asset(
-  "assets/icons/key.png",
-  width: 20,
-  height: 20,
-  fit: BoxFit.fill,
-);
 Image projectIcon = Image.asset(
   "assets/icons/project-management.png",
-  width: 30,
-  height: 30,
-  fit: BoxFit.fill,
-);
-Image staffIcon = Image.asset(
-  "assets/icons/staff.png",
   width: 30,
   height: 30,
   fit: BoxFit.fill,
@@ -128,6 +118,10 @@ const Icon errorIcon = Icon(
   Icons.error,
   color: errorRedColor,
 );
+
+Image resizedIcon(String imagePath, double size) {
+  return Image.asset(imagePath, width: size, height: size, fit: BoxFit.fill,);
+}
 
 // Icon with having notifications
 Widget notifyIcon(int notificationsNumber) {

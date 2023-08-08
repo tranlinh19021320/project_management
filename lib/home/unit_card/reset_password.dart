@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
 import 'package:provider/provider.dart';

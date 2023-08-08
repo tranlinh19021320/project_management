@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/unit_card/create_staff.dart';
+import 'package:project_management/home/admin/widgets/create_staff.dart';
+import 'package:project_management/home/admin/widgets/staff_card.dart';
 import 'package:project_management/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../utils/utils.dart';
-import 'drawer_bar.dart';
+import '../../../utils/utils.dart';
+import '../widgets/drawer_bar.dart';
 
 class PersonalScreen extends StatefulWidget {
   const PersonalScreen({
@@ -29,12 +30,6 @@ class _PersonalScreenState extends State<PersonalScreen> {
   void initState() {
     super.initState();
     searchFocus = FocusNode();
-    searchFocus.addListener(() {
-      setState(() {
-        
-      });
-    },);
-
     getListGroup();
   }
 
@@ -205,7 +200,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
                     return const  Text("Không tìm thấy nhân viên");
                   }
                   List<DocumentSnapshot> documents = getDocuments(snapshot);
-                  return Expanded(child: ListView.builder(itemCount: documents.length,itemBuilder: (context, index) => Text(documents[index]['username'])));
+                  return Expanded(child: ListView.builder(itemCount: documents.length,itemBuilder: (context, index) => StaffCard(staff: documents[index])));
                 },
                 )
 

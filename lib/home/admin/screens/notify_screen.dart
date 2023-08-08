@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../utils/utils.dart';
-import 'drawer_bar.dart';
+import '../../../utils/utils.dart';
+import '../widgets/drawer_bar.dart';
 class NotifyScreen extends StatefulWidget {
   const NotifyScreen({
     super.key,

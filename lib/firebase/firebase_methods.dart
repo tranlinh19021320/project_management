@@ -1,5 +1,3 @@
-import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -163,9 +161,16 @@ class FirebaseMethods {
   }
 
   //delete user use userId
-  deleteUser(String userId) {
+  deleteUser(String userId, String email, String password) {
+    if (email != "") {
+      final cred = EmailAuthProvider.credential(email: email, password: password);
+      _auth.currentUser!.reauthenticateWithCredential(cred).then((value) => 
+      _auth.currentUser!.delete());
+    }
     _firestore.collection("users").doc(userId).delete();
   }
+
+  
 
   //check state of company
   Future<int> isAlreadyCompany(String companyName) async {
@@ -277,7 +282,7 @@ class FirebaseMethods {
         companyId: user.companyId,
         companyName: user.companyName);
 
-    deleteUser(userId);
+    deleteUser(userId, "", "");
   }
 
   changeProfileImage(Uint8List image, String username, String userId) async {
