@@ -26,6 +26,7 @@ class DrawerMenu extends StatefulWidget {
 class _DrawerMenuState extends State<DrawerMenu> {
   bool isOpenProfile = false;
   bool isLoadingImage = false;
+  
 
   signOut() {
     FirebaseMethods().signOut();

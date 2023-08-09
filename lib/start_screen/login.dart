@@ -77,7 +77,7 @@ class _LoginState extends State<Login> {
         String userId = await FirebaseMethods()
             .getUserIdFromAccount(accountController.text);
         String res = await FirebaseMethods()
-            .loginWithUserId(userId: userId, password: passwordController.text);
+            .loginWithUserId(userId: userId,);
         
         
         if (context.mounted) {

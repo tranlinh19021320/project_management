@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:project_management/home/unit_card/reset_password.dart';
 import 'package:project_management/utils/notify_dialog.dart';
@@ -27,7 +26,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   bool isUpdateEmail = false;
   bool isUpdateDetailName = false;
-
   int isEmailState = IS_DEFAULT_STATE;
 
   @override
@@ -99,26 +97,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return (emailController.text != user.getCurrentUser.email);
   }
 
-  isUpdate() {
+  isChangedNameDetail() {
     UserProvider user = Provider.of<UserProvider>(context, listen: false);
-    return (isChangedEmail() ||
-        detailNameController.text != user.getCurrentUser.nameDetails);
+    return (detailNameController.text != user.getCurrentUser.nameDetails);
   }
 
   updateProfile() async {
-    if (isUpdate()) {
-      String res = await context
+    showDialog(
+        context: context,
+        builder: (_) => const NotifyDialog(content: 'loading', isError: false));
+    String res = "";
+    // only change name details
+    if (isChangedNameDetail() && !isChangedEmail()) {
+      res = await context
           .read<UserProvider>()
-          .updateUser(emailController.text, detailNameController.text);
+          .updateNameDetail(detailNameController.text);
+    }
+    // only change email
+    else if (isChangedEmail() && !isChangedNameDetail()) {
+      res =
+          await context.read<UserProvider>().updateEmail(emailController.text);
+    }
+    // change all of them
+    else {
+      String res1 = await context
+          .read<UserProvider>()
+          .updateNameDetail(detailNameController.text);
+      String res2 = "success";
       if (context.mounted) {
-        if (res == 'success') {
-          showDialog(
-              context: context,
-              builder: (_) => const NotifyDialog(
-                  content: "Cập nhật thành công!", isError: false));
-        } else {
-          showSnackBar(context, res, true);
-        }
+        res2 = await context
+            .read<UserProvider>()
+            .updateEmail(emailController.text);
+      }
+
+      (res1 == 'success' && res2 == "success")
+          ? {res = "success"}
+          : res1 == 'success'
+              ? {res = res2}
+              : {res = res1};
+    }
+
+    if (res == 'success') {
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        showDialog(
+            context: context,
+            builder: (_) => const NotifyDialog(
+                content: "Cập nhật thành công!", isError: false));
+      }
+    } else {
+      if (context.mounted) {
+        Navigator.of(context).pop();
+        showDialog(
+            context: context,
+            builder: (_) => NotifyDialog(content: res, isError: false));
       }
     }
   }

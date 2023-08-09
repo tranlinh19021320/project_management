@@ -14,15 +14,24 @@ class UserProvider extends ChangeNotifier {
     _user = user;
     notifyListeners();
   }
-
-  Future<String> updateUser(String email, String nameDetails) async {
+  Future<String> updateNameDetail(String nameDetails) async {
     String userId = _user!.userId;
-    String res = await _firebaseMethods.updateProfile(userId, email, nameDetails);
+    String res = await _firebaseMethods.updateNameDetail(userId, nameDetails);
 
-    if (res == "success") {
+    if (res == 'success') {
       getUserById(userId);
     }
 
+    return res;
+  }
+  Future<String> updateEmail(String email) async {
+    String userId = _user!.userId;
+    String res = await _firebaseMethods.updateEmail(userId, email);
+    if (res == 'success') {
+      String newUserId = await _firebaseMethods.getUserIdFromAccount(email);
+      print(newUserId);
+      getUserById(newUserId); 
+    }
     return res;
   }
 

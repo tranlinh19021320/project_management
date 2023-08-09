@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/admin/widgets/create_staff.dart';
 import 'package:project_management/home/admin/widgets/staff_card.dart';
@@ -20,7 +21,7 @@ class PersonalScreen extends StatefulWidget {
 
 class _PersonalScreenState extends State<PersonalScreen> {
   TextEditingController searchController = TextEditingController();
-  late FocusNode searchFocus = FocusNode();
+  FocusNode searchFocus = FocusNode();
   List<String> groups = ['Tất cả'];
   String groupSelect = 'Tất cả';
   int isResult = IS_DEFAULT_STATE;
@@ -29,7 +30,6 @@ class _PersonalScreenState extends State<PersonalScreen> {
   @override
   void initState() {
     super.initState();
-    searchFocus = FocusNode();
     getListGroup();
   }
 
@@ -116,7 +116,12 @@ class _PersonalScreenState extends State<PersonalScreen> {
                           enabledBorder: const OutlineInputBorder(
                               borderSide: BorderSide(color: defaultColor)),
                         ),
-                        onEditingComplete: ()  {
+                        onChanged: (value) {
+                          setState(() {
+                            
+                          });
+                        },
+                        onSubmitted: (value)  {
                           searchFocus.unfocus;
                           setState(() {
                             
@@ -186,21 +191,22 @@ class _PersonalScreenState extends State<PersonalScreen> {
                   )
                 ],
               ),
-              isLoading? const LinearProgressIndicator() : const Padding(padding: EdgeInsets.only(top: 0)),
+              
               const Divider(),
               FutureBuilder(
                 future: FirebaseMethods().searchSnapshot(groupSelect),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-              child: CircularProgressIndicator(),
+                    return Center(
+              child: LoadingAnimationWidget.hexagonDots(color: backgroundWhiteColor, size: 40),
             );
                   }
-                  if (!snapshot.hasData) {
-                    return const  Text("Không tìm thấy nhân viên");
-                  }
+                  
                   List<DocumentSnapshot> documents = getDocuments(snapshot);
-                  return Expanded(child: ListView.builder(itemCount: documents.length,itemBuilder: (context, index) => StaffCard(staff: documents[index])));
+                  if (documents.isEmpty) {
+                    return const Text("Không tìm thấy nhân viên");
+                  }
+                  return Expanded(child: ListView.builder(itemCount: documents.length,itemBuilder: (context, index) => StaffCard(staff: documents[index], groups: groups,)));
                 },
                 )
 

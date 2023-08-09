@@ -229,6 +229,7 @@ class _CreateStaffState extends State<CreateStaff> {
               suffixIcon: IconButton(
                 icon: isLockedPassword ? hidePasswordIcon : viewPasswordIcon,
                 onPressed: () {
+                  
                   setState(() {
                     isLockedPassword = !isLockedPassword;
                   });
@@ -236,7 +237,9 @@ class _CreateStaffState extends State<CreateStaff> {
               ),
             ),
             obscureText: isLockedPassword,
-            onEditingComplete: () {},
+            onFieldSubmitted: (value) {
+              passwordFocus.unfocus;
+            },
           ),
           const SizedBox(
             height: 12,

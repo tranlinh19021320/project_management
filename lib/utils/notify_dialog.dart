@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/utils/utils.dart';
 
 class NotifyDialog extends StatefulWidget {
@@ -13,21 +14,20 @@ class NotifyDialog extends StatefulWidget {
 class _NotifyDialogState extends State<NotifyDialog> {
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return (widget.content == 'loading') ? AlertDialog(
+      backgroundColor: Colors.transparent,
+      icon: LoadingAnimationWidget.inkDrop(color: darkblueAppbarColor, size: 32),
+      title: const Center(child: Text("Loading...", style: TextStyle(fontSize: 18, color: blueDrawerColor,), ), ),
+    ) : AlertDialog(
       scrollable: true,
-      icon: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: loudspeakerIcon,
-      ),
+      backgroundColor: darkblueAppbarColor,
+      iconPadding:const  EdgeInsets.only(bottom: 0),
+      icon:  loudspeakerIcon,
       // backgroundColor: backgroundWhiteColor,
       actionsAlignment: MainAxisAlignment.center,
       actionsPadding: const EdgeInsets.only(bottom: 12),
       title: Center(
-        child: (widget.content == 'loading')
-            ? const CircularProgressIndicator(
-                strokeWidth: 6,
-              )
-            : Text(
+        child: Text(
                 widget.content,
                 style: TextStyle(
                     fontStyle: FontStyle.italic,

@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
@@ -79,11 +78,12 @@ class FirebaseMethods {
 
   //login Firebase with userId
   Future<String> loginWithUserId(
-      {required String userId, required String password}) async {
+      {required String userId}) async {
     String res = "error";
     try {
       var snap = await _firestore.collection("users").doc(userId).get();
       String email = snap.data()!['email'];
+      String password = snap.data()!['password'];
       if (email != "") {
         await _auth.signInWithEmailAndPassword(
             email: email, password: password);
@@ -117,13 +117,12 @@ class FirebaseMethods {
   }
 
   //update user profile
-  Future<String> updateProfile(
-      String userId, String email, String nameDetails) async {
+  Future<String> updateNameDetail(
+      String userId,  String nameDetails) async {
     String res = "error";
 
     try {
       await _firestore.collection("users").doc(userId).update({
-        'email': email,
         'nameDetails': nameDetails,
       });
       res = "success";
@@ -161,11 +160,14 @@ class FirebaseMethods {
   }
 
   //delete user use userId
-  deleteUser(String userId, String email, String password) {
+  deleteUser(String aduserId, String userId, String email, String password) {
     if (email != "") {
+      loginWithUserId(userId: aduserId);
       final cred = EmailAuthProvider.credential(email: email, password: password);
       _auth.currentUser!.reauthenticateWithCredential(cred).then((value) => 
       _auth.currentUser!.delete());
+      signOut();
+      loginWithUserId(userId: aduserId);
     }
     _firestore.collection("users").doc(userId).delete();
   }
@@ -272,7 +274,8 @@ class FirebaseMethods {
   //update email if email is empty
   updateEmail(String userId, String email) async {
     CurrentUser user = await getCurrentUserByUserId(userId);
-    createUser(
+    String res = 'error';
+    String res1 = await createUser(
         email: email,
         username: user.username,
         password: user.password,
@@ -282,7 +285,14 @@ class FirebaseMethods {
         companyId: user.companyId,
         companyName: user.companyName);
 
-    deleteUser(userId, "", "");
+    deleteUser(userId,userId, "", "");
+    if (res1 == 'success') {
+    String res2 = await loginWithUserId(userId: await getUserIdFromAccount(email));
+    res = res2;
+    } else {
+      res = res1;
+    }
+    return res;
   }
 
   changeProfileImage(Uint8List image, String username, String userId) async {
@@ -312,6 +322,21 @@ class FirebaseMethods {
     } catch (e) {
       res = e.toString();
     }
+    return res;
+  }
+
+  changeUserGroup(String userId, String group) async {
+    String res = "error";
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'group': group
+      });
+      res = 'success';
+
+    } catch(e) {
+      res = e.toString();
+    }
+
     return res;
   }
 
