@@ -9,26 +9,24 @@ import 'package:provider/provider.dart';
 
 class StaffCard extends StatefulWidget {
   final DocumentSnapshot staff;
-  final List<String> groups;
-  const StaffCard({super.key, required this.staff, required this.groups});
+  const StaffCard({
+    super.key,
+    required this.staff,
+  });
 
   @override
   State<StaffCard> createState() => _StaffCardState();
 }
 
 class _StaffCardState extends State<StaffCard> {
-  bool isDeleted = false;
   bool isChangeGroup = false;
-  late String groupSelect;
   late String userGroup;
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-
     userGroup = widget.staff['group'];
-    groupSelect = userGroup;
   }
 
   deleteUser() async {
@@ -96,18 +94,14 @@ class _StaffCardState extends State<StaffCard> {
             ));
     if (comfirm) {
       String res = "";
-      UserProvider user = Provider.of<UserProvider>(context, listen: false);
       try {
-        FirebaseMethods().deleteUser(user.getCurrentUser.userId, widget.staff['userId'],
-            widget.staff['email'], widget.staff['password']);
+        FirebaseMethods()
+            .deleteUser(widget.staff['userId'], widget.staff['email']);
         res = "success";
       } catch (e) {
         res = e.toString();
       }
       if (res == 'success') {
-        setState(() {
-          isDeleted = true;
-        });
         if (context.mounted) {
           showDialog(
               context: context,
@@ -137,7 +131,6 @@ Nhóm: $userGroup''';
     setState(() {
       isLoading = true;
     });
-    userGroup = groupSelect;
     String res = await FirebaseMethods()
         .changeUserGroup(widget.staff['userId'], userGroup);
     setState(() {
@@ -157,7 +150,8 @@ Nhóm: $userGroup''';
 
   @override
   Widget build(BuildContext context) {
-    return (isDeleted || context.watch<UserProvider>().getCurrentUser.userId == widget.staff['userId'])
+    return (context.watch<UserProvider>().getCurrentUser.userId ==
+            widget.staff['userId'])
         ? Container()
         : Container(
             decoration:
@@ -234,37 +228,19 @@ Nhóm: $userGroup''';
                                   (isChangeGroup)
                                       ? Row(
                                           children: [
-                                            DropdownButton(
-                                              menuMaxHeight: 200,
-                                              alignment: Alignment.center,
-                                              value: groupSelect,
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                              ),
-                                              underline: Container(
-                                                height: 1,
-                                                color: backgroundWhiteColor,
-                                              ),
-                                              items: widget.groups
-                                                  .map((String value) {
-                                                return DropdownMenuItem<String>(
-                                                  value: value,
-                                                  child: Text(
-                                                    value,
-                                                    style: TextStyle(
-                                                        color: (value ==
-                                                                groupSelect)
-                                                            ? notifyIconColor
-                                                            : backgroundWhiteColor),
-                                                  ),
-                                                );
-                                              }).toList(),
-                                              onChanged: (val) {
-                                                setState(() {
-                                                  groupSelect = val!;
-                                                });
-                                              },
-                                            ),
+                                            groupDropdown(
+                                                companyId: context
+                                                    .watch<UserProvider>()
+                                                    .getCurrentUser
+                                                    .companyId,
+                                                groupSelect: userGroup,
+                                                isWordAtHead: "",
+                                                onSelectValue:
+                                                    (String selectValue) {
+                                                  setState(() {
+                                                    userGroup = selectValue;
+                                                  });
+                                                }),
                                             const SizedBox(
                                               width: 8,
                                             ),
@@ -295,7 +271,8 @@ Nhóm: $userGroup''';
                                               onTap: () {
                                                 setState(() {
                                                   isChangeGroup = false;
-                                                  groupSelect = userGroup;
+                                                  userGroup =
+                                                      widget.staff['group'];
                                                 });
                                               }, // comfirm change group
                                               child: Container(

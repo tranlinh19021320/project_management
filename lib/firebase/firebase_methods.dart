@@ -2,14 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:project_management/firebase/storage_method.dart';
+import 'package:project_management/provider/user_provider.dart';
 import 'package:project_management/utils/utils.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:project_management/model/user.dart';
 
 class FirebaseMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   //create a new company
   Future<String> createCompany(String companyName, String companyId) async {
     String res = "";
@@ -160,14 +161,9 @@ class FirebaseMethods {
   }
 
   //delete user use userId
-  deleteUser(String aduserId, String userId, String email, String password) {
+  deleteUser(String userId, String email) {
     if (email != "") {
-      loginWithUserId(userId: aduserId);
-      final cred = EmailAuthProvider.credential(email: email, password: password);
-      _auth.currentUser!.reauthenticateWithCredential(cred).then((value) => 
-      _auth.currentUser!.delete());
-      signOut();
-      loginWithUserId(userId: aduserId);
+      
     }
     _firestore.collection("users").doc(userId).delete();
   }
@@ -285,7 +281,7 @@ class FirebaseMethods {
         companyId: user.companyId,
         companyName: user.companyName);
 
-    deleteUser(userId,userId, "", "");
+    deleteUser(userId,'',);
     if (res1 == 'success') {
     String res2 = await loginWithUserId(userId: await getUserIdFromAccount(email));
     res = res2;
@@ -315,10 +311,14 @@ class FirebaseMethods {
   updateGroup(String companyId, String groupName) async {
     String res = "";
     try {
+      var snap = await _firestore.collection('companies').doc(companyId).get();
+      List groups = (snap.data()! as dynamic)['group'];
+      if (!groups.contains(groupName)) {
       await _firestore.collection('companies').doc(companyId).update({
         'group': FieldValue.arrayUnion([groupName]),
       });
       res = 'success';
+      } 
     } catch (e) {
       res = e.toString();
     }
@@ -340,16 +340,16 @@ class FirebaseMethods {
     return res;
   }
 
-  Future<QuerySnapshot<Map<String, dynamic>>> searchSnapshot(
-      String groupSelect) async {
-    QuerySnapshot<Map<String, dynamic>> snap;
+  Stream<QuerySnapshot<Map<String, dynamic>>> searchSnapshot(
+      String groupSelect) {
+    Stream<QuerySnapshot<Map<String, dynamic>>> snap;
     if (groupSelect == 'Tất cả') {
-      snap = await _firestore.collection('users').get();
+      snap =  _firestore.collection('users').snapshots();
     } else {
-      snap = await _firestore
+      snap = _firestore
           .collection('users')
           .where('group', isEqualTo: groupSelect)
-          .get();
+          .snapshots();
     }
 
     return snap;

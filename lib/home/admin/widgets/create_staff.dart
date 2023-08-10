@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
@@ -9,7 +8,6 @@ import '../../../provider/user_provider.dart';
 
 class CreateStaff extends StatefulWidget {
   const CreateStaff({super.key});
-
   @override
   State<CreateStaff> createState() => _CreateStaffState();
 }
@@ -27,14 +25,13 @@ class _CreateStaffState extends State<CreateStaff> {
 
   bool isLockedPassword = false;
   bool isCreateGroup = false;
-  List<String> groups = [];
   String groupSelect = 'Manager';
   bool isLoadingGroup = false;
-
+  List<String> groups = [];
   @override
   void initState() {
     super.initState();
-    getListGroup();
+    // groupSelect = 'Manager'
     usernameFocus = FocusNode();
     usernameFocus.addListener(() async {
       if (!usernameFocus.hasFocus) {
@@ -67,38 +64,17 @@ class _CreateStaffState extends State<CreateStaff> {
     passwordFocus.dispose();
   }
 
-  getListGroup() async {
-    try {
-      groups.clear();
-      UserProvider user = Provider.of<UserProvider>(context, listen: false);
-      var snap = await FirebaseFirestore.instance
-          .collection('companies')
-          .doc(user.getCurrentUser.companyId)
-          .get();
-      for (var value in snap.data()!['group']) {
-        groups.add(value.toString());
-      }
-      setState(() {});
-      //showDialog(context: context, builder: (_) => NotifyDialog(content: groups.toString(), isError: false));
-    } catch (e) {
-      showSnackBar(context, e.toString(), true);
-    }
-  }
-
   updateGroup() async {
     setState(() {
       isLoadingGroup = true;
     });
-    if (!groups.contains(groupController.text)) {
-      UserProvider user = Provider.of<UserProvider>(context, listen: false);
-      String res = await FirebaseMethods()
-          .updateGroup(user.getCurrentUser.companyId, groupController.text);
-      if (res == 'success') {
-        groups.add(groupController.text);
-      } else {
-        if (context.mounted) {
-          showSnackBar(context, res, true);
-        }
+
+    UserProvider user = Provider.of<UserProvider>(context, listen: false);
+    String res = await FirebaseMethods()
+        .updateGroup(user.getCurrentUser.companyId, groupController.text);
+    if (res != 'success') {
+      if (context.mounted) {
+        showSnackBar(context, res, true);
       }
     }
     setState(() {
@@ -110,7 +86,9 @@ class _CreateStaffState extends State<CreateStaff> {
   }
 
   createStaff() async {
-    showDialog(context: context, builder: (_) => const NotifyDialog(content: 'loading', isError: false));
+    showDialog(
+        context: context,
+        builder: (_) => const NotifyDialog(content: 'loading', isError: false));
     if (isAccountState == IS_CORRECT_STATE) {
       if (passwordController.text == "") {
         setState(() {
@@ -127,14 +105,16 @@ class _CreateStaffState extends State<CreateStaff> {
             group: groupSelect,
             companyId: user.getCurrentUser.companyId,
             companyName: user.getCurrentUser.companyName);
-        
+
         if (res == 'success') {
           if (context.mounted) {
-          Navigator.of(context).pop();
-          navigatePop();
-          showDialog(context: context, builder: (_) =>const  NotifyDialog(content: "Tạo thành công!", isError: false));
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+            showDialog(
+                context: context,
+                builder: (_) => const NotifyDialog(
+                    content: "Tạo thành công! ", isError: false));
           }
-
         } else {
           if (context.mounted) {
             showSnackBar(context, res, true);
@@ -142,10 +122,6 @@ class _CreateStaffState extends State<CreateStaff> {
         }
       }
     }
-  }
-  navigatePop() {
-    groups.insert(0, 'Tất cả');
-    Navigator.of(context).pop(groups);
   }
 
   @override
@@ -162,39 +138,42 @@ class _CreateStaffState extends State<CreateStaff> {
         child: Column(children: [
           // username account
           TextFormField(
-            controller: usernameController,
-            focusNode: usernameFocus,
-            decoration: InputDecoration(
-              labelText: "Tài khoản",
-              prefixIcon: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: usernameIcon,
+              controller: usernameController,
+              focusNode: usernameFocus,
+              onTapOutside: (event) => usernameFocus.unfocus(),
+              decoration: InputDecoration(
+                labelText: "Tài khoản",
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: usernameIcon,
+                ),
+                // notify if username is error
+                helperText: isAccountState == IS_ERROR_STATE
+                    ? "Tài khoản đã đăng ký!"
+                    : null,
+                helperStyle:
+                    const TextStyle(color: errorRedColor, fontSize: 14),
+                // outline boder
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                      color: isAccountState == IS_CORRECT_STATE
+                          ? correctGreenColor
+                          : isAccountState == IS_ERROR_STATE
+                              ? errorRedColor
+                              : defaultColor),
+                ),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                suffixIcon: isAccountState == IS_DEFAULT_STATE
+                    ? null
+                    : isAccountState == IS_CORRECT_STATE
+                        ? correctIcon
+                        : errorIcon,
               ),
-              // notify if username is error
-              helperText: isAccountState == IS_ERROR_STATE
-                  ? "Tài khoản đã đăng ký!"
-                  : null,
-              helperStyle: const TextStyle(color: errorRedColor, fontSize: 14),
-              // outline boder
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                    color: isAccountState == IS_CORRECT_STATE
-                        ? correctGreenColor
-                        : isAccountState == IS_ERROR_STATE
-                            ? errorRedColor
-                            : defaultColor),
-              ),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-              suffixIcon: isAccountState == IS_DEFAULT_STATE
-                  ? null
-                  : isAccountState == IS_CORRECT_STATE
-                      ? correctIcon
-                      : errorIcon,
-            ),
-            onEditingComplete: () =>
-                FocusScope.of(context).requestFocus(passwordFocus),
-          ),
+              onFieldSubmitted: (value) {
+                usernameFocus.unfocus();
+                FocusScope.of(context).requestFocus(passwordFocus);
+              }),
           const SizedBox(
             height: 12,
           ),
@@ -229,7 +208,6 @@ class _CreateStaffState extends State<CreateStaff> {
               suffixIcon: IconButton(
                 icon: isLockedPassword ? hidePasswordIcon : viewPasswordIcon,
                 onPressed: () {
-                  
                   setState(() {
                     isLockedPassword = !isLockedPassword;
                   });
@@ -311,35 +289,18 @@ class _CreateStaffState extends State<CreateStaff> {
                           "Nhóm:  ",
                           style: TextStyle(fontSize: 16),
                         ),
-                        DropdownButton(
-                          menuMaxHeight: 200,
-                          alignment: Alignment.center,
-                          value: groupSelect,
-                          style: const TextStyle(
-                            fontSize: 13,
-                          ),
-                          underline: Container(
-                            height: 1,
-                            color: backgroundWhiteColor,
-                          ),
-                          items: groups.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: TextStyle(
-                                    color: (value == groupSelect)
-                                        ? notifyIconColor
-                                        : backgroundWhiteColor),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            setState(() {
-                              groupSelect = val!;
-                            });
-                          },
-                        ),
+                        groupDropdown(
+                            companyId: context
+                                .watch<UserProvider>()
+                                .getCurrentUser
+                                .companyId,
+                            groupSelect: groupSelect,
+                            isWordAtHead: "",
+                            onSelectValue: (String selectValue) {
+                              setState(() {
+                                groupSelect = selectValue;
+                              });
+                            }),
                         Padding(
                           padding: const EdgeInsets.only(
                             top: 12,
@@ -376,7 +337,7 @@ class _CreateStaffState extends State<CreateStaff> {
           ),
         ),
         InkWell(
-          onTap: navigatePop,
+          onTap: () => Navigator.of(context).pop(),
           child: Container(
             padding: const EdgeInsets.all(8),
             decoration: ShapeDecoration(

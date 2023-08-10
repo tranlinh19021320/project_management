@@ -22,7 +22,6 @@ class PersonalScreen extends StatefulWidget {
 class _PersonalScreenState extends State<PersonalScreen> {
   TextEditingController searchController = TextEditingController();
   FocusNode searchFocus = FocusNode();
-  List<String> groups = ['Tất cả'];
   String groupSelect = 'Tất cả';
   int isResult = IS_DEFAULT_STATE;
 
@@ -30,29 +29,10 @@ class _PersonalScreenState extends State<PersonalScreen> {
   @override
   void initState() {
     super.initState();
-    getListGroup();
   }
 
-  getListGroup() async {
-    try {
-      groups.clear();
-      groups.add('Tất cả');
-      UserProvider user = Provider.of<UserProvider>(context, listen: false);
-      var snap = await FirebaseFirestore.instance
-          .collection('companies')
-          .doc(user.getCurrentUser.companyId)
-          .get();
-      for (var value in snap.data()!['group']) {
-        groups.add(value.toString());
-      }
-      setState(() {});
-      //showDialog(context: context, builder: (_) => NotifyDialog(content: groups.toString(), isError: false));
-    } catch (e) {
-      showSnackBar(context, e.toString(), true);
-    }
-  }
-
-  List<DocumentSnapshot> getDocuments(AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+  List<DocumentSnapshot> getDocuments(
+      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
     List<DocumentSnapshot> docs = snapshot.data!.docs;
 
     docs.removeWhere((element) {
@@ -70,8 +50,6 @@ class _PersonalScreenState extends State<PersonalScreen> {
 
     return docs;
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -117,15 +95,11 @@ class _PersonalScreenState extends State<PersonalScreen> {
                               borderSide: BorderSide(color: defaultColor)),
                         ),
                         onChanged: (value) {
-                          setState(() {
-                            
-                          });
+                          setState(() {});
                         },
-                        onSubmitted: (value)  {
+                        onSubmitted: (value) {
                           searchFocus.unfocus;
-                          setState(() {
-                            
-                          });
+                          setState(() {});
                         },
                       ),
                     ),
@@ -143,35 +117,18 @@ class _PersonalScreenState extends State<PersonalScreen> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 12),
-                          child: DropdownButton(
-                            menuMaxHeight: 200,
-                            alignment: Alignment.center,
-                            value: groupSelect,
-                            style: const TextStyle(
-                              fontSize: 13,
-                            ),
-                            underline: Container(
-                              height: 1,
-                              color: backgroundWhiteColor,
-                            ),
-                            items: groups.map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(
-                                  value,
-                                  style: TextStyle(
-                                      color: (value == groupSelect)
-                                          ? notifyIconColor
-                                          : backgroundWhiteColor),
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              setState(() {
-                                groupSelect = val!;
-                              });
-                            },
-                          ),
+                          child: groupDropdown(
+                              companyId: context
+                                  .watch<UserProvider>()
+                                  .getCurrentUser
+                                  .companyId,
+                              groupSelect: groupSelect,
+                              isWordAtHead: "Tất cả",
+                              onSelectValue: (String selectValue) {
+                                setState(() {
+                                  groupSelect = selectValue;
+                                });
+                              }),
                         ),
                       ],
                     ),
@@ -179,11 +136,10 @@ class _PersonalScreenState extends State<PersonalScreen> {
                   Padding(
                     padding: const EdgeInsets.only(left: 2),
                     child: IconButton(
-                      onPressed: () async {
-                        groups = await showDialog(
+                      onPressed: () {
+                        showDialog(
                             context: context,
                             builder: (_) => const CreateStaff());
-                        setState(() {});
                       },
                       icon: addIcon,
                       highlightColor: focusBlueColor,
@@ -191,25 +147,29 @@ class _PersonalScreenState extends State<PersonalScreen> {
                   )
                 ],
               ),
-              
               const Divider(),
-              FutureBuilder(
-                future: FirebaseMethods().searchSnapshot(groupSelect),
+              StreamBuilder(
+                stream: FirebaseMethods().searchSnapshot(groupSelect),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
-              child: LoadingAnimationWidget.hexagonDots(color: backgroundWhiteColor, size: 40),
-            );
+                      child: LoadingAnimationWidget.hexagonDots(
+                          color: backgroundWhiteColor, size: 40),
+                    );
                   }
-                  
+
                   List<DocumentSnapshot> documents = getDocuments(snapshot);
                   if (documents.isEmpty) {
                     return const Text("Không tìm thấy nhân viên");
                   }
-                  return Expanded(child: ListView.builder(itemCount: documents.length,itemBuilder: (context, index) => StaffCard(staff: documents[index], groups: groups,)));
+                  return Expanded(
+                      child: ListView.builder(
+                          itemCount: documents.length,
+                          itemBuilder: (context, index) => StaffCard(
+                                staff: documents[index],
+                              )));
                 },
-                )
-
+              )
             ],
           ),
         ),
