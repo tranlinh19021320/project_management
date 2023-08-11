@@ -1,17 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/provider/user_provider.dart';
+import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
-import 'package:provider/provider.dart';
-
 class StaffCard extends StatefulWidget {
+  final String currentUserId;
   final DocumentSnapshot staff;
   const StaffCard({
     super.key,
-    required this.staff,
+    required this.staff, required this.currentUserId,
   });
 
   @override
@@ -19,14 +19,33 @@ class StaffCard extends StatefulWidget {
 }
 
 class _StaffCardState extends State<StaffCard> {
+  late String companyId;
   bool isChangeGroup = false;
   late String userGroup;
-  bool isLoading = false;
+  // bool isLoading = false;
+  bool isLoadingGroup = false;
 
   @override
   void initState() {
     super.initState();
+    init();
     userGroup = widget.staff['group'];
+  }
+   @override
+  void dispose() {
+    super.dispose();
+  }
+  
+
+  init() async {
+    setState(() {
+      isLoadingGroup = true;
+    });
+    CurrentUser user = await FirebaseMethods().getCurrentUserByUserId(userId: widget.currentUserId);
+    companyId = user.companyId;
+    setState(() {
+      isLoadingGroup = false;
+    });
   }
 
   deleteUser() async {
@@ -96,7 +115,7 @@ class _StaffCardState extends State<StaffCard> {
       String res = "";
       try {
         FirebaseMethods()
-            .deleteUser(widget.staff['userId'], widget.staff['email']);
+            .deleteUser(userId: widget.staff['userId'],email: widget.staff['email']);
         res = "success";
       } catch (e) {
         res = e.toString();
@@ -129,12 +148,12 @@ Nhóm: $userGroup''';
 
   updateGroup() async {
     setState(() {
-      isLoading = true;
+      isLoadingGroup = true;
     });
     String res = await FirebaseMethods()
-        .changeUserGroup(widget.staff['userId'], userGroup);
+        .changeUserGroup(userId: widget.staff['userId'],group: userGroup);
     setState(() {
-      isLoading = false;
+      isLoadingGroup = false;
       isChangeGroup = false;
     });
     if (res == 'success') {
@@ -150,7 +169,7 @@ Nhóm: $userGroup''';
 
   @override
   Widget build(BuildContext context) {
-    return (context.watch<UserProvider>().getCurrentUser.userId ==
+    return (widget.currentUserId ==
             widget.staff['userId'])
         ? Container()
         : Container(
@@ -225,14 +244,12 @@ Nhóm: $userGroup''';
                                     'Nhóm:  ',
                                     style: TextStyle(fontSize: 13),
                                   ),
+                                  isLoadingGroup ? LoadingAnimationWidget.waveDots(color: backgroundWhiteColor, size: 20):
                                   (isChangeGroup)
                                       ? Row(
                                           children: [
                                             groupDropdown(
-                                                companyId: context
-                                                    .watch<UserProvider>()
-                                                    .getCurrentUser
-                                                    .companyId,
+                                                companyId: companyId,
                                                 groupSelect: userGroup,
                                                 isWordAtHead: "",
                                                 onSelectValue:

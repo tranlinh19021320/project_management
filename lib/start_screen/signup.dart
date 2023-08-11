@@ -37,7 +37,7 @@ class _SignupState extends State<Signup> {
     emailFocus.addListener(() async {
       if (!emailFocus.hasFocus) {
         isEmailState =
-            await FirebaseMethods().checkAlreadyEmail(emailController.text);
+            await FirebaseMethods().checkAlreadyEmail(email: emailController.text);
         setState(() {});
       } else {
         setState(() {
@@ -49,7 +49,7 @@ class _SignupState extends State<Signup> {
     accountFocus.addListener(() async {
       if (!accountFocus.hasFocus) {
         isAccountState =
-            await FirebaseMethods().checkAlreadyAccount(accountController.text);
+            await FirebaseMethods().checkAlreadyAccount(username: accountController.text);
         setState(() {});
       } else {
         setState(() {
@@ -94,7 +94,7 @@ class _SignupState extends State<Signup> {
           isLoading = true;
         });
         String companyId = const Uuid().v1();
-        String res1 = await FirebaseMethods().createCompany(widget.companyName, companyId);
+        String res1 = await FirebaseMethods().createCompany(companyName: widget.companyName, companyId: companyId);
         String res2 = await FirebaseMethods().createUser(
             email: emailController.text,
             username: accountController.text,
@@ -106,7 +106,7 @@ class _SignupState extends State<Signup> {
             companyName: widget.companyName,
             );
         String userId = await FirebaseMethods()
-            .getUserIdFromAccount(accountController.text);
+            .getUserIdFromAccount(account: accountController.text);
 
         setState(() {
           isLoading = false;

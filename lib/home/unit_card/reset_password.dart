@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:project_management/firebase/firebase_methods.dart';
+import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
-import 'package:provider/provider.dart';
-
-import '../../provider/user_provider.dart';
-
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+  final String userId;
+  const ResetPasswordScreen({super.key, required this.userId});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -20,6 +19,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   late FocusNode oldPasswordFocus;
   late FocusNode newPasswordFocus;
 
+  late CurrentUser user;
   int isPasswordState = IS_DEFAULT_STATE;
 
   bool isLockedOldPassword = true;
@@ -30,8 +30,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   void initState() {
     super.initState();
-    UserProvider user = Provider.of<UserProvider>(context, listen: false);
-    usernameController.text = user.getCurrentUser.username;
+    init();
 
     oldPasswordFocus = FocusNode();
     oldPasswordFocus.addListener(() {
@@ -56,6 +55,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     newPasswordFocus = FocusNode();
   }
 
+  init() async {
+    user = await FirebaseMethods().getCurrentUserByUserId(userId: widget.userId);
+    setState(() {
+      usernameController.text = user.username;
+    });
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -68,17 +74,18 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   isCorrectPassword() {
-    UserProvider user = Provider.of<UserProvider>(context, listen: false);
-    return (oldPasswordController.text == user.getCurrentUser.password);
+    return (oldPasswordController.text == user.password);
   }
 
   updatePassword() async {
-    showDialog(context: context, builder: (_) =>
-    const NotifyDialog(content: 'loading', isError: false));
-    String res = await context
-        .read<UserProvider>()
-        .changePassword(oldPasswordController.text, newPasswordController.text);
-    // Navigator.pop(context);    
+    showDialog(
+        context: context,
+        builder: (_) => const NotifyDialog(content: 'loading', isError: false));
+    String res = await FirebaseMethods().changePassword(
+        userId: widget.userId,
+        oldpassword: oldPasswordController.text,
+        newpassword: newPasswordController.text);
+    // Navigator.pop(context);
     if (res == "success") {
       if (context.mounted) {
         Navigator.pop(context);

@@ -1,14 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/home/unit_card/reset_password.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
-import 'package:provider/provider.dart';
 import '../../firebase/firebase_methods.dart';
-import '../../provider/user_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
+  final String userId;
   const ProfileScreen({
     super.key,
+    required this.userId,
   });
 
   @override
@@ -21,54 +22,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController groupController = TextEditingController();
 
-  late FocusNode emailFocus;
   late FocusNode detailNameFocus;
 
-  bool isUpdateEmail = false;
+  String nameDetails = '';
   bool isUpdateDetailName = false;
-  int isEmailState = IS_DEFAULT_STATE;
 
   @override
   void initState() {
     super.initState();
-    UserProvider user = Provider.of<UserProvider>(context, listen: false);
-    emailController.text = user.getCurrentUser.email;
-    detailNameController.text = user.getCurrentUser.nameDetails;
-    usernameController.text = user.getCurrentUser.username;
-    groupController.text = user.getCurrentUser.group;
-
-    emailFocus = FocusNode();
-    emailFocus.addListener(() async {
-      if (!emailFocus.hasFocus) {
-        setState(() {
-          isUpdateEmail = false;
-        });
-        if (!isChangedEmail()) {
-          setState(() {
-            isEmailState = IS_DEFAULT_STATE;
-          });
-        } else {
-          isEmailState =
-              await FirebaseMethods().checkAlreadyEmail(emailController.text);
-          setState(() {});
-          if (isEmailState == IS_ERROR_STATE) {
-            if (context.mounted) {
-              showDialog(
-                  context: context,
-                  builder: (_) => const NotifyDialog(
-                      content: ("Email đã đăng ký!"), isError: true));
-            }
-          } else if (isEmailState == IS_ERROR_FORMAT_STATE) {
-            if (context.mounted) {
-              showDialog(
-                  context: context,
-                  builder: (_) => const NotifyDialog(
-                      content: ("Lỗi định dạng Email!"), isError: true));
-            }
-          }
-        }
-      }
-    });
+    detailNameController.text = "";
 
     detailNameFocus = FocusNode();
     detailNameFocus.addListener(() {
@@ -88,55 +50,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     usernameController.dispose();
     groupController.dispose();
 
-    emailFocus.dispose();
+    // emailFocus.dispose();
     detailNameFocus.dispose();
   }
 
-  isChangedEmail() {
-    UserProvider user = Provider.of<UserProvider>(context, listen: false);
-    return (emailController.text != user.getCurrentUser.email);
-  }
-
-  isChangedNameDetail() {
-    UserProvider user = Provider.of<UserProvider>(context, listen: false);
-    return (detailNameController.text != user.getCurrentUser.nameDetails);
-  }
 
   updateProfile() async {
     showDialog(
         context: context,
         builder: (_) => const NotifyDialog(content: 'loading', isError: false));
-    String res = "";
+
     // only change name details
-    if (isChangedNameDetail() && !isChangedEmail()) {
-      res = await context
-          .read<UserProvider>()
-          .updateNameDetail(detailNameController.text);
-    }
-    // only change email
-    else if (isChangedEmail() && !isChangedNameDetail()) {
-      res =
-          await context.read<UserProvider>().updateEmail(emailController.text);
-    }
-    // change all of them
-    else {
-      String res1 = await context
-          .read<UserProvider>()
-          .updateNameDetail(detailNameController.text);
-      String res2 = "success";
-      if (context.mounted) {
-        res2 = await context
-            .read<UserProvider>()
-            .updateEmail(emailController.text);
-      }
-
-      (res1 == 'success' && res2 == "success")
-          ? {res = "success"}
-          : res1 == 'success'
-              ? {res = res2}
-              : {res = res1};
-    }
-
+    String res = await FirebaseMethods().updateNameDetail(
+        userId: widget.userId, nameDetails: detailNameController.text);
     if (res == 'success') {
       if (context.mounted) {
         Navigator.of(context).pop();
@@ -157,194 +83,191 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            //email text
-            TextField(
-              controller: emailController,
-              focusNode: emailFocus,
-              decoration: InputDecoration(
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: emailIcon,
-                  ),
-                  prefixText: "Email: ",
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6)),
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: isEmailState == IS_ERROR_STATE ||
-                                  isEmailState == IS_ERROR_FORMAT_STATE
-                              ? errorRedColor
-                              : isEmailState == IS_CORRECT_STATE
-                                  ? correctGreenColor
-                                  : defaultColor)),
-                  suffixIcon:
-                      (context.watch<UserProvider>().getCurrentUser.email != "")
-                          ? null
-                          : IconButton(
-                              icon: isUpdateEmail
-                                  ? const Icon(
-                                      Icons.update,
-                                      color: correctGreenColor,
-                                    )
-                                  : const Icon(
-                                      Icons.update_disabled,
-                                      color: defaultIconColor,
-                                    ),
-                              onPressed: () {
-                                setState(() {
-                                  isUpdateEmail = !isUpdateEmail;
-                                  if (isUpdateEmail) {
-                                    FocusScope.of(context)
-                                        .requestFocus(emailFocus);
-                                  } else {
-                                    emailFocus.unfocus();
-                                  }
-                                });
-                              },
-                            )),
-              readOnly: !isUpdateEmail,
-              onEditingComplete: () => emailFocus.unfocus(),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            //details name text
-            TextField(
-              controller: detailNameController,
-              focusNode: detailNameFocus,
-              decoration: InputDecoration(
-                  prefixIcon: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: detailNameIcon,
-                  ),
-                  prefixText: "Họ và tên: ",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(color: defaultColor)),
-                  suffixIcon: IconButton(
-                    icon: isUpdateDetailName
-                        ? const Icon(
-                            Icons.update,
-                            color: correctGreenColor,
-                          )
-                        : const Icon(
-                            Icons.update_disabled,
-                            color: defaultIconColor,
-                          ),
-                    onPressed: () {
-                      setState(() {
-                        isUpdateDetailName = !isUpdateDetailName;
-                        if (isUpdateDetailName) {
-                          FocusScope.of(context).requestFocus(detailNameFocus);
-                        } else {
-                          detailNameFocus.unfocus();
-                        }
-                      });
-                    },
-                  )),
-              readOnly: !isUpdateDetailName,
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            //account username text
-            TextField(
-              controller: usernameController,
-              decoration: InputDecoration(
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: usernameIcon,
-                ),
-                prefixText: "Tài khoản: ",
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: defaultColor)),
+    return StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.userId)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.transparent,
               ),
-              readOnly: true,
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            //group text
-            TextField(
-              controller: groupController,
-              decoration: InputDecoration(
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: groupIcon,
-                ),
-                prefixText: "Nhóm: ",
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(color: defaultColor)),
-              ),
-              readOnly: true,
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                InkWell(
-                  onTap: () {
-                    showDialog(
-                        context: context,
-                        builder: (_) => const ResetPasswordScreen());
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: ShapeDecoration(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      color: buttonGreenColor,
-                    ),
-                    width: 100,
-                    height: 36,
-                    child: const Center(
-                        child: Text(
-                      "Đổi mật khẩu",
-                    )),
-                  ),
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                InkWell(
-                  onTap: updateProfile,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: ShapeDecoration(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      color: focusBlueColor,
-                    ),
-                    width: 100,
-                    height: 36,
-                    child: const Center(
-                        child: Text(
-                      "Cập nhật",
-                    )),
-                  ),
-                ),
-              ],
-            ),
+            );
+          }
 
-            //
-          ],
-        ),
-      ),
-    );
+          emailController.text = snapshot.data!['email'];
+
+          nameDetails = snapshot.data!['nameDetails'];
+          if (detailNameController.text == "") {
+            detailNameController.text = nameDetails;
+          }
+
+          usernameController.text = snapshot.data!['username'];
+          groupController.text = snapshot.data!['group'];
+
+          return Scaffold(
+            backgroundColor: Colors.transparent,
+            body: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  //email text
+                  TextField(
+                    controller: emailController,
+                    decoration: InputDecoration(
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: emailIcon,
+                      ),
+                      prefixText: "Email: ",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6)),
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: defaultColor)),
+                    ),
+                    readOnly: true,
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  //details name text
+                  TextField(
+                    controller: detailNameController,
+                    focusNode: detailNameFocus,
+                    decoration: InputDecoration(
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: detailNameIcon,
+                        ),
+                        prefixText: "Họ và tên: ",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(color: defaultColor)),
+                        suffixIcon: IconButton(
+                          icon: isUpdateDetailName
+                              ? const Icon(
+                                  Icons.update,
+                                  color: correctGreenColor,
+                                )
+                              : const Icon(
+                                  Icons.update_disabled,
+                                  color: defaultIconColor,
+                                ),
+                          onPressed: () {
+                            setState(() {
+                              isUpdateDetailName = !isUpdateDetailName;
+
+                              if (isUpdateDetailName) {
+                                FocusScope.of(context)
+                                    .requestFocus(detailNameFocus);
+                              } else {
+                                detailNameFocus.unfocus();
+                              }
+                            });
+                          },
+                        )),
+                    readOnly: !isUpdateDetailName,
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  //account username text
+                  TextField(
+                    controller: usernameController,
+                    decoration: InputDecoration(
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: usernameIcon,
+                      ),
+                      prefixText: "Tài khoản: ",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6)),
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: defaultColor)),
+                    ),
+                    readOnly: true,
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  //group text
+                  TextField(
+                    controller: groupController,
+                    decoration: InputDecoration(
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: groupIcon,
+                      ),
+                      prefixText: "Nhóm: ",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6)),
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: defaultColor)),
+                    ),
+                    readOnly: true,
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (_) => ResetPasswordScreen(
+                                    userId: widget.userId,
+                                  ));
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: ShapeDecoration(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            color: buttonGreenColor,
+                          ),
+                          width: 100,
+                          height: 36,
+                          child: const Center(
+                              child: Text(
+                            "Đổi mật khẩu",
+                          )),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 8,
+                      ),
+                      InkWell(
+                        onTap: updateProfile,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: ShapeDecoration(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            color: focusBlueColor,
+                          ),
+                          width: 100,
+                          height: 36,
+                          child: const Center(
+                              child: Text(
+                            "Cập nhật",
+                          )),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  //
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

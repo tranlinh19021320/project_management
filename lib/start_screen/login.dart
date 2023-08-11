@@ -75,7 +75,7 @@ class _LoginState extends State<Login> {
           isLoading = true;
         });
         String userId = await FirebaseMethods()
-            .getUserIdFromAccount(accountController.text);
+            .getUserIdFromAccount(account: accountController.text);
         String res = await FirebaseMethods()
             .loginWithUserId(userId: userId,);
         
@@ -116,7 +116,7 @@ class _LoginState extends State<Login> {
       });
     } else {
       String userId =
-          await FirebaseMethods().getUserIdFromAccount(accountController.text);
+          await FirebaseMethods().getUserIdFromAccount(account: accountController.text);
       if (userId == "") {
         setState(() {
           isAccountState = IS_ERROR_STATE;

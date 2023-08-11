@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import '../../../utils/utils.dart';
 import '../widgets/drawer_bar.dart';
 class NotifyScreen extends StatefulWidget {
+  final String userId;
   const NotifyScreen({
-    super.key,
+    super.key, required this.userId,
   });
 
   @override
@@ -30,7 +31,7 @@ class _NotifyScreenState extends State<NotifyScreen> {
             )
           ],
         ),
-        drawer: const DrawerMenu(selectedPage: IS_NOTIFY_PAGE),
+        drawer: DrawerMenu(selectedPage: IS_NOTIFY_PAGE, userId: widget.userId,),
         body: const Text("..."),
       ),
     );

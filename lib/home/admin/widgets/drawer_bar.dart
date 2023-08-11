@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -7,17 +8,16 @@ import 'package:project_management/home/admin/screens/event_screen.dart';
 import 'package:project_management/home/admin/screens/personal_screen.dart';
 import 'package:project_management/home/admin/screens/projects_screen.dart';
 import 'package:project_management/home/admin/screens/notify_screen.dart';
-import 'package:provider/provider.dart';
-
 import '../../../firebase/firebase_methods.dart';
-import '../../../provider/user_provider.dart';
 import '../../../start_screen/login.dart';
 import '../../../utils/utils.dart';
 import '../../unit_card/user_profile.dart';
 
 class DrawerMenu extends StatefulWidget {
   final int selectedPage;
-  const DrawerMenu({super.key, required this.selectedPage});
+  final String userId;
+  const DrawerMenu(
+      {super.key, required this.selectedPage, required this.userId});
 
   @override
   State<DrawerMenu> createState() => _DrawerMenuState();
@@ -26,7 +26,6 @@ class DrawerMenu extends StatefulWidget {
 class _DrawerMenuState extends State<DrawerMenu> {
   bool isOpenProfile = false;
   bool isLoadingImage = false;
-  
 
   signOut() {
     FirebaseMethods().signOut();
@@ -89,8 +88,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
             ));
   }
 
-  changeProfileImage(Uint8List image) {
-      context.read<UserProvider>().changeImage(image);
+  changeProfileImage(Uint8List image) async {
+    await FirebaseMethods().changeProfileImage(image:image,userId: widget.userId);
   }
 
   @override
@@ -99,58 +98,68 @@ class _DrawerMenuState extends State<DrawerMenu> {
       backgroundColor: blueDrawerColor,
       child: Column(
         children: [
-          UserAccountsDrawerHeader(
-            currentAccountPicture: Stack(
-              children: [
-                InkWell(
-                  onTap: () {
-                    (isOpenProfile) ? selectImage() : null;
-                  },
-                  child: (isLoadingImage)
-                      ? CircleAvatar(
-                          radius: 64,
-                          backgroundColor: Colors.transparent,
-                          child: LoadingAnimationWidget.discreteCircle(
-                              color: backgroundWhiteColor, size: 24),
-                        )
-                      : CircleAvatar(
+          StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(widget.userId)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return UserAccountsDrawerHeader(
+                    currentAccountPicture: CircleAvatar(
+                      child: LoadingAnimationWidget.discreteCircle(
+                          color: backgroundWhiteColor, size: 40),
+                    ),
+                    accountName: LoadingAnimationWidget.staggeredDotsWave(
+                        color: backgroundWhiteColor, size: 18),
+                    accountEmail: LoadingAnimationWidget.staggeredDotsWave(
+                        color: backgroundWhiteColor, size: 18),
+                  );
+                }
+              
+                return UserAccountsDrawerHeader(
+                  currentAccountPicture: Stack(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          (isOpenProfile) ? selectImage() : null;
+                        },
+                        child: CircleAvatar(
                           backgroundColor: backgroundWhiteColor,
-                          backgroundImage: NetworkImage(context
-                              .watch<UserProvider>()
-                              .getCurrentUser
-                              .photoURL),
+                          backgroundImage: NetworkImage(snapshot.data!['photoURL']),
                           radius: 64,
                         ),
-                ),
-                (isOpenProfile)
-                    ? Positioned(
-                        bottom: -15,
-                        left: 35,
-                        child: IconButton(
-                          onPressed: selectImage,
-                          icon: const Icon(
-                            Icons.add_a_photo,
-                            size: 18,
-                          ),
-                          color: backgroundWhiteColor,
-                        ),
-                      )
-                    : Container(),
-              ],
-            ),
-            accountName:
-                Text(context.watch<UserProvider>().getCurrentUser.nameDetails),
-            accountEmail:
-                Text(context.watch<UserProvider>().getCurrentUser.email),
-            onDetailsPressed: () {
-              setState(() {
-                isOpenProfile = !isOpenProfile;
-              });
-            },
-          ),
+                      ),
+                      (isOpenProfile)
+                          ? Positioned(
+                              bottom: -15,
+                              left: 35,
+                              child: IconButton(
+                                onPressed: selectImage,
+                                icon: const Icon(
+                                  Icons.add_a_photo,
+                                  size: 18,
+                                ),
+                                color: backgroundWhiteColor,
+                              ),
+                            )
+                          : Container(),
+                    ],
+                  ),
+                  accountName: Text(
+                      snapshot.data!['nameDetails']),
+                  accountEmail:
+                      Text(snapshot.data!['email']),
+                  onDetailsPressed: () {
+                    setState(() {
+                      isOpenProfile = !isOpenProfile;
+                    });
+                  },
+                );
+              }),
           Expanded(
               child: isOpenProfile
-                  ? const ProfileScreen()
+                  ? ProfileScreen(userId: widget.userId,)
                   : Scaffold(
                       backgroundColor: Colors.transparent,
                       body: ListView(
@@ -175,7 +184,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             onTap: () {
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                      builder: (_) => const ProjectsScreen()));
+                                      builder: (_) => ProjectsScreen(userId: widget.userId)));
                             },
                           ),
                           // personal select
@@ -197,7 +206,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             onTap: () {
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                      builder: (_) => const PersonalScreen()));
+                                      builder: (_) => PersonalScreen(userId: widget.userId,)));
                             },
                           ),
                           // notification select
@@ -219,7 +228,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             onTap: () {
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                      builder: (_) => const NotifyScreen()));
+                                      builder: (_) => NotifyScreen(userId: widget.userId,)));
                             },
                           ),
                           //event select
@@ -241,7 +250,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             onTap: () {
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                      builder: (_) => const EventScreen()));
+                                      builder: (_) => EventScreen(userId: widget.userId,)));
                             },
                           )
                         ],

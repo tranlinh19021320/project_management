@@ -48,7 +48,7 @@ class _AddCompanyState extends State<AddCompany> {
 
   checkAlreadyCompany() async {
     isAlreadyCompany =
-        await FirebaseMethods().isAlreadyCompany(controller.text);
+        await FirebaseMethods().isAlreadyCompany(companyName: controller.text);
     setState(() {});
   }
 

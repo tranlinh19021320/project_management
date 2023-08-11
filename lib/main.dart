@@ -2,10 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/home/home_screen.dart';
-import 'package:project_management/provider/user_provider.dart';
 import 'package:project_management/start_screen/login.dart';
 import 'package:project_management/utils/utils.dart';
-import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -22,11 +20,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()),
-      ],
-      child: MaterialApp(
+    return  MaterialApp(
         title: 'QLDA',
         debugShowCheckedModeBanner: false,
         theme: ThemeData.dark(),
@@ -53,7 +47,7 @@ class MyApp extends StatelessWidget {
             return const Login();
           },
         ),
-      ),
-    );
+      );
+    
   }
 }

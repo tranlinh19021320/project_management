@@ -1,10 +1,10 @@
 
 import 'package:flutter/material.dart';
+import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/admin/screens/projects_screen.dart';
 import 'package:project_management/home/staff/screens/staff_home.dart';
-import 'package:project_management/provider/user_provider.dart';
+import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/utils.dart';
-import 'package:provider/provider.dart';
 class HomeScreen extends StatefulWidget {
   final String userId;
   const HomeScreen({
@@ -16,23 +16,32 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String group = "Devs1";
+  bool isLoading = false;
   @override
   void initState() {
+    
     super.initState();
     init();
+    
   }
 
   init() async {
-    UserProvider user = Provider.of<UserProvider>(context, listen: false);
-    await user.getUserById(widget.userId);
+    setState(() {
+      isLoading = true;
+    });
+    CurrentUser user = await FirebaseMethods().getCurrentUserByUserId(userId: widget.userId);
+    group = user.group;
+    setState(() {
+      isLoading = false;
+    });
   }
   @override
   Widget build(BuildContext context) {
-    setState(() {
-      
-    });
-    return context.watch<UserProvider>().getCurrentUser.group == manager
-        ? const ProjectsScreen()
+    return isLoading?const Center(
+      child: CircularProgressIndicator(backgroundColor: Colors.transparent,),
+    ): group == manager
+        ? ProjectsScreen(userId: widget.userId,)
         : const StaffHomeScreen();
   }
 }

@@ -3,7 +3,8 @@ import 'package:project_management/home/admin/widgets/drawer_bar.dart';
 import 'package:project_management/utils/utils.dart';
 
 class ProjectsScreen extends StatefulWidget {
-  const ProjectsScreen({super.key});
+  final String userId;
+  const ProjectsScreen({super.key, required this.userId});
 
   @override
   State<ProjectsScreen> createState() => _ProjectsScreenState();
@@ -29,7 +30,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             )
           ],
         ),
-        drawer: const DrawerMenu(selectedPage: IS_PROJECTS_PAGE),
+        drawer: DrawerMenu(selectedPage: IS_PROJECTS_PAGE,userId :widget.userId),
         body: const Text("..."),
       ),
     );

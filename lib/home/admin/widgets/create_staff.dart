@@ -1,25 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
-import 'package:provider/provider.dart';
-
 import '../../../firebase/firebase_methods.dart';
-import '../../../provider/user_provider.dart';
 
 class CreateStaff extends StatefulWidget {
-  const CreateStaff({super.key});
+  final String userId;
+  final List<String> groups;
+  const CreateStaff({super.key, required this.userId, required this.groups});
   @override
   State<CreateStaff> createState() => _CreateStaffState();
 }
 
 class _CreateStaffState extends State<CreateStaff> {
+  TextEditingController emailController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController groupController = TextEditingController();
 
+  late FocusNode emailFocus;
   late FocusNode usernameFocus;
   late FocusNode passwordFocus;
 
+  late CurrentUser user;
+
+  int isEmailState = IS_DEFAULT_STATE;
   int isAccountState = IS_DEFAULT_STATE;
   int isPasswordState = IS_DEFAULT_STATE;
 
@@ -27,16 +33,18 @@ class _CreateStaffState extends State<CreateStaff> {
   bool isCreateGroup = false;
   String groupSelect = 'Manager';
   bool isLoadingGroup = false;
-  List<String> groups = [];
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
+    init();
     // groupSelect = 'Manager'
     usernameFocus = FocusNode();
     usernameFocus.addListener(() async {
       if (!usernameFocus.hasFocus) {
         isAccountState = await FirebaseMethods()
-            .checkAlreadyAccount(usernameController.text);
+            .checkAlreadyAccount(username: usernameController.text);
         setState(() {});
       } else {
         setState(() {
@@ -64,14 +72,24 @@ class _CreateStaffState extends State<CreateStaff> {
     passwordFocus.dispose();
   }
 
+  init() async {
+    setState(() {
+      isLoading = true;
+    });
+    user =
+        await FirebaseMethods().getCurrentUserByUserId(userId: widget.userId);
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   updateGroup() async {
     setState(() {
       isLoadingGroup = true;
     });
 
-    UserProvider user = Provider.of<UserProvider>(context, listen: false);
     String res = await FirebaseMethods()
-        .updateGroup(user.getCurrentUser.companyId, groupController.text);
+        .addGroup(companyId: user.companyId, groupName: groupController.text);
     if (res != 'success') {
       if (context.mounted) {
         showSnackBar(context, res, true);
@@ -95,7 +113,6 @@ class _CreateStaffState extends State<CreateStaff> {
           isPasswordState = IS_ERROR_STATE;
         });
       } else {
-        UserProvider user = Provider.of<UserProvider>(context, listen: false);
         String res = await FirebaseMethods().createUser(
             email: '',
             username: usernameController.text,
@@ -103,8 +120,8 @@ class _CreateStaffState extends State<CreateStaff> {
             nameDetails: usernameController.text,
             photoURL: '',
             group: groupSelect,
-            companyId: user.getCurrentUser.companyId,
-            companyName: user.getCurrentUser.companyName);
+            companyId: user.companyId,
+            companyName: user.companyName);
 
         if (res == 'success') {
           if (context.mounted) {
@@ -134,190 +151,215 @@ class _CreateStaffState extends State<CreateStaff> {
         "Tạo tài khoản nhân viên",
         style: TextStyle(fontSize: 16),
       )),
-      content: Form(
-        child: Column(children: [
-          // username account
-          TextFormField(
-              controller: usernameController,
-              focusNode: usernameFocus,
-              onTapOutside: (event) => usernameFocus.unfocus(),
-              decoration: InputDecoration(
-                labelText: "Tài khoản",
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: usernameIcon,
+      content: (isLoading)
+          ? Center(
+              child: LoadingAnimationWidget.hexagonDots(
+                  color: backgroundWhiteColor, size: 40))
+          : Form(
+              child: Column(children: [
+                // username account
+                TextFormField(
+                    controller: usernameController,
+                    focusNode: usernameFocus,
+                    onTapOutside: (event) => usernameFocus.unfocus(),
+                    decoration: InputDecoration(
+                      labelText: "Tài khoản",
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: usernameIcon,
+                      ),
+                      // notify if username is error
+                      helperText: isAccountState == IS_ERROR_STATE
+                          ? "Tài khoản đã đăng ký!"
+                          : null,
+                      helperStyle:
+                          const TextStyle(color: errorRedColor, fontSize: 14),
+                      // outline boder
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: isAccountState == IS_CORRECT_STATE
+                                ? correctGreenColor
+                                : isAccountState == IS_ERROR_STATE
+                                    ? errorRedColor
+                                    : defaultColor),
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(6)),
+                      suffixIcon: isAccountState == IS_DEFAULT_STATE
+                          ? null
+                          : isAccountState == IS_CORRECT_STATE
+                              ? correctIcon
+                              : errorIcon,
+                    ),
+                    onFieldSubmitted: (value) {
+                      usernameFocus.unfocus();
+                      FocusScope.of(context).requestFocus(passwordFocus);
+                    }),
+                const SizedBox(
+                  height: 12,
                 ),
-                // notify if username is error
-                helperText: isAccountState == IS_ERROR_STATE
-                    ? "Tài khoản đã đăng ký!"
-                    : null,
-                helperStyle:
-                    const TextStyle(color: errorRedColor, fontSize: 14),
-                // outline boder
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                      color: isAccountState == IS_CORRECT_STATE
-                          ? correctGreenColor
-                          : isAccountState == IS_ERROR_STATE
+
+                //password
+                TextFormField(
+                  controller: passwordController,
+                  focusNode: passwordFocus,
+                  decoration: InputDecoration(
+                    labelText: "Mật khẩu",
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: passwordIcon,
+                    ),
+
+                    //notify if password is empty
+                    helperText: isPasswordState == IS_ERROR_STATE
+                        ? "Vui lòng nhập mật khẩu!"
+                        : null,
+                    helperStyle:
+                        const TextStyle(color: errorRedColor, fontSize: 14),
+                    //outline border
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: isPasswordState == IS_ERROR_STATE
                               ? errorRedColor
                               : defaultColor),
+                    ),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6)),
+
+                    //icon lock
+                    suffixIcon: IconButton(
+                      icon: isLockedPassword
+                          ? hidePasswordIcon
+                          : viewPasswordIcon,
+                      onPressed: () {
+                        setState(() {
+                          isLockedPassword = !isLockedPassword;
+                        });
+                      },
+                    ),
+                  ),
+                  obscureText: isLockedPassword,
+                  onFieldSubmitted: (value) {
+                    passwordFocus.unfocus;
+                  },
                 ),
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                suffixIcon: isAccountState == IS_DEFAULT_STATE
-                    ? null
-                    : isAccountState == IS_CORRECT_STATE
-                        ? correctIcon
-                        : errorIcon,
-              ),
-              onFieldSubmitted: (value) {
-                usernameFocus.unfocus();
-                FocusScope.of(context).requestFocus(passwordFocus);
-              }),
-          const SizedBox(
-            height: 12,
-          ),
-
-          //password
-          TextFormField(
-            controller: passwordController,
-            focusNode: passwordFocus,
-            decoration: InputDecoration(
-              labelText: "Mật khẩu",
-              prefixIcon: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: passwordIcon,
-              ),
-
-              //notify if password is empty
-              helperText: isPasswordState == IS_ERROR_STATE
-                  ? "Vui lòng nhập mật khẩu!"
-                  : null,
-              helperStyle: const TextStyle(color: errorRedColor, fontSize: 14),
-              //outline border
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                    color: isPasswordState == IS_ERROR_STATE
-                        ? errorRedColor
-                        : defaultColor),
-              ),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-
-              //icon lock
-              suffixIcon: IconButton(
-                icon: isLockedPassword ? hidePasswordIcon : viewPasswordIcon,
-                onPressed: () {
-                  setState(() {
-                    isLockedPassword = !isLockedPassword;
-                  });
-                },
-              ),
+                const SizedBox(
+                  height: 12,
+                ),
+                (isLoadingGroup)
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : (isCreateGroup)
+                        ? Row(
+                            children: [
+                              const Text(
+                                "Nhóm:  ",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              // group
+                              Expanded(
+                                child: SizedBox(
+                                  width: 100,
+                                  height: 32,
+                                  child: TextFormField(
+                                    controller: groupController,
+                                    autofocus: true,
+                                    decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    )),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              InkWell(
+                                onTap: updateGroup,
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: ShapeDecoration(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    color: focusBlueColor,
+                                  ),
+                                  width: 48,
+                                  height: 32,
+                                  child: const Center(
+                                      child: Text(
+                                    "Tạo",
+                                    style: TextStyle(fontSize: 14),
+                                  )),
+                                ),
+                              ),
+                              IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isCreateGroup = false;
+                                      groupController.clear();
+                                    });
+                                  },
+                                  icon: const Icon(
+                                    Icons.cancel_outlined,
+                                    color: defaultColor,
+                                    size: 28,
+                                  ))
+                            ],
+                          )
+                        : Row(
+                            children: [
+                              const Text(
+                                "Nhóm:  ",
+                                style: TextStyle(fontSize: 16),
+                              ),
+                                  DropdownButton(
+                                      menuMaxHeight: 200,
+                                      alignment: Alignment.center,
+                                      value: groupSelect,
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                      ),
+                                      underline: Container(
+                                        height: 1,
+                                        color: backgroundWhiteColor,
+                                      ),
+                                      items: widget.groups.map((String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(
+                                            value,
+                                            style: TextStyle(
+                                                color: (value == groupSelect)
+                                                    ? notifyIconColor
+                                                    : backgroundWhiteColor),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (val) {
+                                        setState(() {
+                                          groupSelect = val!;
+                                        });
+                                      },
+                                    ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 12,
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      isCreateGroup = true;
+                                    });
+                                  },
+                                  icon: createIcon,
+                                ),
+                              )
+                            ],
+                          )
+              ]),
             ),
-            obscureText: isLockedPassword,
-            onFieldSubmitted: (value) {
-              passwordFocus.unfocus;
-            },
-          ),
-          const SizedBox(
-            height: 12,
-          ),
-          (isLoadingGroup)
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : (isCreateGroup)
-                  ? Row(
-                      children: [
-                        const Text(
-                          "Nhóm:  ",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        // group
-                        Expanded(
-                          child: SizedBox(
-                            width: 100,
-                            height: 32,
-                            child: TextFormField(
-                              controller: groupController,
-                              autofocus: true,
-                              decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              )),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        InkWell(
-                          onTap: updateGroup,
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: ShapeDecoration(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
-                              color: focusBlueColor,
-                            ),
-                            width: 48,
-                            height: 32,
-                            child: const Center(
-                                child: Text(
-                              "Tạo",
-                              style: TextStyle(fontSize: 14),
-                            )),
-                          ),
-                        ),
-                        IconButton(
-                            onPressed: () {
-                              setState(() {
-                                isCreateGroup = false;
-                                groupController.clear();
-                              });
-                            },
-                            icon: const Icon(
-                              Icons.cancel_outlined,
-                              color: defaultColor,
-                              size: 28,
-                            ))
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        const Text(
-                          "Nhóm:  ",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        groupDropdown(
-                            companyId: context
-                                .watch<UserProvider>()
-                                .getCurrentUser
-                                .companyId,
-                            groupSelect: groupSelect,
-                            isWordAtHead: "",
-                            onSelectValue: (String selectValue) {
-                              setState(() {
-                                groupSelect = selectValue;
-                              });
-                            }),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            top: 12,
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              setState(() {
-                                isCreateGroup = true;
-                              });
-                            },
-                            icon: createIcon,
-                          ),
-                        )
-                      ],
-                    )
-        ]),
-      ),
       actions: [
         InkWell(
           onTap: createStaff,
