@@ -176,11 +176,7 @@ class _SignupState extends State<Signup> {
                       // outline boder
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                            color: isEmailState == IS_CORRECT_STATE
-                                ? correctGreenColor
-                                : isEmailState == IS_DEFAULT_STATE
-                                    ? defaultColor
-                                    : errorRedColor),
+                            color: notifyColor(state: isEmailState)),
                       ),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6)),
@@ -218,11 +214,7 @@ class _SignupState extends State<Signup> {
                       // outline boder
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                            color: isAccountState == IS_CORRECT_STATE
-                                ? correctGreenColor
-                                : isAccountState == IS_ERROR_STATE
-                                    ? errorRedColor
-                                    : defaultColor),
+                            color:notifyColor(state: isAccountState)),
                       ),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6)),
@@ -259,9 +251,7 @@ class _SignupState extends State<Signup> {
                       //outline border
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                            color: isPasswordState == IS_ERROR_STATE
-                                ? errorRedColor
-                                : defaultColor),
+                            color: notifyColor(state: isPasswordState)),
                       ),
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(6)),

@@ -89,7 +89,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
   }
 
   changeProfileImage(Uint8List image) async {
-    await FirebaseMethods().changeProfileImage(image:image,userId: widget.userId);
+    await FirebaseMethods()
+        .changeProfileImage(image: image, userId: widget.userId);
   }
 
   @override
@@ -116,7 +117,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                         color: backgroundWhiteColor, size: 18),
                   );
                 }
-              
+
                 return UserAccountsDrawerHeader(
                   currentAccountPicture: Stack(
                     children: [
@@ -126,7 +127,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
                         },
                         child: CircleAvatar(
                           backgroundColor: backgroundWhiteColor,
-                          backgroundImage: NetworkImage(snapshot.data!['photoURL']),
+                          backgroundImage:
+                              NetworkImage(snapshot.data!['photoURL']),
                           radius: 64,
                         ),
                       ),
@@ -146,10 +148,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
                           : Container(),
                     ],
                   ),
-                  accountName: Text(
-                      snapshot.data!['nameDetails']),
-                  accountEmail:
-                      Text(snapshot.data!['email']),
+                  accountName: Text(snapshot.data!['nameDetails']),
+                  accountEmail: Text(snapshot.data!['email']),
                   onDetailsPressed: () {
                     setState(() {
                       isOpenProfile = !isOpenProfile;
@@ -159,7 +159,9 @@ class _DrawerMenuState extends State<DrawerMenu> {
               }),
           Expanded(
               child: isOpenProfile
-                  ? ProfileScreen(userId: widget.userId,)
+                  ? ProfileScreen(
+                      userId: widget.userId,
+                    )
                   : Scaffold(
                       backgroundColor: Colors.transparent,
                       body: ListView(
@@ -184,7 +186,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             onTap: () {
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                      builder: (_) => ProjectsScreen(userId: widget.userId)));
+                                      builder: (_) => ProjectsScreen(
+                                          userId: widget.userId)));
                             },
                           ),
                           // personal select
@@ -204,9 +207,11 @@ class _DrawerMenuState extends State<DrawerMenu> {
                               style: TextStyle(fontSize: 16),
                             ),
                             onTap: () {
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (_) => PersonalScreen(userId: widget.userId,)));
+                              Navigator.of(context)
+                                  .pushReplacement(MaterialPageRoute(
+                                      builder: (_) => PersonalScreen(
+                                            userId: widget.userId,
+                                          )));
                             },
                           ),
                           // notification select
@@ -226,9 +231,11 @@ class _DrawerMenuState extends State<DrawerMenu> {
                               style: TextStyle(fontSize: 16),
                             ),
                             onTap: () {
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (_) => NotifyScreen(userId: widget.userId,)));
+                              Navigator.of(context)
+                                  .pushReplacement(MaterialPageRoute(
+                                      builder: (_) => NotifyScreen(
+                                            userId: widget.userId,
+                                          )));
                             },
                           ),
                           //event select
@@ -248,13 +255,17 @@ class _DrawerMenuState extends State<DrawerMenu> {
                               style: TextStyle(fontSize: 16),
                             ),
                             onTap: () {
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (_) => EventScreen(userId: widget.userId,)));
+                              Navigator.of(context)
+                                  .pushReplacement(MaterialPageRoute(
+                                      builder: (_) => EventScreen(
+                                            userId: widget.userId,
+                                          )));
                             },
                           )
                         ],
                       ),
+
+                      // button sign Out
                       floatingActionButton: InkWell(
                         onTap: signOut,
                         child: Container(
@@ -272,6 +283,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                           )),
                         ),
                       ),
+                      
                       floatingActionButtonLocation:
                           FloatingActionButtonLocation.endFloat,
                     )),

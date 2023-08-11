@@ -158,21 +158,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ? "Nhập mật khẩu cũ để xác thực"
                       : "Đã xác thực mật khẩu",
               helperStyle: TextStyle(
-                  color: (isPasswordState == IS_CORRECT_STATE)
-                      ? correctGreenColor
-                      : (isPasswordState == IS_DEFAULT_STATE)
-                          ? backgroundWhiteColor
-                          : errorRedColor,
+                  color: notifyColor(state: isPasswordState),
                   fontSize: 11),
 
               //outline border
               enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                    color: isPasswordState == IS_ERROR_STATE
-                        ? errorRedColor
-                        : isPasswordState == IS_CORRECT_STATE
-                            ? correctGreenColor
-                            : defaultColor),
+                    color: notifyColor(state: isPasswordState)),
               ),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(6)),

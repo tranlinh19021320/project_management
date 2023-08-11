@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/admin/widgets/create_staff.dart';
+import 'package:project_management/home/admin/widgets/group_dropdown_button.dart';
 import 'package:project_management/home/admin/widgets/staff_card.dart';
 import 'package:project_management/model/user.dart';
 import '../../../utils/utils.dart';
@@ -25,6 +26,11 @@ class _PersonalScreenState extends State<PersonalScreen> {
   String groupSelect = 'Tất cả';
   int isResult = IS_DEFAULT_STATE;
   String companyId = '';
+  String companyName = "";
+
+  late SizedBox groupDropdownButton;
+
+  // late GroupDropdownButton groupDropdownButton;
 
   bool isLoading = false;
   @override
@@ -45,6 +51,32 @@ class _PersonalScreenState extends State<PersonalScreen> {
     CurrentUser user =
         await FirebaseMethods().getCurrentUserByUserId(userId: widget.userId);
     companyId = user.companyId;
+    companyName = user.companyName;
+
+    groupDropdownButton = SizedBox(
+      height: 48,
+      child: Stack(
+        children: [
+          const Text(
+            "Nhóm:",
+            style: TextStyle(fontSize: 16),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            // group dropdown button
+            child: GroupDropdownButton(
+                companyId: companyId,
+                groupSelect: groupSelect,
+                isWordAtHead: "Tất cả",
+                onSelectValue: (String value) {
+                  setState(() {
+                    groupSelect = value;
+                  });
+                }),
+          ),
+        ],
+      ),
+    );
     setState(() {
       isLoading = false;
     });
@@ -136,61 +168,23 @@ class _PersonalScreenState extends State<PersonalScreen> {
                         const SizedBox(
                           width: 12,
                         ),
-                        SizedBox(
-                          height: 48,
-                          child: Stack(
-                            children: [
-                              const Text(
-                                "Nhóm:",
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 12),
-                                child: groupDropdown(
-                                    companyId: companyId,
-                                    groupSelect: groupSelect,
-                                    isWordAtHead: "Tất cả",
-                                    onSelectValue: (String selectValue) {
-                                      setState(() {
-                                        groupSelect = selectValue;
-                                      });
-                                    }),
-                              ),
-                            ],
+                        groupDropdownButton,
+                        // button to create user
+                        Padding(
+                          padding: const EdgeInsets.only(left: 2),
+                          child: IconButton(
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (_) => CreateStaff(
+                                        companyId: companyId,
+                                        companyName: companyName,
+                                      ));
+                            },
+                            icon: addIcon,
+                            highlightColor: focusBlueColor,
                           ),
-                        ),
-                        StreamBuilder(
-                            stream: FirebaseFirestore.instance
-                                .collection('companies')
-                                .doc(companyId)
-                                .snapshots(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return LoadingAnimationWidget.fallingDot(
-                                    color: darkblueAppbarColor, size: 20);
-                              }
-
-                              List<String> groups = [];
-                              for (var value in snapshot.data!['group']) {
-                                groups.add(value.toString());
-                              }
-                              return Padding(
-                                padding: const EdgeInsets.only(left: 2),
-                                child: IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (_) => CreateStaff(
-                                              userId: widget.userId,
-                                              groups: groups,
-                                            ));
-                                  },
-                                  icon: addIcon,
-                                  highlightColor: focusBlueColor,
-                                ),
-                              );
-                            })
+                        )
                       ],
                     ),
                     const Divider(),

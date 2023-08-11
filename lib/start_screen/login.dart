@@ -171,11 +171,7 @@ class _LoginState extends State<Login> {
                         // outline boder
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                              color: isAccountState == IS_CORRECT_STATE
-                                  ? correctGreenColor
-                                  : isAccountState == IS_ERROR_STATE
-                                      ? errorRedColor
-                                      : defaultColor),
+                              color: notifyColor(state: isAccountState)),
                         ),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6)),
@@ -216,10 +212,7 @@ class _LoginState extends State<Login> {
                         //outline border
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
-                              color: isPasswordState == IS_ERROR_STATE ||
-                                      isPasswordState == IS_ERROR_FORMAT_STATE
-                                  ? errorRedColor
-                                  : defaultColor),
+                              color: notifyColor(state: isPasswordState)),
                         ),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6)),

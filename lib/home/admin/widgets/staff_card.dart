@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/model/user.dart';
+import 'package:project_management/home/admin/widgets/group_dropdown_button.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
+
 class StaffCard extends StatefulWidget {
   final String currentUserId;
   final DocumentSnapshot staff;
   const StaffCard({
     super.key,
-    required this.staff, required this.currentUserId,
+    required this.staff,
+    required this.currentUserId,
   });
 
   @override
@@ -28,24 +30,8 @@ class _StaffCardState extends State<StaffCard> {
   @override
   void initState() {
     super.initState();
-    init();
+    companyId = widget.staff['companyId'];
     userGroup = widget.staff['group'];
-  }
-   @override
-  void dispose() {
-    super.dispose();
-  }
-  
-
-  init() async {
-    setState(() {
-      isLoadingGroup = true;
-    });
-    CurrentUser user = await FirebaseMethods().getCurrentUserByUserId(userId: widget.currentUserId);
-    companyId = user.companyId;
-    setState(() {
-      isLoadingGroup = false;
-    });
   }
 
   deleteUser() async {
@@ -114,8 +100,8 @@ class _StaffCardState extends State<StaffCard> {
     if (comfirm) {
       String res = "";
       try {
-        FirebaseMethods()
-            .deleteUser(userId: widget.staff['userId'],email: widget.staff['email']);
+        FirebaseMethods().deleteUser(
+            userId: widget.staff['userId'], email: widget.staff['email']);
         res = "success";
       } catch (e) {
         res = e.toString();
@@ -151,7 +137,7 @@ Nhóm: $userGroup''';
       isLoadingGroup = true;
     });
     String res = await FirebaseMethods()
-        .changeUserGroup(userId: widget.staff['userId'],group: userGroup);
+        .changeUserGroup(userId: widget.staff['userId'], group: userGroup);
     setState(() {
       isLoadingGroup = false;
       isChangeGroup = false;
@@ -169,8 +155,7 @@ Nhóm: $userGroup''';
 
   @override
   Widget build(BuildContext context) {
-    return (widget.currentUserId ==
-            widget.staff['userId'])
+    return (widget.currentUserId == widget.staff['userId'])
         ? Container()
         : Container(
             decoration:
@@ -244,108 +229,117 @@ Nhóm: $userGroup''';
                                     'Nhóm:  ',
                                     style: TextStyle(fontSize: 13),
                                   ),
-                                  isLoadingGroup ? LoadingAnimationWidget.waveDots(color: backgroundWhiteColor, size: 20):
-                                  (isChangeGroup)
-                                      ? Row(
-                                          children: [
-                                            groupDropdown(
-                                                companyId: companyId,
-                                                groupSelect: userGroup,
-                                                isWordAtHead: "",
-                                                onSelectValue:
-                                                    (String selectValue) {
-                                                  setState(() {
-                                                    userGroup = selectValue;
-                                                  });
-                                                }),
-                                            const SizedBox(
-                                              width: 8,
-                                            ),
-                                            InkWell(
-                                              onTap:
-                                                  updateGroup, // comfirm change group
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(0),
-                                                decoration: ShapeDecoration(
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12)),
-                                                  color: focusBlueColor,
+                                  isLoadingGroup
+                                      ? LoadingAnimationWidget.waveDots(
+                                          color: backgroundWhiteColor, size: 20)
+                                      : (isChangeGroup)
+                                          ? Row(
+                                              children: [
+                                                GroupDropdownButton(
+                                                    companyId: companyId,
+                                                    groupSelect: userGroup,
+                                                    isWordAtHead: '',
+                                                    onSelectValue:
+                                                        (String value) {
+                                                      if (context.mounted) {
+                                                        setState(() {
+                                                          userGroup = value;
+                                                        });
+                                                      }
+                                                    }),
+                                                const SizedBox(
+                                                  width: 8,
                                                 ),
-                                                width: 28,
-                                                height: 28,
-                                                child: const Center(
-                                                    child: Text(
-                                                  "Ok",
-                                                  style:
-                                                      TextStyle(fontSize: 12),
-                                                )),
-                                              ),
-                                            ),
-                                            InkWell(
-                                              onTap: () {
-                                                setState(() {
-                                                  isChangeGroup = false;
-                                                  userGroup =
-                                                      widget.staff['group'];
-                                                });
-                                              }, // comfirm change group
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(4),
-                                                color: Colors.transparent,
-                                                width: 28,
-                                                height: 28,
-                                                child: const Center(
-                                                    child: Icon(
-                                                  Icons.cancel_outlined,
-                                                  color: defaultColor,
-                                                  size: 20,
-                                                )),
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      : Row(
-                                          children: [
-                                            Text(
-                                              userGroup,
-                                              style:
-                                                  const TextStyle(fontSize: 13),
-                                            ),
-                                            const SizedBox(
-                                              width: 8,
-                                            ),
-                                            (userGroup == "Manager")
-                                                ? Container()
-                                                : InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        isChangeGroup = true;
-                                                      });
-                                                    },
-                                                    child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(0),
-                                                        width: 20,
-                                                        height: 20,
-                                                        child: const Padding(
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  0.0),
-                                                          child: Icon(
-                                                            Icons.change_circle,
-                                                            color:
-                                                                buttonGreenColor,
-                                                            size: 20,
-                                                          ),
-                                                        )),
+                                                InkWell(
+                                                  onTap:
+                                                      updateGroup, // comfirm change group
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(0),
+                                                    decoration: ShapeDecoration(
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          12)),
+                                                      color: focusBlueColor,
+                                                    ),
+                                                    width: 28,
+                                                    height: 28,
+                                                    child: const Center(
+                                                        child: Text(
+                                                      "Ok",
+                                                      style: TextStyle(
+                                                          fontSize: 12),
+                                                    )),
                                                   ),
-                                          ],
-                                        ),
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      isChangeGroup = false;
+                                                      userGroup =
+                                                          widget.staff['group'];
+                                                    });
+                                                  }, // comfirm change group
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(4),
+                                                    color: Colors.transparent,
+                                                    width: 28,
+                                                    height: 28,
+                                                    child: const Center(
+                                                        child: Icon(
+                                                      Icons.cancel_outlined,
+                                                      color: defaultColor,
+                                                      size: 20,
+                                                    )),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : Row(
+                                              children: [
+                                                Text(
+                                                  userGroup,
+                                                  style: const TextStyle(
+                                                      fontSize: 13),
+                                                ),
+                                                const SizedBox(
+                                                  width: 8,
+                                                ),
+                                                (userGroup == "Manager")
+                                                    ? Container()
+                                                    : InkWell(
+                                                        onTap: () {
+                                                          setState(() {
+                                                            isChangeGroup =
+                                                                true;
+                                                          });
+                                                        },
+                                                        child: Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(0),
+                                                            width: 20,
+                                                            height: 20,
+                                                            child:
+                                                                const Padding(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(0.0),
+                                                              child: Icon(
+                                                                Icons
+                                                                    .change_circle,
+                                                                color:
+                                                                    buttonGreenColor,
+                                                                size: 20,
+                                                              ),
+                                                            )),
+                                                      ),
+                                              ],
+                                            ),
                                 ],
                               ),
                             ),

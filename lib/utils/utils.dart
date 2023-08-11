@@ -1,22 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/utils/notify_dialog.dart';
+
 // images path
 String backgroundImage = "assets/images/background_image.jpg";
 String defaultProfileImage = "assets/images/default-profile.jpg";
 String keyImage = "assets/icons/key.png";
 String staffImage = "assets/icons/staff.png";
 
-//path
-String databaseURL =
-    'https://project-management-89017-default-rtdb.asia-southeast1.firebasedatabase.app';
-String projectId = "project-management-89017";
-String clientEmail =
-    "firebase-adminsdk-34nls@project-management-89017.iam.gserviceaccount.com";
-String privateKey =
-    "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCww4N5QSs6txve\nnDjUVqNkFs4I0PsDw7BXl4RWVYcxPgtWvssW5woVruOQVvq/9BHZXlP5DR4ME5nF\nJkHWnIUcFKblMWlFKylrmADZThd+bMB+2y3MstgDG3D3yVEt2EcIml/pSk6QWo2l\nW2yCCgUVv3ws1hGA/t17BCiXs2Q0XlykZ7H+wlLYCvLgID3DaRrOZ7vHIP/c7ReB\nBs/xuIU9FV2wj9duEvbQUSY1SRrQaLoi5Wnr4PVYCP1FUCY6+N4ZKGPXykW71XHH\n3/13gV+6/TI2qQgDM1Dk4f1U8vk/Sj1fWpG9lx1hNcF9JgHMX69HIUo7ljR7uIOs\nuxEr5hCPAgMBAAECggEABRil9j2AQxGbbpgfdVPIIy8bIprv2cRvFZ9rM9gEbVGG\nHyqiDVd87XIc4oD3eshNKXC0SBZuOtfn04zOUiMyHUSlKS97AwEDETSRNbKwL7dv\n91hXYjL30mMcpzA5NHKrXZ6hzEaVrEjIE6/mmXszeVSLfnlviMIQXacZioIkDfRs\nJd+IjxRFgEu/5FRv2/VrNJpPiAzmxmcdqOzydv9DiDKBcQIfDbE2OkRJXfozBnbB\nBITdyDHcmjz7u3JT8skK/YgW+wG0mcmikJKenTxzhgpcyCjCoIHOkcLdkCpzQa0H\nVO4rxskugQmC4+uXtLg5tD9X+N0oFsGesUh3e7tX4QKBgQDyGf/CPTnZVjWI4AVG\nEZhRoGsZtVRgw2bXcA8t8pI3Ozyn12tDay+1p8JZw16bbbygabiuajUcHL7jpBCD\nMhhIJE5io+Z5DoA1h3SagajIVC9Csp0Zl6tOt9wtnGiNSk8Xeudw5xMCoUil5WeJ\nJWp3821OnHiMHMlPn69t17No7wKBgQC66UoA4TEkrx6eWtYMKsQ7MBWuAtZVFVbS\nYpU3pebCDk5cW6y7mSxKx+MNcTrFv4KCR/4EUl4KINuu8clfRsudq0Wld0TK6q0M\nzbS6B4Sfds6jGViTz8yweAXV0D+2QPMnQLcL1/G9pDeieliRrLmuOCASFYNHPU5A\n3hQAhB2SYQKBgGADjZnz/ChEd1DEP3MtcTIWI8N7VW5WsEeKioqXZAOBe6m41jJT\npQUu9fXxdGjB2YfoxbRuLIfsoovXOjE9wcGCnI+kHrgt1wzjnovUFiL0uBWEjqdi\nri623hw8pn46VSmjtXviOHjXi983HpuWeiX+JYCCr5AprnDkjIdMfzuDAoGBALWB\nuoWkKW7wSBGLMHVcSncXuNXkl3LEaC2h4jnJ947XCa2SsOj0VBjCh3EUVfiWgww1\nES3tNrkrM2puDhlhzHVuTxHiAoHy5t2aHTjR+C5K11t3T5cqoiF0TGZX9qbr57Rk\nmdz8dRquEADOQpgkXaQbiLlG/tb9Z7KCdnYR1g3BAoGBAM4aRQJyd+tsRuh6OhIY\n16Iv/yXQVKE/apYC2UOIfH+yL7d7wggoGTIF/3LmXv10If4YeRy3Los0Ot+ZwfbO\nM+iTInC3E8Hz3sPsBcZ/KI+wzFLClqbrqYxN1wALS2Jvcl0ej6sem1sY7nLbftZj\nxIlL5IAxM5+5cGmucemOa2LX\n-----END PRIVATE KEY-----\n";
 // asset icon
 Image emailIcon = Image.asset(
   "assets/icons/gmail.png",
@@ -260,50 +251,10 @@ pickImage(BuildContext context, ImageSource source) async {
   }
 }
 
-Widget groupDropdown({required String companyId, required String groupSelect, required String isWordAtHead, required Function onSelectValue,}) {
-  // Function(String value) onSelectValue;
-  return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('companies')
-          .doc(companyId)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return LoadingAnimationWidget.hexagonDots(
-              color: darkblueAppbarColor, size: 20);
-        }
-        String selectValue = groupSelect;
-        List<String> groups = [];
-        if (isWordAtHead != "") groups.add(isWordAtHead);
-        for (var value in snapshot.data!['group']) {
-          groups.add(value.toString());
-        }
-        return DropdownButton(
-          menuMaxHeight: 200,
-          alignment: Alignment.center,
-          value: selectValue,
-          style: const TextStyle(
-            fontSize: 13,
-          ),
-          underline: Container(
-            height: 1,
-            color: backgroundWhiteColor,
-          ),
-          items: groups.map((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(
-                value,
-                style: TextStyle(
-                    color: (value == selectValue)
-                        ? notifyIconColor
-                        : backgroundWhiteColor),
-              ),
-            );
-          }).toList(),
-          onChanged: (val) {
-              onSelectValue(val!);
-          },
-        );
-      });
+Color notifyColor({required int state}) {
+  return (state == IS_CORRECT_STATE)
+      ? correctGreenColor
+      : (state == IS_DEFAULT_STATE)
+          ? defaultColor
+          : errorRedColor;
 }

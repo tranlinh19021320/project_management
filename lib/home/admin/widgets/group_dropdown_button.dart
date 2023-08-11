@@ -17,6 +17,12 @@ class GroupDropdownButton extends StatefulWidget {
 }
 
 class _GroupDropdownButtonState extends State<GroupDropdownButton> {
+  String selectValue = "Manager";
+  @override
+  void initState() {
+    super.initState();
+    selectValue = widget.groupSelect;
+  }
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -29,7 +35,6 @@ class _GroupDropdownButtonState extends State<GroupDropdownButton> {
           return LoadingAnimationWidget.hexagonDots(
               color: darkblueAppbarColor, size: 20);
         }
-        String selectValue = widget.groupSelect;
         List<String> groups = [];
         if (widget.isWordAtHead != "") groups.add(widget.isWordAtHead);
         for (var value in snapshot.data!['group']) {
@@ -59,7 +64,12 @@ class _GroupDropdownButtonState extends State<GroupDropdownButton> {
             );
           }).toList(),
           onChanged: (val) {
-              widget.onSelectValue(val!);
+              setState(() {
+                selectValue = val!;
+                print(selectValue);
+              });
+            
+              widget.onSelectValue(selectValue);
           },
         );
       });
