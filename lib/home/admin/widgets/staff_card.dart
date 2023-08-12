@@ -1,19 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/admin/widgets/group_dropdown_button.dart';
+import 'package:project_management/home/unit_card/text_button.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
 
 class StaffCard extends StatefulWidget {
-  final String currentUserId;
   final DocumentSnapshot staff;
   const StaffCard({
     super.key,
     required this.staff,
-    required this.currentUserId,
   });
 
   @override
@@ -21,6 +21,7 @@ class StaffCard extends StatefulWidget {
 }
 
 class _StaffCardState extends State<StaffCard> {
+  late String managerId;
   late String companyId;
   bool isChangeGroup = false;
   late String userGroup;
@@ -30,6 +31,7 @@ class _StaffCardState extends State<StaffCard> {
   @override
   void initState() {
     super.initState();
+    managerId = FirebaseAuth.instance.currentUser!.uid;
     companyId = widget.staff['companyId'];
     userGroup = widget.staff['group'];
   }
@@ -59,66 +61,29 @@ class _StaffCardState extends State<StaffCard> {
               actionsAlignment: MainAxisAlignment.center,
               actionsPadding: const EdgeInsets.only(bottom: 14),
               actions: [
-                InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop(true);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: ShapeDecoration(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      color: focusBlueColor,
-                    ),
+                TextBoxButton(
+                    color: focusBlueColor,
+                    text: "Ok",
+                    fontSize: 14,
                     width: 64,
                     height: 36,
-                    child: const Center(
-                        child: Text(
-                      "Ok",
-                    )),
-                  ),
-                ),
-                InkWell(
-                  onTap: () => Navigator.of(context).pop(false),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: ShapeDecoration(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      color: textErrorRedColor,
-                    ),
+                    funtion: () => Navigator.of(context).pop(true)),
+                TextBoxButton(
+                    color: textErrorRedColor,
+                    text: "Hủy",
+                    fontSize: 14,
                     width: 64,
                     height: 36,
-                    child: const Center(
-                        child: Text(
-                      "Hủy",
-                    )),
-                  ),
-                ),
+                    funtion: () => Navigator.of(context).pop(false)),
               ],
             ));
     if (comfirm) {
-      String res = "";
-      try {
-        FirebaseMethods().deleteUser(
-            userId: widget.staff['userId'], email: widget.staff['email']);
-        res = "success";
-      } catch (e) {
-        res = e.toString();
-      }
-      if (res == 'success') {
-        if (context.mounted) {
-          showDialog(
-              context: context,
-              builder: (_) => const NotifyDialog(
-                  content: "Xóa thành công!", isError: false));
-        }
-      } else {
-        if (context.mounted) {
-          showDialog(
-              context: context,
-              builder: (_) => NotifyDialog(content: res, isError: false));
-        }
+      FirebaseMethods().deleteUser(deleteUserId: widget.staff['userId']);
+      if (context.mounted) {
+        showDialog(
+            context: context,
+            builder: (_) =>
+                const NotifyDialog(content: "Xóa thành công!", isError: false));
       }
     }
   }
@@ -155,7 +120,7 @@ Nhóm: $userGroup''';
 
   @override
   Widget build(BuildContext context) {
-    return (widget.currentUserId == widget.staff['userId'])
+    return (managerId == widget.staff['userId'])
         ? Container()
         : Container(
             decoration:
@@ -250,31 +215,13 @@ Nhóm: $userGroup''';
                                                 const SizedBox(
                                                   width: 8,
                                                 ),
-                                                InkWell(
-                                                  onTap:
-                                                      updateGroup, // comfirm change group
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(0),
-                                                    decoration: ShapeDecoration(
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          12)),
-                                                      color: focusBlueColor,
-                                                    ),
-                                                    width: 28,
-                                                    height: 28,
-                                                    child: const Center(
-                                                        child: Text(
-                                                      "Ok",
-                                                      style: TextStyle(
-                                                          fontSize: 12),
-                                                    )),
-                                                  ),
-                                                ),
+                                                TextBoxButton(
+                                                    color: focusBlueColor,
+                                                    text: "Ok",
+                                                    fontSize: 11,
+                                                    width: 30,
+                                                    height: 30,
+                                                    funtion: updateGroup),
                                                 InkWell(
                                                   onTap: () {
                                                     setState(() {
@@ -348,25 +295,15 @@ Nhóm: $userGroup''';
                             ),
                             (userGroup == "Manager")
                                 ? Container()
-                                : InkWell(
-                                    onTap: () {},
-                                    child: Container(
-                                      padding: const EdgeInsets.all(0),
-                                      decoration: ShapeDecoration(
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(2)),
-                                        color: focusBlueColor,
-                                      ),
-                                      width: 100,
-                                      height: 20,
-                                      child: const Center(
-                                          child: Text(
-                                        "Bảng chấm công",
-                                        style: TextStyle(fontSize: 12),
-                                      )),
-                                    ),
-                                  ),
+                                : TextBoxButton(
+                                    color: focusBlueColor,
+                                    text: "Bảng chấm công",
+                                    fontSize: 12,
+                                    width: 100,
+                                    height: 20,
+                                    padding: 0,
+                                    radius: 2,
+                                    funtion: () {})
                           ],
                         ),
                       ),

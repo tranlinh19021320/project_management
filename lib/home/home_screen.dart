@@ -1,4 +1,5 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/admin/screens/projects_screen.dart';
@@ -6,9 +7,8 @@ import 'package:project_management/home/staff/screens/staff_home.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/utils.dart';
 class HomeScreen extends StatefulWidget {
-  final String userId;
   const HomeScreen({
-    super.key, required this.userId, 
+    super.key,
   });
 
   @override
@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isLoading = true;
     });
-    CurrentUser user = await FirebaseMethods().getCurrentUserByUserId(userId: widget.userId);
+    CurrentUser user = await FirebaseMethods().getCurrentUserByUserId(userId: FirebaseAuth.instance.currentUser!.uid);
     group = user.group;
     setState(() {
       isLoading = false;
@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return isLoading?const Center(
       child: CircularProgressIndicator(backgroundColor: Colors.transparent,),
     ): group == manager
-        ? ProjectsScreen(userId: widget.userId,)
+        ? const ProjectsScreen()
         : const StaffHomeScreen();
   }
 }

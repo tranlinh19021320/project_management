@@ -20,34 +20,33 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
-        title: 'QLDA',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData.dark(),
-        home: StreamBuilder(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: darkblueAppbarColor,
-                  color: backgroundWhiteColor,
-                ),
-              );
-            }
+    return MaterialApp(
+      title: 'QLDA',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark(),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(
+                backgroundColor: darkblueAppbarColor,
+                color: backgroundWhiteColor,
+              ),
+            );
+          }
 
-            if (snapshot.connectionState == ConnectionState.active) {
-              if (snapshot.hasData) {
-                return HomeScreen(userId: snapshot.data!.uid);
-              } else if (snapshot.hasError) {
-                return Center(child: Text("${snapshot.error}"));
-              }
+          if (snapshot.connectionState == ConnectionState.active) {
+            if (snapshot.hasData) {
+              return const HomeScreen();
+            } else if (snapshot.hasError) {
+              return Center(child: Text("${snapshot.error}"));
             }
+          }
 
-            return const Login();
-          },
-        ),
-      );
-    
+          return const Login();
+        },
+      ),
+    );
   }
 }

@@ -78,6 +78,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   updatePassword() async {
+    if (isPasswordState == IS_CORRECT_STATE) {
     showDialog(
         context: context,
         builder: (_) => const NotifyDialog(content: 'loading', isError: false));
@@ -88,6 +89,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     // Navigator.pop(context);
     if (res == "success") {
       if (context.mounted) {
+        Navigator.pop(context);
         Navigator.pop(context);
         showDialog(
             context: context,
@@ -100,6 +102,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             context: context,
             builder: (_) => NotifyDialog(content: res, isError: true));
       }
+    }
     }
   }
 

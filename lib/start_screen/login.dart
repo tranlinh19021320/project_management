@@ -76,20 +76,18 @@ class _LoginState extends State<Login> {
         });
         String userId = await FirebaseMethods()
             .getUserIdFromAccount(account: accountController.text);
-        String res = await FirebaseMethods()
-            .loginWithUserId(userId: userId,);
-        
-        
+        String res = await FirebaseMethods().loginWithUserId(
+          userId: userId,
+        );
+
         if (context.mounted) {
           // log in completely
           if (res == "success") {
             if (context.mounted) {
-            showSnackBar(context, "Đăng nhập thành công!", false);
-            
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => HomeScreen(
-                      userId: userId,
-                    )));
+              showSnackBar(context, "Đăng nhập thành công!", false);
+
+              Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const HomeScreen()));
             }
           }
 
@@ -115,8 +113,8 @@ class _LoginState extends State<Login> {
         isAccountState = IS_DEFAULT_STATE;
       });
     } else {
-      String userId =
-          await FirebaseMethods().getUserIdFromAccount(account: accountController.text);
+      String userId = await FirebaseMethods()
+          .getUserIdFromAccount(account: accountController.text);
       if (userId == "") {
         setState(() {
           isAccountState = IS_ERROR_STATE;
@@ -160,14 +158,14 @@ class _LoginState extends State<Login> {
                           padding: const EdgeInsets.all(12.0),
                           child: usernameIcon,
                         ),
-              
+
                         // notify if error email
                         helperText: isAccountState == IS_ERROR_STATE
                             ? "Không tìm thấy tài khoản!"
                             : null,
                         helperStyle:
                             const TextStyle(color: errorRedColor, fontSize: 14),
-              
+
                         // outline boder
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
@@ -175,7 +173,7 @@ class _LoginState extends State<Login> {
                         ),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6)),
-              
+
                         suffixIcon: isAccountState == IS_DEFAULT_STATE
                             ? null
                             : isAccountState == IS_CORRECT_STATE
@@ -189,7 +187,7 @@ class _LoginState extends State<Login> {
                     const SizedBox(
                       height: 12,
                     ),
-              
+
                     // password text field
                     TextFormField(
                       controller: passwordController,
@@ -208,7 +206,7 @@ class _LoginState extends State<Login> {
                                 : null,
                         helperStyle:
                             const TextStyle(color: errorRedColor, fontSize: 14),
-              
+
                         //outline border
                         enabledBorder: OutlineInputBorder(
                           borderSide: BorderSide(
@@ -216,7 +214,7 @@ class _LoginState extends State<Login> {
                         ),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(6)),
-              
+
                         suffixIcon: IconButton(
                           icon: isLockedPassword
                               ? hidePasswordIcon
@@ -234,7 +232,7 @@ class _LoginState extends State<Login> {
                     const SizedBox(
                       height: 16,
                     ),
-              
+
                     // login button
                     InkWell(
                       onTap: logIn,
@@ -262,21 +260,23 @@ class _LoginState extends State<Login> {
                     const SizedBox(
                       height: 12,
                     ),
-              
+
                     const Text(
                       "hoặc",
-                      style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                      style:
+                          TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
                     ),
                     const SizedBox(
                       height: 12,
                     ),
-              
+
                     // navigator to sign up
                     InkWell(
                       onTap: navigateToSignup,
                       child: const Text(
                         "Đăng ký như người quản lý",
-                        style: TextStyle(color: textLightBlueColor, fontSize: 20),
+                        style:
+                            TextStyle(color: textLightBlueColor, fontSize: 20),
                       ),
                     )
                   ],

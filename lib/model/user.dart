@@ -8,8 +8,10 @@ class CurrentUser {
   final String userId;
   final String companyId;
   final String companyName;
+  final int notifyNumber;
 
-  const CurrentUser({
+  const CurrentUser( {
+    required this.notifyNumber,
     required this.email,
     required this.username,
     required this.password,
@@ -31,5 +33,7 @@ class CurrentUser {
         'userId': userId,
         'companyId': companyId,
         'companyName': companyName,
+        'notifyNumber' : notifyNumber
+
       };
 }

@@ -4,8 +4,8 @@ import '../../../utils/utils.dart';
 import '../widgets/drawer_bar.dart';
 
 class EventScreen extends StatefulWidget {
-  final String userId;
-  const EventScreen({super.key, required this.userId});
+
+  const EventScreen({super.key, });
 
   @override
   State<EventScreen> createState() => _EventScreenState();
@@ -26,11 +26,11 @@ class _EventScreenState extends State<EventScreen> {
           actions: [
             Padding(
               padding: const EdgeInsets.all(12.0),
-              child: notifyIcon(3),
+              child: notifications(3),
             )
           ],
         ),
-        drawer: DrawerMenu(selectedPage: IS_EVENT_PAGE, userId: widget.userId,),
+        drawer:const  DrawerMenu(selectedPage: IS_EVENT_PAGE,),
         body: const Text("..."),
       ),
     );

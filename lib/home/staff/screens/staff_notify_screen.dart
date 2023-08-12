@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:project_management/home/staff/widgets/staff_drawer.dart';
 
 import '../../../utils/utils.dart';
-import '../widgets/drawer_bar.dart';
-class NotifyScreen extends StatefulWidget {
- 
-  const NotifyScreen({
-    super.key, 
-  });
+
+class StaffNotifyScreen extends StatefulWidget {
+  const StaffNotifyScreen({super.key});
 
   @override
-  State<NotifyScreen> createState() => _NotifyScreenState();
+  State<StaffNotifyScreen> createState() => _StaffNotifyScreenState();
 }
 
-class _NotifyScreenState extends State<NotifyScreen> {
+class _StaffNotifyScreenState extends State<StaffNotifyScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         image: DecorationImage(
-            image: AssetImage(backgroundImage), fit: BoxFit.fill),),
+            image: AssetImage(backgroundImage), fit: BoxFit.fill),
+      ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
@@ -31,7 +30,7 @@ class _NotifyScreenState extends State<NotifyScreen> {
             )
           ],
         ),
-        drawer:const  DrawerMenu(selectedPage: IS_NOTIFY_PAGE,),
+        drawer:const StaffDrawerMenu(selectedPage: IS_NOTIFY_PAGE,),
         body: const Text("..."),
       ),
     );

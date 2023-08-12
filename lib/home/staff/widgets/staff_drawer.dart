@@ -5,31 +5,29 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:project_management/home/admin/screens/event_screen.dart';
-import 'package:project_management/home/admin/screens/personal_screen.dart';
-import 'package:project_management/home/admin/screens/projects_screen.dart';
-import 'package:project_management/home/admin/screens/notify_screen.dart';
+import 'package:project_management/home/staff/screens/staff_event.dart';
+import 'package:project_management/home/staff/screens/staff_home.dart';
+import 'package:project_management/home/staff/screens/staff_notify_screen.dart';
 import 'package:project_management/home/unit_card/text_button.dart';
 import '../../../firebase/firebase_methods.dart';
 import '../../../start_screen/login.dart';
 import '../../../utils/utils.dart';
 import '../../unit_card/user_profile.dart';
 
-class DrawerMenu extends StatefulWidget {
+class StaffDrawerMenu extends StatefulWidget {
   final int selectedPage;
-  const DrawerMenu({
+  const StaffDrawerMenu({
     super.key,
     required this.selectedPage,
   });
 
   @override
-  State<DrawerMenu> createState() => _DrawerMenuState();
+  State<StaffDrawerMenu> createState() => _StaffDrawerMenuState();
 }
 
-class _DrawerMenuState extends State<DrawerMenu> {
+class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
   bool isOpenProfile = false;
   bool isLoadingImage = false;
-
 
   signOut() {
     FirebaseMethods().signOut();
@@ -38,9 +36,6 @@ class _DrawerMenuState extends State<DrawerMenu> {
   }
 
   selectImage() async {
-    setState(() {
-      isLoadingImage = true;
-    });
     showDialog(
         context: context,
         builder: (_) => SimpleDialog(
@@ -93,9 +88,6 @@ class _DrawerMenuState extends State<DrawerMenu> {
                 ),
               ],
             ));
-            setState(() {
-              isLoadingImage = false;
-            });
   }
 
   changeProfileImage(Uint8List image) async {
@@ -116,7 +108,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                   .doc(FirebaseAuth.instance.currentUser!.uid)
                   .snapshots(),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting || isLoadingImage) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return UserAccountsDrawerHeader(
                     currentAccountPicture: const CircleAvatar(
                       foregroundColor: backgroundWhiteColor,
@@ -181,48 +173,26 @@ class _DrawerMenuState extends State<DrawerMenu> {
                       body: ListView(
                         padding: const EdgeInsets.only(top: 4),
                         children: [
-                          // project select
+                          // quest select
                           ListTile(
-                            tileColor: (widget.selectedPage == IS_PROJECTS_PAGE)
+                            tileColor: (widget.selectedPage == IS_QUEST_PAGE)
                                 ? focusBlueColor
                                 : Colors.transparent,
                             shape: RoundedRectangleBorder(
                                 side: const BorderSide(color: focusBlueColor),
                                 borderRadius: BorderRadius.circular(12)),
                             leading: projectIcon,
-                            trailing: (widget.selectedPage == IS_PROJECTS_PAGE)
+                            trailing: (widget.selectedPage == IS_QUEST_PAGE)
                                 ? rightArrowPageIcon
                                 : null,
                             title: const Text(
-                              "Dự án",
+                              "Nhiệm vụ",
                               style: TextStyle(fontSize: 16),
                             ),
                             onTap: () {
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                      builder: (_) => const ProjectsScreen()));
-                            },
-                          ),
-                          // personal select
-                          ListTile(
-                            tileColor: (widget.selectedPage == IS_PERSONAL_PAGE)
-                                ? focusBlueColor
-                                : Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(color: focusBlueColor),
-                                borderRadius: BorderRadius.circular(12)),
-                            leading: resizedIcon(staffImage, 30),
-                            trailing: (widget.selectedPage == IS_PERSONAL_PAGE)
-                                ? rightArrowPageIcon
-                                : null,
-                            title: const Text(
-                              "Nhân sự",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            onTap: () {
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (_) => const PersonalScreen()));
+                                      builder: (_) => const StaffHomeScreen()));
                             },
                           ),
                           // notification select
@@ -231,7 +201,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                 ? focusBlueColor
                                 : Colors.transparent,
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(color: focusBlueColor),
+                                side: const BorderSide(color: focusBlueColor),
                                 borderRadius: BorderRadius.circular(12)),
                             leading: notifications(0),
                             trailing: (widget.selectedPage == IS_NOTIFY_PAGE)
@@ -244,7 +214,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             onTap: () {
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                      builder: (_) => const NotifyScreen()));
+                                      builder: (_) =>
+                                          const StaffNotifyScreen()));
                             },
                           ),
                           //event select
@@ -253,7 +224,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                 ? focusBlueColor
                                 : Colors.transparent,
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(color: focusBlueColor),
+                                side: const BorderSide(color: focusBlueColor),
                                 borderRadius: BorderRadius.circular(12)),
                             leading: eventIcon,
                             trailing: (widget.selectedPage == IS_EVENT_PAGE)
@@ -266,18 +237,19 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             onTap: () {
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
-                                      builder: (_) => const EventScreen()));
+                                      builder: (_) =>
+                                          const StaffEventScreen()));
                             },
                           )
                         ],
                       ),
                       floatingActionButton: TextBoxButton(
-        color: errorRedColor,
-        text: "Đăng xuất",
-        fontSize: 14,
-        width: 80,
-        height: 36,
-        funtion: signOut),
+                          color: errorRedColor,
+                          text: "Đăng xuất",
+                          fontSize: 14,
+                          width: 80,
+                          height: 36,
+                          funtion: signOut),
                       floatingActionButtonLocation:
                           FloatingActionButtonLocation.endFloat,
                     )),

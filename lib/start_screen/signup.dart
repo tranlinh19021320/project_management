@@ -36,8 +36,8 @@ class _SignupState extends State<Signup> {
     emailFocus = FocusNode();
     emailFocus.addListener(() async {
       if (!emailFocus.hasFocus) {
-        isEmailState =
-            await FirebaseMethods().checkAlreadyEmail(email: emailController.text);
+        isEmailState = await FirebaseMethods()
+            .checkAlreadyEmail(email: emailController.text);
         setState(() {});
       } else {
         setState(() {
@@ -48,8 +48,8 @@ class _SignupState extends State<Signup> {
     accountFocus = FocusNode();
     accountFocus.addListener(() async {
       if (!accountFocus.hasFocus) {
-        isAccountState =
-            await FirebaseMethods().checkAlreadyAccount(username: accountController.text);
+        isAccountState = await FirebaseMethods()
+            .checkAlreadyAccount(username: accountController.text);
         setState(() {});
       } else {
         setState(() {
@@ -94,32 +94,27 @@ class _SignupState extends State<Signup> {
           isLoading = true;
         });
         String companyId = const Uuid().v1();
-        String res1 = await FirebaseMethods().createCompany(companyName: widget.companyName, companyId: companyId);
+        String res1 = await FirebaseMethods().createCompany(
+            companyName: widget.companyName, companyId: companyId);
         String res2 = await FirebaseMethods().createUser(
-            email: emailController.text,
-            username: accountController.text,
-            password: passwordController.text,
-            nameDetails: accountController.text,
-            photoURL: '',
-            group: manager,
-            companyId: companyId,
-            companyName: widget.companyName,
-            );
-        String userId = await FirebaseMethods()
-            .getUserIdFromAccount(account: accountController.text);
-
+          email: emailController.text,
+          username: accountController.text,
+          password: passwordController.text,
+          nameDetails: accountController.text,
+          photoURL: '',
+          group: manager,
+          companyId: companyId,
+          companyName: widget.companyName,
+        );
         setState(() {
           isLoading = false;
         });
-        String res3 = await FirebaseMethods().loginWithUserId(userId: userId,);
-        if (res1 == "success" && res2 == 'success' && res3 == 'sucess') {
+        if (res1 == "success" && res2 == 'success') {
           if (context.mounted) {
             showSnackBar(context, "Đăng ký thành công!", false);
-            
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => HomeScreen(
-                      userId: userId,
-                    )));
+
+            Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const HomeScreen()));
           }
         } else {
           if (context.mounted) {
@@ -130,10 +125,12 @@ class _SignupState extends State<Signup> {
       }
     }
   }
+
   navigateToAddCompany() {
     Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const AddCompany()));
   }
+
   navigateToLogin() {
     Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const Login()));
@@ -147,195 +144,199 @@ class _SignupState extends State<Signup> {
             image: AssetImage(backgroundImage), fit: BoxFit.fill),
       ),
       child: Scaffold(
-          backgroundColor: Colors.transparent,
-          body: Padding(
-            padding: const EdgeInsets.all(28.0),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // email text field
-                  TextFormField(
-                    controller: emailController,
-                    focusNode: emailFocus,
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: emailIcon,
-                      ),
-                      //notify if email is error
-                      helperText: isEmailState == IS_ERROR_STATE
-                          ? "Email đã đăng ký!"
-                          : isEmailState == IS_ERROR_FORMAT_STATE
-                              ? "Lỗi định dạng Email!"
-                              : null,
-                      helperStyle:
-                          const TextStyle(color: errorRedColor, fontSize: 14),
-
-                      // outline boder
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: notifyColor(state: isEmailState)),
-                      ),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6)),
-
-                      suffixIcon: isEmailState == IS_DEFAULT_STATE
-                          ? null
-                          : isEmailState == IS_CORRECT_STATE
-                              ? correctIcon
-                              : errorIcon,
+        backgroundColor: Colors.transparent,
+        body: Padding(
+          padding: const EdgeInsets.all(28.0),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // email text field
+                TextFormField(
+                  controller: emailController,
+                  focusNode: emailFocus,
+                  decoration: InputDecoration(
+                    labelText: "Email",
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: emailIcon,
                     ),
-                    autofocus: true,
-                    onEditingComplete: () =>
-                        FocusScope.of(context).requestFocus(accountFocus),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
+                    //notify if email is error
+                    helperText: isEmailState == IS_ERROR_STATE
+                        ? "Email đã đăng ký!"
+                        : isEmailState == IS_ERROR_FORMAT_STATE
+                            ? "Lỗi định dạng Email!"
+                            : null,
+                    helperStyle:
+                        const TextStyle(color: errorRedColor, fontSize: 14),
 
-                  //account text field
-                  TextFormField(
-                    controller: accountController,
-                    focusNode: accountFocus,
-                    decoration: InputDecoration(
-                      labelText: "Tài khoản",
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: usernameIcon,
-                      ),
-                      // notify if username is error
-                      helperText: isAccountState == IS_ERROR_STATE
-                          ? "Tài khoản đã đăng ký!"
-                          : null,
-                      helperStyle:
-                          const TextStyle(color: errorRedColor, fontSize: 14),
-                      // outline boder
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color:notifyColor(state: isAccountState)),
-                      ),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6)),
-                      suffixIcon: isAccountState == IS_DEFAULT_STATE
-                          ? null
-                          : isAccountState == IS_CORRECT_STATE
-                              ? correctIcon
-                              : errorIcon,
+                    // outline boder
+                    enabledBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: notifyColor(state: isEmailState)),
                     ),
-                    onEditingComplete: () =>
-                        FocusScope.of(context).requestFocus(passwordFocus),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6)),
+
+                    suffixIcon: isEmailState == IS_DEFAULT_STATE
+                        ? null
+                        : isEmailState == IS_CORRECT_STATE
+                            ? correctIcon
+                            : errorIcon,
                   ),
-                  const SizedBox(
-                    height: 12,
-                  ),
+                  autofocus: true,
+                  onEditingComplete: () =>
+                      FocusScope.of(context).requestFocus(accountFocus),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
 
-                  // password text field
-                  TextFormField(
-                    controller: passwordController,
-                    focusNode: passwordFocus,
-                    decoration: InputDecoration(
-                      labelText: "Mật khẩu",
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: passwordIcon,
-                      ),
-
-                      //notify if password is empty
-                      helperText: isPasswordState == IS_ERROR_STATE
-                          ? "Vui lòng nhập mật khẩu!"
-                          : null,
-                      helperStyle:
-                          const TextStyle(color: errorRedColor, fontSize: 14),
-                      //outline border
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: notifyColor(state: isPasswordState)),
-                      ),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(6)),
-
-                      //icon lock
-                      suffixIcon: IconButton(
-                        icon: isLockedPassword
-                            ? hidePasswordIcon
-                            : viewPasswordIcon,
-                        onPressed: () {
-                          setState(() {
-                            isLockedPassword = !isLockedPassword;
-                          });
-                        },
-                      ),
+                //account text field
+                TextFormField(
+                  controller: accountController,
+                  focusNode: accountFocus,
+                  decoration: InputDecoration(
+                    labelText: "Tài khoản",
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: usernameIcon,
                     ),
-                    obscureText: isLockedPassword,
-                    onEditingComplete: () => signUp(),
+                    // notify if username is error
+                    helperText: isAccountState == IS_ERROR_STATE
+                        ? "Tài khoản đã đăng ký!"
+                        : null,
+                    helperStyle:
+                        const TextStyle(color: errorRedColor, fontSize: 14),
+                    // outline boder
+                    enabledBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: notifyColor(state: isAccountState)),
+                    ),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6)),
+                    suffixIcon: isAccountState == IS_DEFAULT_STATE
+                        ? null
+                        : isAccountState == IS_CORRECT_STATE
+                            ? correctIcon
+                            : errorIcon,
                   ),
-                  const SizedBox(
-                    height: 16,
-                  ),
+                  onEditingComplete: () =>
+                      FocusScope.of(context).requestFocus(passwordFocus),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
 
-                  // sign up button
-                  InkWell(
-                    onTap: signUp,
-                    child: Container(
-                      width: double.infinity,
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: ShapeDecoration(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        color: buttonGreenColor,
-                      ),
-                      child: isLoading
-                          ? const Center(
-                              child: CircularProgressIndicator(
-                                color: correctGreenColor,
-                              ),
-                            )
-                          : const Text(
-                              "Đăng ký",
-                              style: TextStyle(fontSize: 18),
+                // password text field
+                TextFormField(
+                  controller: passwordController,
+                  focusNode: passwordFocus,
+                  decoration: InputDecoration(
+                    labelText: "Mật khẩu",
+                    prefixIcon: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: passwordIcon,
+                    ),
+
+                    //notify if password is empty
+                    helperText: isPasswordState == IS_ERROR_STATE
+                        ? "Vui lòng nhập mật khẩu!"
+                        : null,
+                    helperStyle:
+                        const TextStyle(color: errorRedColor, fontSize: 14),
+                    //outline border
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: notifyColor(state: isPasswordState)),
+                    ),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(6)),
+
+                    //icon lock
+                    suffixIcon: IconButton(
+                      icon: isLockedPassword
+                          ? hidePasswordIcon
+                          : viewPasswordIcon,
+                      onPressed: () {
+                        setState(() {
+                          isLockedPassword = !isLockedPassword;
+                        });
+                      },
+                    ),
+                  ),
+                  obscureText: isLockedPassword,
+                  onEditingComplete: () => signUp(),
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+
+                // sign up button
+                InkWell(
+                  onTap: signUp,
+                  child: Container(
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8)),
+                      color: buttonGreenColor,
+                    ),
+                    child: isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: correctGreenColor,
                             ),
+                          )
+                        : const Text(
+                            "Đăng ký",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+
+                const Text(
+                  "hoặc",
+                  style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
+
+                // navigator to sign up
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Đã có tài khoản? ",
+                      style: TextStyle(fontSize: 19),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-
-                  const Text(
-                    "hoặc",
-                    style: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-
-                  // navigator to sign up
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "Đã có tài khoản? ",
-                        style: TextStyle(fontSize: 19),
+                    InkWell(
+                      onTap: navigateToLogin,
+                      child: const Text(
+                        "Đăng nhập",
+                        style:
+                            TextStyle(color: textLightBlueColor, fontSize: 20),
                       ),
-                      InkWell(
-                        onTap: navigateToLogin,
-                        child: const Text(
-                          "Đăng nhập",
-                          style: TextStyle(
-                              color: textLightBlueColor, fontSize: 20),
-                        ),
-                      ),
-                    ],
-                  )
-                ],
-              ),
+                    ),
+                  ],
+                )
+              ],
             ),
           ),
-          floatingActionButton: IconButton(onPressed: navigateToAddCompany, icon: leftArrowIcon, highlightColor: correctGreenColor,),
-          floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-          ),
+        ),
+        floatingActionButton: IconButton(
+          onPressed: navigateToAddCompany,
+          icon: leftArrowIcon,
+          highlightColor: correctGreenColor,
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
+      ),
     );
   }
 }

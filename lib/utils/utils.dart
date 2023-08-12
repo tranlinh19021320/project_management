@@ -130,7 +130,7 @@ Image resizedIcon(String imagePath, double size) {
 }
 
 // Icon with having notifications
-Widget notifyIcon(int notificationsNumber) {
+Widget notifications(int notificationsNumber) {
   return SizedBox(
     width: 30,
     height: 30,
@@ -175,6 +175,7 @@ const int IS_PROJECTS_PAGE = 0;
 const int IS_PERSONAL_PAGE = 1;
 const int IS_NOTIFY_PAGE = 2;
 const int IS_EVENT_PAGE = 3;
+const int IS_QUEST_PAGE = 4;
 
 // colors
 const Color backgroundWhiteColor = Colors.white;
@@ -185,8 +186,8 @@ const Color correctGreenColor = Color.fromARGB(255, 91, 238, 54);
 const Color textErrorRedColor = Color.fromARGB(255, 234, 117, 117);
 const Color defaultColor = Color.fromARGB(255, 155, 155, 155);
 const Color defaultIconColor = Color.fromARGB(255, 207, 207, 207);
-Color focusBlueColor = Colors.blue;
-Color darkblueAppbarColor = Colors.blue.shade800;
+const Color focusBlueColor = Color.fromARGB(255, 0, 170, 255);
+const Color darkblueAppbarColor = Color.fromARGB(255, 14, 92, 181);
 const Color blueDrawerColor = Color.fromARGB(255, 33, 108, 169);
 const Color notifyIconColor = Color.fromARGB(255, 247, 229, 70);
 
@@ -257,4 +258,12 @@ Color notifyColor({required int state}) {
       : (state == IS_DEFAULT_STATE)
           ? defaultColor
           : errorRedColor;
+}
+
+Icon? notifyIcon({required int state}) {
+  return (state == IS_DEFAULT_STATE)
+      ? null
+      : (state == IS_CORRECT_STATE)
+          ? correctIcon
+          : errorIcon;
 }

@@ -3,14 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:project_management/firebase/storage_method.dart';
 import 'package:project_management/utils/utils.dart';
-import 'package:uuid/uuid.dart';
 import 'package:project_management/model/user.dart';
 
 class FirebaseMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   //create a new company
-  Future<String> createCompany({required String companyName,required String companyId}) async {
+  Future<String> createCompany(
+      {required String companyName, required String companyId}) async {
     String res = "";
     try {
       await _firestore.collection("companies").doc(companyId).set({
@@ -38,13 +39,20 @@ class FirebaseMethods {
       required String companyId,
       required String companyName}) async {
     String res = "error";
-    String userId = const Uuid().v1();
     String url;
+    String userId;
     try {
-      if (email != '') {
+      User? currentUser = _auth.currentUser;
+      if (currentUser == null) {
         UserCredential cred = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
         userId = cred.user!.uid;
+      } else {
+        String uid = currentUser.uid;
+        UserCredential cred = await _auth.createUserWithEmailAndPassword(
+            email: email, password: password);
+        userId = cred.user!.uid;
+        await loginWithUserId(userId: uid);
       }
       if (photoURL == "") {
         ByteData dataImage = await rootBundle.load(defaultProfileImage);
@@ -64,7 +72,8 @@ class FirebaseMethods {
           photoURL: url,
           userId: userId,
           companyId: companyId,
-          companyName: companyName);
+          companyName: companyName,
+          notifyNumber: 0);
 
       await _firestore.collection('users').doc(userId).set(user.toJson());
       res = "success";
@@ -76,17 +85,13 @@ class FirebaseMethods {
   }
 
   //login Firebase with userId
-  Future<String> loginWithUserId(
-      {required String userId}) async {
+  Future<String> loginWithUserId({required String userId}) async {
     String res = "error";
     try {
       var snap = await _firestore.collection("users").doc(userId).get();
       String email = snap.data()!['email'];
       String password = snap.data()!['password'];
-      if (email != "") {
-        await _auth.signInWithEmailAndPassword(
-            email: email, password: password);
-      }
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
       res = "success";
     } catch (e) {
       res = e.toString();
@@ -112,20 +117,20 @@ class FirebaseMethods {
         group: (snap.data()!)['group'],
         userId: (snap.data()!)['userId'],
         companyId: (snap.data()!)['companyId'],
-        companyName: (snap.data()!)['companyName']);
+        companyName: (snap.data()!)['companyName'],
+        notifyNumber: (snap.data()!)['notifyNumber']);
   }
 
   //update user profile
   Future<String> updateNameDetail(
       {required String userId, required String nameDetails}) async {
     String res = "error";
-    
+
     try {
       await _firestore.collection("users").doc(userId).update({
         'nameDetails': nameDetails,
       });
       res = "success";
-      
     } catch (e) {
       res = e.toString();
     }
@@ -160,14 +165,9 @@ class FirebaseMethods {
   }
 
   //delete user use userId
-  deleteUser({required String userId,required String email}) {
-    if (email != "") {
-      
-    }
-    _firestore.collection("users").doc(userId).delete();
+  deleteUser({required String deleteUserId}) {
+    _firestore.collection("users").doc(deleteUserId).delete();
   }
-
-  
 
   //check state of company
   Future<int> isAlreadyCompany({required String companyName}) async {
@@ -202,7 +202,8 @@ class FirebaseMethods {
       // email is invalid format
       state = IS_ERROR_FORMAT_STATE;
     } else {
-      String userId = await FirebaseMethods().getUserIdFromAccount(account: email);
+      String userId =
+          await FirebaseMethods().getUserIdFromAccount(account: email);
 
       if (userId == "") {
         // email not registered yet
@@ -221,7 +222,8 @@ class FirebaseMethods {
     if (username == "") {
       state = IS_DEFAULT_STATE;
     } else {
-      String userId = await FirebaseMethods().getUserIdFromAccount(account: username);
+      String userId =
+          await FirebaseMethods().getUserIdFromAccount(account: username);
 
       if (userId == "") {
         //username not registered yet
@@ -235,8 +237,10 @@ class FirebaseMethods {
   }
 
   //change password
-  Future<String> changePassword({required
-      String userId,required String oldpassword,required String newpassword}) async {
+  Future<String> changePassword(
+      {required String userId,
+      required String oldpassword,
+      required String newpassword}) async {
     String res = "error";
     try {
       CurrentUser user = await getCurrentUserByUserId(userId: userId);
@@ -264,15 +268,18 @@ class FirebaseMethods {
       res = e.toString();
     }
     return res;
-      }
+  }
 
-  changeProfileImage({required Uint8List image, required String userId}) async {
+  Future<String> changeProfileImage({
+    required Uint8List image,
+  }) async {
     String res = '';
-    CurrentUser user =await getCurrentUserByUserId(userId: userId);
+    CurrentUser user =
+        await getCurrentUserByUserId(userId: _auth.currentUser!.uid);
     try {
       String photoURL = await StorageMethods()
           .uploadImageToStorage('profile', user.username, image);
-      await _firestore.collection('users').doc(userId).update({
+      await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
         'photoURL': photoURL,
       });
 
@@ -284,32 +291,31 @@ class FirebaseMethods {
     return res;
   }
 
-  addGroup({required String companyId,required String groupName}) async {
+  Future<String> addGroup(
+      {required String companyId, required String groupName}) async {
     String res = "";
     try {
       var snap = await _firestore.collection('companies').doc(companyId).get();
       List groups = (snap.data()! as dynamic)['group'];
       if (!groups.contains(groupName)) {
-      await _firestore.collection('companies').doc(companyId).update({
-        'group': FieldValue.arrayUnion([groupName]),
-      });
-      res = 'success';
-      } 
+        await _firestore.collection('companies').doc(companyId).update({
+          'group': FieldValue.arrayUnion([groupName]),
+        });
+        res = 'success';
+      }
     } catch (e) {
       res = e.toString();
     }
     return res;
   }
 
-  changeUserGroup({required String userId,required String group}) async {
+  Future<String> changeUserGroup(
+      {required String userId, required String group}) async {
     String res = "error";
     try {
-      await _firestore.collection('users').doc(userId).update({
-        'group': group
-      });
+      await _firestore.collection('users').doc(userId).update({'group': group});
       res = 'success';
-
-    } catch(e) {
+    } catch (e) {
       res = e.toString();
     }
 
@@ -320,7 +326,7 @@ class FirebaseMethods {
       {required String groupSelect}) {
     Stream<QuerySnapshot<Map<String, dynamic>>> snap;
     if (groupSelect == 'Tất cả') {
-      snap =  _firestore.collection('users').snapshots();
+      snap = _firestore.collection('users').snapshots();
     } else {
       snap = _firestore
           .collection('users')

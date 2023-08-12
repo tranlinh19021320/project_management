@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/home/admin/widgets/group_dropdown_button.dart';
+import 'package:project_management/home/unit_card/text_button.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
 import '../../../firebase/firebase_methods.dart';
@@ -35,16 +36,30 @@ class _CreateStaffState extends State<CreateStaff> {
   bool isCreateGroup = false;
   String groupSelect = 'Manager';
   bool isLoadingGroup = false;
-  
+
   @override
   void initState() {
     super.initState();
-    // groupSelect = 'Manager'
+    // dropdown button
     groupDropdownButton = GroupDropdownButton(
         companyId: widget.companyId,
         groupSelect: groupSelect,
         isWordAtHead: "",
         onSelectValue: onSelectValue);
+    // text button
+
+    emailFocus = FocusNode();
+    emailFocus.addListener(() async {
+      if (!emailFocus.hasFocus) {
+        isEmailState = await FirebaseMethods()
+            .checkAlreadyEmail(email: emailController.text);
+      } else {
+        isEmailState = IS_DEFAULT_STATE;
+      }
+      if (mounted) {
+        setState(() {});
+      }
+    });
     usernameFocus = FocusNode();
     usernameFocus.addListener(() async {
       if (!usernameFocus.hasFocus) {
@@ -94,16 +109,17 @@ class _CreateStaffState extends State<CreateStaff> {
       if (context.mounted) {
         showSnackBar(context, res, true);
       }
+    } else {
+      groupSelect = groupController.text;
+      groupDropdownButton = GroupDropdownButton(
+          companyId: widget.companyId,
+          groupSelect: groupSelect,
+          isWordAtHead: "",
+          onSelectValue: onSelectValue);
+      groupController.clear();
     }
     setState(() {
       isLoadingGroup = false;
-      groupSelect = groupController.text;
-      groupDropdownButton = GroupDropdownButton(
-        companyId: widget.companyId,
-        groupSelect: groupSelect,
-        isWordAtHead: "",
-        onSelectValue: onSelectValue);
-      groupController.clear();
       isCreateGroup = false;
     });
   }
@@ -112,14 +128,15 @@ class _CreateStaffState extends State<CreateStaff> {
     showDialog(
         context: context,
         builder: (_) => const NotifyDialog(content: 'loading', isError: false));
-    if (isAccountState == IS_CORRECT_STATE) {
+    if (isAccountState == IS_CORRECT_STATE &&
+        isEmailState == IS_CORRECT_STATE) {
       if (passwordController.text == "") {
         setState(() {
           isPasswordState = IS_ERROR_STATE;
         });
       } else {
         String res = await FirebaseMethods().createUser(
-            email: '',
+            email: emailController.text,
             username: usernameController.text,
             password: passwordController.text,
             nameDetails: usernameController.text,
@@ -158,6 +175,40 @@ class _CreateStaffState extends State<CreateStaff> {
       )),
       content: Form(
         child: Column(children: [
+          //email account
+          TextFormField(
+            controller: emailController,
+            focusNode: emailFocus,
+            decoration: InputDecoration(
+              labelText: "Email",
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: emailIcon,
+              ),
+              //notify if email is error
+              helperText: isEmailState == IS_ERROR_STATE
+                  ? "Email đã đăng ký!"
+                  : isEmailState == IS_ERROR_FORMAT_STATE
+                      ? "Lỗi định dạng Email!"
+                      : null,
+              helperStyle: const TextStyle(color: errorRedColor, fontSize: 14),
+
+              // outline boder
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: notifyColor(state: isEmailState)),
+              ),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+
+              suffixIcon: notifyIcon(state: isEmailState),
+            ),
+            autofocus: true,
+            onEditingComplete: () =>
+                FocusScope.of(context).requestFocus(usernameFocus),
+          ),
+          const SizedBox(
+            height: 12,
+          ),
           // username account
           TextFormField(
               controller: usernameController,
@@ -182,11 +233,7 @@ class _CreateStaffState extends State<CreateStaff> {
                 ),
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-                suffixIcon: isAccountState == IS_DEFAULT_STATE
-                    ? null
-                    : isAccountState == IS_CORRECT_STATE
-                        ? correctIcon
-                        : errorIcon,
+                suffixIcon: notifyIcon(state: isAccountState),
               ),
               onFieldSubmitted: (value) {
                 usernameFocus.unfocus();
@@ -209,7 +256,6 @@ class _CreateStaffState extends State<CreateStaff> {
                 padding: const EdgeInsets.all(12.0),
                 child: passwordIcon,
               ),
-
               //notify if password is empty
               helperText: isPasswordState == IS_ERROR_STATE
                   ? "Vui lòng nhập mật khẩu!"
@@ -217,14 +263,11 @@ class _CreateStaffState extends State<CreateStaff> {
               helperStyle: const TextStyle(color: errorRedColor, fontSize: 14),
               //outline border
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                    color: isPasswordState == IS_ERROR_STATE
-                        ? errorRedColor
-                        : defaultColor),
+                borderSide:
+                    BorderSide(color: notifyColor(state: isPasswordState)),
               ),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
-
               //icon lock
               suffixIcon: IconButton(
                 icon: isLockedPassword ? hidePasswordIcon : viewPasswordIcon,
@@ -272,24 +315,14 @@ class _CreateStaffState extends State<CreateStaff> {
                         const SizedBox(
                           width: 8,
                         ),
-                        InkWell(
-                          onTap: updateGroup,
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: ShapeDecoration(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
-                              color: focusBlueColor,
-                            ),
+                        // createGroupButton,
+                        TextBoxButton(
+                            color: focusBlueColor,
+                            text: "Tạo",
+                            fontSize: 14,
                             width: 48,
                             height: 32,
-                            child: const Center(
-                                child: Text(
-                              "Tạo",
-                              style: TextStyle(fontSize: 14),
-                            )),
-                          ),
-                        ),
+                            funtion: updateGroup),
                         IconButton(
                             onPressed: () {
                               setState(() {
@@ -329,40 +362,21 @@ class _CreateStaffState extends State<CreateStaff> {
         ]),
       ),
       actions: [
-        InkWell(
-          onTap: createStaff,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              color: buttonGreenColor,
-            ),
-            width: 80,
-            height: 36,
-            child: const Center(
-                child: Text(
-              "Tạo",
-            )),
-          ),
-        ),
-        InkWell(
-          onTap: () => Navigator.of(context).pop(),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              color: textErrorRedColor,
-            ),
+        TextBoxButton(
+        color: buttonGreenColor,
+        text: "Tạo",
+        fontSize: 14,
+        width: 80,
+        height: 36,
+        funtion: createStaff),
+        //  cancelButton,
+        TextBoxButton(
+            color: textErrorRedColor,
+            text: "Hủy",
+            fontSize: 14,
             width: 64,
             height: 36,
-            child: const Center(
-                child: Text(
-              "Hủy",
-            )),
-          ),
-        ),
+            funtion: () => Navigator.of(context).pop()),
       ],
     );
   }

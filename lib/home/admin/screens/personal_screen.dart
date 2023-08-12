@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
@@ -10,10 +11,10 @@ import '../../../utils/utils.dart';
 import '../widgets/drawer_bar.dart';
 
 class PersonalScreen extends StatefulWidget {
-  final String userId;
+ 
   const PersonalScreen({
     super.key,
-    required this.userId,
+ 
   });
 
   @override
@@ -27,9 +28,9 @@ class _PersonalScreenState extends State<PersonalScreen> {
   int isResult = IS_DEFAULT_STATE;
   String companyId = '';
   String companyName = "";
-
+  late String userId;
   late SizedBox groupDropdownButton;
-
+  
   // late GroupDropdownButton groupDropdownButton;
 
   bool isLoading = false;
@@ -48,8 +49,9 @@ class _PersonalScreenState extends State<PersonalScreen> {
     setState(() {
       isLoading = true;
     });
+    userId = FirebaseAuth.instance.currentUser!.uid;
     CurrentUser user =
-        await FirebaseMethods().getCurrentUserByUserId(userId: widget.userId);
+        await FirebaseMethods().getCurrentUserByUserId(userId: userId);
     companyId = user.companyId;
     companyName = user.companyName;
 
@@ -123,13 +125,13 @@ class _PersonalScreenState extends State<PersonalScreen> {
                 actions: [
                   Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: notifyIcon(3),
+                    child: notifications(3),
                   )
                 ],
               ),
               drawer: DrawerMenu(
                 selectedPage: IS_PERSONAL_PAGE,
-                userId: widget.userId,
+             
               ),
               body: Padding(
                 padding: const EdgeInsets.all(12),
@@ -210,7 +212,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
                                 itemCount: documents.length,
                                 itemBuilder: (context, index) => StaffCard(
                                       staff: documents[index],
-                                      currentUserId: widget.userId,
+                                     
                                     )));
                       },
                     )
