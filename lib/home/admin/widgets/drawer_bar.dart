@@ -231,7 +231,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                 ? focusBlueColor
                                 : Colors.transparent,
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(color: focusBlueColor),
+                                side: const BorderSide(color: focusBlueColor),
                                 borderRadius: BorderRadius.circular(12)),
                             leading: notifications(0),
                             trailing: (widget.selectedPage == IS_NOTIFY_PAGE)
@@ -253,7 +253,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                                 ? focusBlueColor
                                 : Colors.transparent,
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(color: focusBlueColor),
+                                side: const BorderSide(color: focusBlueColor),
                                 borderRadius: BorderRadius.circular(12)),
                             leading: eventIcon,
                             trailing: (widget.selectedPage == IS_EVENT_PAGE)

@@ -129,7 +129,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
                   )
                 ],
               ),
-              drawer: DrawerMenu(
+              drawer: const DrawerMenu(
                 selectedPage: IS_PERSONAL_PAGE,
              
               ),

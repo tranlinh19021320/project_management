@@ -336,4 +336,39 @@ class FirebaseMethods {
 
     return snap;
   }
+
+  // function to create project
+  Future<String> createProject({
+    required String projectId,
+    required String nameProject,
+    required String description,
+    required String startDate,
+    required String endDate,
+  }) async {
+    String res = 'error';
+    try {
+      CurrentUser user =
+          await getCurrentUserByUserId(userId: _auth.currentUser!.uid);
+      await _firestore
+          .collection('companies')
+          .doc(user.companyId)
+          .collection('projects')
+          .doc(projectId)
+          .set({
+        'projectId': projectId,
+        'nameProject': nameProject,
+        'description': description,
+        'startDate': startDate,
+        'endDate': endDate,
+        'companyId': user.companyId,
+      });
+
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+
+    return res;
+  }
+
 }

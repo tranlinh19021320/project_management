@@ -20,10 +20,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = false;
   @override
   void initState() {
-    
     super.initState();
     init();
-    
   }
 
   init() async {
@@ -35,6 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isLoading = false;
     });
+  }
+  @override
+  void dispose() {
+    super.dispose();
   }
   @override
   Widget build(BuildContext context) {

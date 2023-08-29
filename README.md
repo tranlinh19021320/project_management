@@ -25,6 +25,10 @@
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/personal.png" alt="Search Going">
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/create_staff.png" alt="Create Staff">
 </p>
+- Page Project
+<p align = "center">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/create_project.png" alt="Create Project">
+</p>
 
 
 

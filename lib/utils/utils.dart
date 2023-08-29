@@ -178,6 +178,7 @@ const int IS_EVENT_PAGE = 3;
 const int IS_QUEST_PAGE = 4;
 
 // colors
+const Color blackColor = Colors.black;
 const Color backgroundWhiteColor = Colors.white;
 const Color buttonGreenColor = Color.fromARGB(233, 129, 206, 101);
 const Color textLightBlueColor = Color.fromARGB(214, 150, 178, 235);
