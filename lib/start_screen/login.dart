@@ -84,7 +84,7 @@ class _LoginState extends State<Login> {
           // log in completely
           if (res == "success") {
             if (context.mounted) {
-              showSnackBar(context, "Đăng nhập thành công!", false);
+              showSnackBar(context: context, content: "Đăng nhập thành công!",);
 
               Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (context) => const HomeScreen()));

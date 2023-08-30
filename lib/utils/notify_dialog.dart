@@ -5,7 +5,7 @@ import 'package:project_management/utils/utils.dart';
 class NotifyDialog extends StatefulWidget {
   final String content;
   final bool isError;
-  const NotifyDialog({super.key, required this.content, required this.isError});
+  const NotifyDialog({super.key, required this.content, this.isError = false});
 
   @override
   State<NotifyDialog> createState() => _NotifyDialogState();

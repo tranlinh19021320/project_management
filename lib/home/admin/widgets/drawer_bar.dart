@@ -9,11 +9,11 @@ import 'package:project_management/home/admin/screens/event_screen.dart';
 import 'package:project_management/home/admin/screens/personal_screen.dart';
 import 'package:project_management/home/admin/screens/projects_screen.dart';
 import 'package:project_management/home/admin/screens/notify_screen.dart';
-import 'package:project_management/home/unit_card/text_button.dart';
+import 'package:project_management/home/widgets/text_button.dart';
 import '../../../firebase/firebase_methods.dart';
 import '../../../start_screen/login.dart';
 import '../../../utils/utils.dart';
-import '../../unit_card/user_profile.dart';
+import '../../widgets/user_profile.dart';
 
 class DrawerMenu extends StatefulWidget {
   final int selectedPage;

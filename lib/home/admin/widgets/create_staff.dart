@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:project_management/home/admin/widgets/group_dropdown_button.dart';
-import 'package:project_management/home/unit_card/text_button.dart';
+import 'package:project_management/home/widgets/group_dropdown_button.dart';
+import 'package:project_management/home/widgets/text_button.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
 import '../../../firebase/firebase_methods.dart';
@@ -107,7 +107,7 @@ class _CreateStaffState extends State<CreateStaff> {
         .addGroup(companyId: widget.companyId, groupName: groupController.text);
     if (res != 'success') {
       if (context.mounted) {
-        showSnackBar(context, res, true);
+        showSnackBar(context:context,content: res,isError: true);
       }
     } else {
       groupSelect = groupController.text;
@@ -152,11 +152,11 @@ class _CreateStaffState extends State<CreateStaff> {
             showDialog(
                 context: context,
                 builder: (_) => const NotifyDialog(
-                    content: "Tạo thành công! ", isError: false));
+                    content: "Tạo thành công! ",));
           }
         } else {
           if (context.mounted) {
-            showSnackBar(context, res, true);
+            showSnackBar(context:context,content: res,isError: true);
           }
         }
       }

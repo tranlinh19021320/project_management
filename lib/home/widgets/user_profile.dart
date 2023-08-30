@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:project_management/home/unit_card/reset_password.dart';
-import 'package:project_management/home/unit_card/text_button.dart';
+import 'package:project_management/home/widgets/reset_password.dart';
+import 'package:project_management/home/widgets/text_button.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
 import '../../firebase/firebase_methods.dart';

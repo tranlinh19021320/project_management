@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/admin/widgets/group_dropdown_button.dart';
-import 'package:project_management/home/unit_card/text_button.dart';
+import 'package:project_management/home/widgets/group_dropdown_button.dart';
+import 'package:project_management/home/widgets/text_button.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/utils.dart';
 
@@ -109,11 +109,11 @@ Nhóm: $userGroup''';
     });
     if (res == 'success') {
       if (context.mounted) {
-        showSnackBar(context, "Thay đổi thành công!", false);
+        showSnackBar(context:context, content: "Thay đổi thành công!",);
       }
     } else {
       if (context.mounted) {
-        showSnackBar(context, res, true);
+        showSnackBar(context: context, content: res, isError: true);
       }
     }
   }

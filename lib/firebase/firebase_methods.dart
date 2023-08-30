@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:project_management/firebase/storage_method.dart';
+import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/utils.dart';
 import 'package:project_management/model/user.dart';
 
@@ -342,26 +343,27 @@ class FirebaseMethods {
     required String projectId,
     required String nameProject,
     required String description,
-    required String startDate,
-    required String endDate,
+    required DateTime startDate,
+    required DateTime endDate,
   }) async {
     String res = 'error';
     try {
       CurrentUser user =
           await getCurrentUserByUserId(userId: _auth.currentUser!.uid);
+      Project project = Project(
+          companyId: user.companyId,
+          projectId: projectId,
+          nameProject: nameProject,
+          description: description,
+          createDate: DateTime.now(),
+          startDate: startDate,
+          endDate: endDate);
       await _firestore
           .collection('companies')
           .doc(user.companyId)
           .collection('projects')
           .doc(projectId)
-          .set({
-        'projectId': projectId,
-        'nameProject': nameProject,
-        'description': description,
-        'startDate': startDate,
-        'endDate': endDate,
-        'companyId': user.companyId,
-      });
+          .set(project.toJson());
 
       res = 'success';
     } catch (e) {
@@ -371,4 +373,16 @@ class FirebaseMethods {
     return res;
   }
 
+  Future<String> deleteProject({required String companyId, required String projectId}) async {
+    String res = 'error';
+    try {
+    _firestore.collection('companies').doc(companyId).collection('projects').doc(projectId).delete();
+    res = 'success';
+    } catch(er) {
+      res = er.toString();
+    }
+
+    return res;
+    
+  }
 }

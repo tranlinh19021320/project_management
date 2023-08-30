@@ -191,12 +191,14 @@ const Color focusBlueColor = Color.fromARGB(255, 0, 170, 255);
 const Color darkblueAppbarColor = Color.fromARGB(255, 14, 92, 181);
 const Color blueDrawerColor = Color.fromARGB(255, 33, 108, 169);
 const Color notifyIconColor = Color.fromARGB(255, 247, 229, 70);
+const Color dartblueColor = Color.fromARGB(255, 8, 0, 248);
+
 
 String manager = "Manager";
 //funtions
 
 //funtion to show snack bar for events
-showSnackBar(BuildContext context, String content, bool isError) {
+showSnackBar({required BuildContext context,required String content, bool isError = false}) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     content: isError
         ? Column(

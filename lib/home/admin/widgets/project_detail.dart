@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:uuid/uuid.dart';
+import 'package:project_management/home/widgets/text_button.dart';
+import 'package:project_management/model/project.dart';
+import 'package:project_management/utils/notify_dialog.dart';
 import '../../../utils/utils.dart';
 import 'package:intl/intl.dart';
 
-class CreateProjectScreen extends StatefulWidget {
-  const CreateProjectScreen({super.key});
+class ProjectDetailScreen extends StatefulWidget {
+  final Project project;
+  const ProjectDetailScreen({super.key, required this.project});
 
   @override
-  State<CreateProjectScreen> createState() => _CreateProjectScreenState();
+  State<ProjectDetailScreen> createState() => _ProjectDetailScreenState();
 }
 
-class _CreateProjectScreenState extends State<CreateProjectScreen> {
+class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   TextEditingController nameProject = TextEditingController();
   TextEditingController description = TextEditingController();
   ScrollController descriptionScroll = ScrollController();
@@ -36,8 +39,10 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
         setState(() {});
       }
     });
-    startDate = DateTime.now();
-    endDate = DateTime.now();
+    startDate = widget.project.startDate;
+    endDate = widget.project.endDate;
+    nameProject.text = widget.project.nameProject;
+    description.text = widget.project.description;
   }
 
   @override
@@ -50,23 +55,99 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
     descriptionScroll.dispose();
   }
 
-  createproject() async {
-    if (nameProject.text != "") {
-      String projectId = const Uuid().v1();
-      String res = await FirebaseMethods().createProject(
-          projectId: projectId,
-          nameProject: nameProject.text,
-          description: description.text,
-          startDate: startDate,
-          endDate: endDate);
+  // createproject() async {
+  //   if (nameProject.text != "") {
+  //     String projectId = const Uuid().v1();
+  //     String res = await FirebaseMethods().createProject(
+  //         projectId: projectId,
+  //         nameProject: nameProject.text,
+  //         description: description.text,
+  //         startDate: startDate,
+  //         endDate: endDate);
+  //     if (res == 'success') {
+  //       if (context.mounted) {
+  //         showSnackBar(
+  //           context: context,
+  //           content: "tạo project thành công",
+  //         );
+  //         Navigator.pop(context);
+  //       }
+  //     } else {
+  //       if (context.mounted) {
+  //         showSnackBar(context: context, content: res, isError: false);
+  //       }
+  //     }
+  //   }
+  // }
+
+  delete() async {
+    bool? comfirm = await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              scrollable: true,
+              backgroundColor: darkblueAppbarColor,
+              iconPadding: const EdgeInsets.only(bottom: 8),
+              icon: loudspeakerIcon,
+              title: Column(
+                children: [
+                  Text(
+                      "Bạn chắc muốn xóa dự án '' ${widget.project.nameProject} '' ?",
+                      style: const TextStyle(fontSize: 18)),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  const Text(
+                    "Dự án sẽ bị xóa vĩnh viễn!",
+                    style: TextStyle(color: errorRedColor, fontSize: 12),
+                  ),
+                ],
+              ),
+              actionsAlignment: MainAxisAlignment.spaceAround,
+              actionsPadding: const EdgeInsets.only(bottom: 14),
+              actions: [
+                TextBoxButton(
+                    color: dartblueColor,
+                    text: "Ok",
+                    fontSize: 14,
+                    width: 64,
+                    height: 36,
+                    funtion: () => Navigator.of(context).pop(true)),
+                TextBoxButton(
+                    color: errorRedColor,
+                    text: "Hủy",
+                    fontSize: 14,
+                    width: 64,
+                    height: 36,
+                    funtion: () => Navigator.of(context).pop(false)),
+              ],
+            ));
+
+    if (comfirm != null && comfirm) {
+      if (context.mounted) {
+        showDialog(
+            context: context,
+            builder: (_) => const NotifyDialog(
+                  content: "loading",
+                ));
+      }
+      String res = await FirebaseMethods().deleteProject(
+          companyId: widget.project.companyId,
+          projectId: widget.project.projectId);
+
       if (res == 'success') {
         if (context.mounted) {
-          showSnackBar(context:context,content: "tạo project thành công",);
           Navigator.pop(context);
+          Navigator.pop(context);
+          showDialog(
+              context: context,
+              builder: (_) => const NotifyDialog(
+                    content: "Đã xóa dự án thành công!",
+                  ));
         }
       } else {
         if (context.mounted) {
-          showSnackBar(context:context,content: res, isError: true);
+          Navigator.pop(context);
+          showSnackBar(context: context, content: res, isError: true);
         }
       }
     }
@@ -83,7 +164,16 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: darkblueAppbarColor,
-          title: const Text('Dự án mới'),
+          title: const Text('Dự án'),
+          actions: [
+            IconButton(
+                onPressed: delete,
+                tooltip: "Xóa vĩnh viễn",
+                icon: const Icon(
+                  Icons.delete_forever,
+                  color: errorRedColor,
+                ))
+          ],
         ),
         body: Padding(
           padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 20),
@@ -246,9 +336,9 @@ class _CreateProjectScreenState extends State<CreateProjectScreen> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         floatingActionButton: FloatingActionButton(
-          onPressed: createproject,
+          onPressed: () {},
           tooltip: "Tạo",
-          child: const Icon(Icons.add),
+          child: const Icon(Icons.update),
         ),
       ),
     );

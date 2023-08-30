@@ -8,11 +8,11 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/home/staff/screens/staff_event.dart';
 import 'package:project_management/home/staff/screens/staff_home.dart';
 import 'package:project_management/home/staff/screens/staff_notify_screen.dart';
-import 'package:project_management/home/unit_card/text_button.dart';
+import 'package:project_management/home/widgets/text_button.dart';
 import '../../../firebase/firebase_methods.dart';
 import '../../../start_screen/login.dart';
 import '../../../utils/utils.dart';
-import '../../unit_card/user_profile.dart';
+import '../../widgets/user_profile.dart';
 
 class StaffDrawerMenu extends StatefulWidget {
   final int selectedPage;

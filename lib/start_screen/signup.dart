@@ -111,15 +111,15 @@ class _SignupState extends State<Signup> {
         });
         if (res1 == "success" && res2 == 'success') {
           if (context.mounted) {
-            showSnackBar(context, "Đăng ký thành công!", false);
+            showSnackBar(context : context,content: "Đăng ký thành công!",);
 
             Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (context) => const HomeScreen()));
           }
         } else {
           if (context.mounted) {
-            showSnackBar(context, res1, true);
-            showSnackBar(context, res2, true);
+            showSnackBar(context:context,content: res1, isError: true);
+            showSnackBar(context:context,content: res2, isError: true);
           }
         }
       }
