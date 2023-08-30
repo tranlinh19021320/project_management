@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:project_management/firebase/storage_method.dart';
+import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/utils.dart';
 import 'package:project_management/model/user.dart';
@@ -373,16 +374,81 @@ class FirebaseMethods {
     return res;
   }
 
-  Future<String> deleteProject({required String companyId, required String projectId}) async {
+  Future<String> deleteProject(
+      {required String companyId, required String projectId}) async {
     String res = 'error';
     try {
-    _firestore.collection('companies').doc(companyId).collection('projects').doc(projectId).delete();
-    res = 'success';
-    } catch(er) {
+      _firestore
+          .collection('companies')
+          .doc(companyId)
+          .collection('projects')
+          .doc(projectId)
+          .delete();
+      res = 'success';
+    } catch (er) {
       res = er.toString();
     }
-
     return res;
-    
   }
+
+  Future<String> updateProject(
+      {required Project project,
+      required String nameProject,
+      required String description,
+      required DateTime startDate,
+      required DateTime endDate}) async {
+    String res = 'error';
+    try {
+      await _firestore
+          .collection('companies')
+          .doc(project.companyId)
+          .collection('projects')
+          .doc(project.projectId)
+          .update({
+        'nameProject': nameProject,
+        'description': description,
+        'createDate': DateTime.now(),
+        'startDate': startDate,
+        'endDate': endDate,
+      });
+
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+    return res;
+  }
+
+  Future<String> createMission(
+      {required Project project,
+      required String missionId,
+      required String nameMission,
+      required String description,
+      required DateTime startDate,
+      required DateTime endDate,
+      required String staffId}) async {
+    String res = 'error';
+    try {
+      Mission mission = Mission(
+          companyId: project.companyId,
+          projectId: project.projectId,
+          missionId: missionId,
+          nameMission: nameMission,
+          description: description,
+          createDate: DateTime.now(),
+          startDate: startDate,
+          endDate: endDate,
+          datePercent: {DateTime.now(): 0} ,
+          dateDetail: {DateTime.now(): ''},
+          percent: 0,
+          staffId: staffId);
+      await _firestore.collection('missions').doc(missionId).set(mission.toJson());
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+    return res;
+  }
+
+  
 }

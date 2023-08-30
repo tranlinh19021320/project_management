@@ -65,6 +65,12 @@ Image projectIcon = Image.asset(
   height: 30,
   fit: BoxFit.fill,
 );
+Image missionIcon = Image.asset(
+  "assets/icons/target.png",
+  width: 30,
+  height: 30,
+  fit: BoxFit.fill,
+);
 Image defaultnotifyIcon = Image.asset(
   "assets/icons/notify.png",
   width: 30,

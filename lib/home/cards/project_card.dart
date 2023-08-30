@@ -1,7 +1,7 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:project_management/home/admin/widgets/project_detail.dart';
+import 'package:project_management/home/admin/widgets/project.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/utils.dart';
 
@@ -38,7 +38,7 @@ class _ProjectCardState extends State<ProjectCard> {
           width: MediaQuery.of(context).size.width * 0.95,
           child: ListTile(
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (_) => ProjectDetailScreen(project: widget.project)));
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => ProjectHomeScreen(project: widget.project)));
             },
             contentPadding: EdgeInsets.zero,
             dense: true,
@@ -52,7 +52,10 @@ class _ProjectCardState extends State<ProjectCard> {
                   children: [
                     (widget.project.missions != 0)
                         ? Container()
-                        : AnimatedTextKit(repeatForever: true, animatedTexts: [
+                        : AnimatedTextKit(repeatForever: true,
+                        
+                        pause: const Duration(milliseconds: 0),
+                         animatedTexts: [
                             ColorizeAnimatedText('New    ',
                                 textStyle: const TextStyle(fontSize: 14),
                                 colors: [
@@ -64,6 +67,7 @@ class _ProjectCardState extends State<ProjectCard> {
                                   Colors.purple,
                                   Colors.white,
                                 ]),
+                                
                           ]),
                     Center(
                         child: Text(
