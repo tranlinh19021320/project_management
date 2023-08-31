@@ -8,7 +8,7 @@ class GroupDropdownButton extends StatefulWidget {
   final String isWordAtHead;
   final ValueChanged<String> onSelectValue;
 
-  const GroupDropdownButton({super.key, required this.companyId, required this.groupSelect, required this.isWordAtHead, required this.onSelectValue});
+  const GroupDropdownButton({super.key, required this.companyId, required this.groupSelect, this.isWordAtHead = '', required this.onSelectValue});
   
   @override
   State<GroupDropdownButton> createState() => _GroupDropdownButtonState();

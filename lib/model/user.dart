@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class CurrentUser {
   final String email;
   final String username;
@@ -10,7 +12,7 @@ class CurrentUser {
   final String companyName;
   final int notifyNumber;
 
-  const CurrentUser( {
+  const CurrentUser({
     required this.notifyNumber,
     required this.email,
     required this.username,
@@ -33,7 +35,18 @@ class CurrentUser {
         'userId': userId,
         'companyId': companyId,
         'companyName': companyName,
-        'notifyNumber' : notifyNumber
-
+        'notifyNumber': notifyNumber
       };
+
+  static CurrentUser fromSnap({required DocumentSnapshot user}) => CurrentUser(
+      notifyNumber: user['notifyNumber'],
+      email: user['email'],
+      username: user['username'],
+      password: user['password'],
+      nameDetails: user['nameDetails'],
+      photoURL: user['photoURL'],
+      group: user['group'],
+      userId: user['userId'],
+      companyId: user['companyId'],
+      companyName: user['companyName']);
 }

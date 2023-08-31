@@ -105,9 +105,9 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
   }
 
 
-  onPageChanged(int page) {
+  onPageChanged(int _page) {
     setState(() {
-      page = page;
+      page = _page;
     });
   }
   @override

@@ -9,8 +9,8 @@ class Mission {
   final DateTime createDate;
   final DateTime startDate;
   final DateTime endDate;
-  final Map<dynamic, String> dateDetail;
-  final Map<dynamic, double> datePercent;
+  final Map<DateTime, String> dateDetail;
+  final Map<DateTime, double> datePercent;
   final double percent;
   final String staffId;
 

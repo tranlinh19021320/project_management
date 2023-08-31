@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
+import 'package:project_management/home/admin/utils/create_mission.dart';
 import 'package:project_management/home/widgets/text_button.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/notify_dialog.dart';
@@ -55,78 +56,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
     descriptionScroll.dispose();
   }
 
-  delete() async {
-    bool? comfirm = await showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-              scrollable: true,
-              backgroundColor: darkblueAppbarColor,
-              iconPadding: const EdgeInsets.only(bottom: 8),
-              icon: loudspeakerIcon,
-              title: Column(
-                children: [
-                  Text(
-                      "Bạn chắc muốn xóa dự án '' ${widget.project.nameProject} '' ?",
-                      style: const TextStyle(fontSize: 18)),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  const Text(
-                    "Dự án sẽ bị xóa vĩnh viễn!",
-                    style: TextStyle(color: errorRedColor, fontSize: 12),
-                  ),
-                ],
-              ),
-              actionsAlignment: MainAxisAlignment.spaceAround,
-              actionsPadding: const EdgeInsets.only(bottom: 14),
-              actions: [
-                TextBoxButton(
-                    color: dartblueColor,
-                    text: "Ok",
-                    fontSize: 14,
-                    width: 64,
-                    height: 36,
-                    funtion: () => Navigator.of(context).pop(true)),
-                TextBoxButton(
-                    color: errorRedColor,
-                    text: "Hủy",
-                    fontSize: 14,
-                    width: 64,
-                    height: 36,
-                    funtion: () => Navigator.of(context).pop(false)),
-              ],
-            ));
 
-    if (comfirm != null && comfirm) {
-      if (context.mounted) {
-        showDialog(
-            context: context,
-            builder: (_) => const NotifyDialog(
-                  content: "loading",
-                ));
-      }
-      String res = await FirebaseMethods().deleteProject(
-          companyId: widget.project.companyId,
-          projectId: widget.project.projectId);
-
-      if (res == 'success') {
-        if (context.mounted) {
-          Navigator.pop(context);
-          Navigator.pop(context);
-          showDialog(
-              context: context,
-              builder: (_) => const NotifyDialog(
-                    content: "Đã xóa dự án thành công!",
-                  ));
-        }
-      } else {
-        if (context.mounted) {
-          Navigator.pop(context);
-          showSnackBar(context: context, content: res, isError: true);
-        }
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +65,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
       body: const Text('hahaa'),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => CreateMissionScreen(project: widget.project))),
         child: const Icon(Icons.create),
       ),
     );
