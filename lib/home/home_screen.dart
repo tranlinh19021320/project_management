@@ -5,7 +5,7 @@ import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/admin/screens/projects_screen.dart';
 import 'package:project_management/home/staff/screens/staff_home.dart';
 import 'package:project_management/model/user.dart';
-import 'package:project_management/utils/utils.dart';
+import 'package:project_management/utils/parameters.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,

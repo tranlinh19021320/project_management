@@ -3,8 +3,12 @@ import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/home_screen.dart';
 import 'package:project_management/start_screen/add_company.dart';
 import 'package:project_management/start_screen/login.dart';
+import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/functions.dart';
+import 'package:project_management/utils/icons.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/paths.dart';
 import 'package:uuid/uuid.dart';
-import '../utils/utils.dart';
 
 class Signup extends StatefulWidget {
   final String companyName;

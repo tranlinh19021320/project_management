@@ -12,7 +12,11 @@ import 'package:project_management/home/admin/screens/notify_screen.dart';
 import 'package:project_management/home/widgets/text_button.dart';
 import '../../../firebase/firebase_methods.dart';
 import '../../../start_screen/login.dart';
-import '../../../utils/utils.dart';
+import 'package:project_management/utils/functions.dart';
+import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/icons.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/paths.dart';
 import '../../widgets/user_profile.dart';
 
 class DrawerMenu extends StatefulWidget {

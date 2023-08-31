@@ -3,12 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/admin/widgets/create_staff.dart';
+import 'package:project_management/home/admin/utils/create_staff.dart';
 import 'package:project_management/home/widgets/group_dropdown_button.dart';
-import 'package:project_management/home/cards/staff_card.dart';
+import 'package:project_management/home/admin/utils/staff_card.dart';
 import 'package:project_management/model/user.dart';
-import '../../../utils/utils.dart';
-import '../widgets/drawer_bar.dart';
+import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/icons.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/paths.dart';
+import '../utils/drawer_bar.dart';
 
 class PersonalScreen extends StatefulWidget {
  

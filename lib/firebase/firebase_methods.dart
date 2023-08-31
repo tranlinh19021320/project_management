@@ -4,7 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:project_management/firebase/storage_method.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/project.dart';
-import 'package:project_management/utils/utils.dart';
+import 'package:project_management/utils/functions.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/paths.dart';
 import 'package:project_management/model/user.dart';
 
 class FirebaseMethods {

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/notify_dialog.dart';
-import '../../utils/utils.dart';
+import 'package:project_management/utils/functions.dart';
+import 'package:project_management/utils/colors.dart';
 import 'package:intl/intl.dart';
 
 class ProjectDetailScreen extends StatefulWidget {

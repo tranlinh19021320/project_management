@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:project_management/utils/utils.dart';
+import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/icons.dart';
 
 class NotifyDialog extends StatefulWidget {
   final String content;

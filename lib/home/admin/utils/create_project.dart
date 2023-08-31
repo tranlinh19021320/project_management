@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:uuid/uuid.dart';
-import '../../../utils/utils.dart';
+import 'package:project_management/utils/functions.dart';
+import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/paths.dart';
 import 'package:intl/intl.dart';
 
 class CreateProjectScreen extends StatefulWidget {

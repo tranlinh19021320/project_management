@@ -1,9 +1,9 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:project_management/home/admin/widgets/project.dart';
+import 'package:project_management/home/admin/utils/project.dart';
 import 'package:project_management/model/project.dart';
-import 'package:project_management/utils/utils.dart';
+import 'package:project_management/utils/colors.dart';
 
 class ProjectCard extends StatefulWidget {
   final Project project;

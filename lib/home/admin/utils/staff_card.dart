@@ -6,8 +6,11 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/widgets/group_dropdown_button.dart';
 import 'package:project_management/home/widgets/text_button.dart';
+import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/notify_dialog.dart';
-import 'package:project_management/utils/utils.dart';
+import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/icons.dart';
+import 'package:project_management/utils/paths.dart';
 
 class StaffCard extends StatefulWidget {
   final DocumentSnapshot staff;

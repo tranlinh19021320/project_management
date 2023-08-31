@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/home/home_screen.dart';
 import 'package:project_management/start_screen/login.dart';
-import 'package:project_management/utils/utils.dart';
+import 'package:project_management/utils/colors.dart';
 import 'firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 

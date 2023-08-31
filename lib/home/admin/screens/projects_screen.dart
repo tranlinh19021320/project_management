@@ -2,12 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/admin/widgets/create_project.dart';
-import 'package:project_management/home/admin/widgets/drawer_bar.dart';
-import 'package:project_management/home/cards/project_card.dart';
+import 'package:project_management/home/admin/utils/create_project.dart';
+import 'package:project_management/home/admin/utils/drawer_bar.dart';
+import 'package:project_management/home/admin/utils/project_card.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/model/user.dart';
-import 'package:project_management/utils/utils.dart';
+import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/icons.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/paths.dart';
 
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({
@@ -99,7 +102,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                         builder: (_) => const CreateProjectScreen()));
                   },
                   tooltip: 'Tạo mới dự án',
-                  child: Icon(Icons.add),
+                  child: const Icon(Icons.add),
                 )),
           );
   }

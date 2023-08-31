@@ -1,34 +1,60 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/cards/missions_screen.dart';
-import 'package:project_management/home/cards/project_detail.dart';
 import 'package:project_management/home/widgets/text_button.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/notify_dialog.dart';
-import 'package:project_management/utils/utils.dart';
-
-class ProjectHomeScreen extends StatefulWidget {
+import 'package:project_management/utils/functions.dart';
+import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/icons.dart';
+class MissionsScreen extends StatefulWidget {
   final Project project;
-  const ProjectHomeScreen({super.key, required this.project});
+  const MissionsScreen({super.key, required this.project});
 
   @override
-  State<ProjectHomeScreen> createState() => _ProjectHomeScreenState();
+  State<MissionsScreen> createState() => _MissionsScreenState();
 }
 
-class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
-  int page = 0;
-  PageController pageController = PageController();
+class _MissionsScreenState extends State<MissionsScreen> {
+  TextEditingController nameProject = TextEditingController();
+  TextEditingController description = TextEditingController();
+  ScrollController descriptionScroll = ScrollController();
+  late FocusNode nameFocus;
+  late FocusNode descriptionFocus;
+
+  late DateTime startDate;
+  late DateTime endDate;
+
   @override
   void initState() {
     super.initState();
+    nameFocus = FocusNode();
+    nameFocus.addListener(() {
+      if (nameFocus.hasFocus) {
+        setState(() {});
+      }
+    });
+    descriptionFocus = FocusNode();
+    descriptionFocus.addListener(() {
+      if (descriptionFocus.hasFocus) {
+        setState(() {});
+      }
+    });
+    startDate = widget.project.startDate;
+    endDate = widget.project.endDate;
+    nameProject.text = widget.project.nameProject;
+    description.text = widget.project.description;
   }
 
   @override
   void dispose() {
     super.dispose();
-    pageController.dispose();
+    nameProject.dispose();
+    description.dispose();
+    nameFocus.dispose();
+    descriptionFocus.dispose();
+    descriptionScroll.dispose();
   }
+
   delete() async {
     bool? comfirm = await showDialog(
         context: context,
@@ -102,53 +128,15 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
     }
   }
 
-
-  onPageChanged(int _page) {
-    setState(() {
-      page = _page;
-    });
-  }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage(backgroundImage), fit: BoxFit.fill),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: darkblueAppbarColor,
-          title: const Text('Dự án'),
-          actions: [
-            IconButton(
-                onPressed: delete,
-                tooltip: "Xóa vĩnh viễn",
-                icon: const Icon(
-                  Icons.delete_forever,
-                  color: errorRedColor,
-                ))
-          ],
-        ),
-        body: PageView(
-          controller: pageController,
-          onPageChanged: onPageChanged,
-          children: [
-            ProjectDetailScreen(project: widget.project),
-            MissionsScreen(project: widget.project),
-          ],
-        ),
-       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.transparent,
-        currentIndex: page,
-        items: [
-          BottomNavigationBarItem(icon: projectIcon, label: "Chi tiết", ),
-          BottomNavigationBarItem(icon: missionIcon, label: "Nhiệm vụ",),
-        ],
-        
-        onTap: (page) => pageController.jumpToPage(page),
-        
-        ),
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: const Text('hahaa'),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: const Icon(Icons.create),
       ),
     );
   }

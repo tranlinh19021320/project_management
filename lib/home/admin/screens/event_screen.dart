@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../utils/utils.dart';
-import '../widgets/drawer_bar.dart';
+import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/icons.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/paths.dart';
+import '../utils/drawer_bar.dart';
 
 class EventScreen extends StatefulWidget {
 

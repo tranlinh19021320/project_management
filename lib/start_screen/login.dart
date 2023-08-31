@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/home_screen.dart';
 import 'package:project_management/start_screen/add_company.dart';
-import 'package:project_management/utils/utils.dart';
+import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/functions.dart';
+import 'package:project_management/utils/icons.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/paths.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
