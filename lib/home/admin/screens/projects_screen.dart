@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/admin/utils/create_project.dart';
 import 'package:project_management/home/admin/utils/drawer_bar.dart';
 import 'package:project_management/home/admin/utils/project_card.dart';
+import 'package:project_management/home/admin/utils/project_detail.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/colors.dart';
@@ -91,15 +91,31 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                       }
                       return ListView.builder(
                           itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (context, index) =>
-                              ProjectCard(project: Project.fromSnap(snapshot.data!.docs[index])));
+                          itemBuilder: (context, index) => ProjectCard(
+                              project: Project.fromSnap(
+                                  snapshot.data!.docs[index])));
                     }),
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.endFloat,
                 floatingActionButton: FloatingActionButton(
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => const CreateProjectScreen()));
+                        builder: (_) => Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: AssetImage(backgroundImage),
+                                    fit: BoxFit.fill),
+                              ),
+                              child: Scaffold(
+                                backgroundColor: Colors.transparent,
+                                appBar: AppBar(
+                                  backgroundColor: darkblueAppbarColor,
+                                  title: const Text('Dự án mới'),
+                                  centerTitle: true,
+                                ),
+                                body: const ProjectDetailScreen(),
+                              ),
+                            )));
                   },
                   tooltip: 'Tạo mới dự án',
                   child: const Icon(Icons.add),

@@ -145,11 +145,10 @@ class _DrawerMenuState extends State<DrawerMenu> {
                         onTap: () {
                           (isOpenProfile) ? selectImage() : null;
                         },
-                        child: CircleAvatar(
-                          backgroundColor: backgroundWhiteColor,
-                          backgroundImage:
-                              NetworkImage(snapshot.data!['photoURL']),
-                          radius: 64,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(64),
+                          clipBehavior: Clip.antiAliasWithSaveLayer,
+                          child:getImageFromUrl(url: snapshot.data!['photoURL']),
                         ),
                       ),
                       (isOpenProfile)

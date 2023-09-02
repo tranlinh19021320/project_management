@@ -4,6 +4,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/icons.dart';
 import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/paths.dart';
@@ -27,6 +28,11 @@ class SearchUser extends StatefulWidget {
 
 class _SearchUserState extends State<SearchUser> {
   String selectValue = "";
+  @override
+  void initState() {
+    super.initState();
+    selectValue = widget.selectuserId;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +45,6 @@ class _SearchUserState extends State<SearchUser> {
                   color: darkblueAppbarColor, size: 20);
             }
             List<String> usersId = [''];
-            selectValue = widget.selectuserId;
             Map<String, CurrentUser> users = {};
             for (DocumentSnapshot doc in snapshot.data!.docs) {
               usersId.add(doc['userId']);
@@ -65,66 +70,34 @@ class _SearchUserState extends State<SearchUser> {
                     items: usersId.map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: (value == "")
-                            ? Container(
+                        child: Container(
                                height: 50,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
                                   color: focusBlueColor
                                 ),
-                
+
+                                color: (value == selectValue && value != "") ? focusBlueColor : Colors.transparent,
                 
                               ),
-                              child: const Center(
+                    
+                              child:(value == "") ? const Center(
                                 child: Text(
                                     'Trống',
                                     style: TextStyle(color: defaultColor),
                                   ),
-                              ),
-                            )
-                            : Container(
-                              height: 50,
-                              decoration: !(value == selectValue) ? BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: focusBlueColor
-                                ),
-                
-                
-                              ) : BoxDecoration(
-                                border: Border.all(
-                                  color: focusBlueColor,
-                                  
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                                color: focusBlueColor
-                              ),
-                    
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                                dense: true,
-                                visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(users[value]!.photoURL),
-                                  radius: 20,
-                                ),
-                                
-                                title: Text(users[value]!.nameDetails, style: TextStyle(fontSize: 16),),
-                                subtitle: Text(users[value]!.group),
-                
-                                trailing: (users[value]!.group == manager) ? resizedIcon(keyImage, 18) : resizedIcon(staffImage, 18),
-                              ),
+                              ) : userCard(user: users[value]!),
                             ),
                       );
                     }).toList(),
                     onChanged: (val) {
                       setState(() {
                         selectValue = val!;
-                        
+                        widget.onSelectValue(selectValue);
                       });
                     
-                      widget.onSelectValue(selectValue);
+                      
                     },
                   ),
                 ),

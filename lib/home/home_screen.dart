@@ -5,7 +5,9 @@ import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/admin/screens/projects_screen.dart';
 import 'package:project_management/home/staff/screens/staff_home.dart';
 import 'package:project_management/model/user.dart';
+import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/parameters.dart';
+import 'package:provider/provider.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     super.key,
@@ -16,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String group = "Devs1";
+  late bool isManager;
   bool isLoading = false;
   @override
   void initState() {
@@ -28,8 +30,9 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isLoading = true;
     });
-    CurrentUser user = await FirebaseMethods().getCurrentUserByUserId(userId: FirebaseAuth.instance.currentUser!.uid);
-    group = user.group;
+    GroupProvider groupProvider = Provider.of<GroupProvider>(context, listen: false);
+    await groupProvider.refresh();
+    isManager = groupProvider.getIsManager;
     setState(() {
       isLoading = false;
     });
@@ -42,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return isLoading?const Center(
       child: CircularProgressIndicator(backgroundColor: Colors.transparent,),
-    ): group == manager
+    ): isManager
         ? const ProjectsScreen()
         : const StaffHomeScreen();
   }

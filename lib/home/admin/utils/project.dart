@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/admin/utils/missions_screen.dart';
+import 'package:project_management/home/widgets/missions_screen.dart';
 import 'package:project_management/home/admin/utils/project_detail.dart';
 import 'package:project_management/home/widgets/text_button.dart';
 import 'package:project_management/model/project.dart';
@@ -21,9 +21,15 @@ class ProjectHomeScreen extends StatefulWidget {
 class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
   int page = 0;
   PageController pageController = PageController();
+  late bool isManager;
   @override
   void initState() {
     super.initState();
+    init();
+  }
+
+  init() async {
+    isManager =await currentUserIsManager();
   }
 
   @override
@@ -136,7 +142,7 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
           controller: pageController,
           onPageChanged: onPageChanged,
           children: [
-            ProjectDetailScreen(project: widget.project),
+            ProjectDetailScreen(project: widget.project,),
             MissionsScreen(project: widget.project),
           ],
         ),

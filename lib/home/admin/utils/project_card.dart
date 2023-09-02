@@ -14,6 +14,7 @@ class ProjectCard extends StatefulWidget {
 }
 
 class _ProjectCardState extends State<ProjectCard> {
+
   String percent() {
     return (widget.project.missions == 0 ||
             widget.project.completedMissions == 0)

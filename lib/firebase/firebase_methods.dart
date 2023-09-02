@@ -440,17 +440,48 @@ class FirebaseMethods {
           createDate: DateTime.now(),
           startDate: startDate,
           endDate: endDate,
-          datePercent: {DateTime.now(): 0} ,
-          dateDetail: {DateTime.now(): ''},
           percent: 0,
           staffId: staffId);
-      await _firestore.collection('missions').doc(missionId).set(mission.toJson());
-      res = 'success';
+      await _firestore
+          .collection('missions')
+          .doc(missionId)
+          .set(mission.toJson());
+      res = await updateMissionProgress(
+          missionId: missionId, desciption: 'create', progress: 0);
+      
+      if (res == 'success') {
+        await _firestore.collection('companies').doc(project.companyId).collection('projects').doc(project.projectId).update({
+          'missions' : project.missions + 1, 
+        });
+      }
     } catch (e) {
       res = e.toString();
     }
     return res;
   }
 
-  
+  Future<String> updateMissionProgress(
+      {required String missionId,
+      required String desciption,
+      required double progress}) async {
+    String res = "error";
+    String today = dayToString(time: DateTime.now());
+    try {
+      await _firestore
+          .collection('missions')
+          .doc(missionId)
+          .collection('progress')
+          .doc(today)
+          .set({
+        'date': today,
+        'description': desciption,
+        'progress': progress,
+      });
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+
+    return res;
+  }
 }

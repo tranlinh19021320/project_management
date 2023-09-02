@@ -9,8 +9,6 @@ class Mission {
   final DateTime createDate;
   final DateTime startDate;
   final DateTime endDate;
-  final Map<DateTime, String> dateDetail;
-  final Map<DateTime, double> datePercent;
   final double percent;
   final String staffId;
 
@@ -23,38 +21,33 @@ class Mission {
     required this.createDate,
     required this.startDate,
     required this.endDate,
-    required this.datePercent,
-    required this.dateDetail,
     required this.percent,
     required this.staffId,
   });
 
   Map<String, dynamic> toJson() => {
-    'companyId' : companyId,
-    'projectId' : projectId,
-    'missionId' : missionId,
-    'nameMission' : nameMission,
-    'description' : description,
-    'createDate' : createDate,
-    'startDate' : startDate,
-    'endDate' : endDate,
-    'dateDetail' : dateDetail,
-    'datePercent' : datePercent,
-    'percent' : percent,
-    'staffId' : staffId,
-  };
+        'companyId': companyId,
+        'projectId': projectId,
+        'missionId': missionId,
+        'nameMission': nameMission,
+        'description': description,
+        'createDate': createDate,
+        'startDate': startDate,
+        'endDate': endDate,
+        'percent': percent,
+        'staffId': staffId,
+      };
 
   static Mission fromSnap({required DocumentSnapshot mission}) => Mission(
-      companyId: mission['companyId'],
-      projectId: mission['projectId'],
-      missionId: mission['missionId'],
-      nameMission: mission['nameMission'],
-      description: mission['description'],
-      createDate: mission['createDate'].toDate(),
-      startDate: mission['startDate'].toDate(),
-      endDate: mission['endDate'].toDate(),
-      percent: mission['percent'],
-      staffId: mission['staffId'],
-      dateDetail: mission['dateDetail'],
-      datePercent: mission['datePercent']);
+        companyId: mission['companyId'],
+        projectId: mission['projectId'],
+        missionId: mission['missionId'],
+        nameMission: mission['nameMission'],
+        description: mission['description'],
+        createDate: mission['createDate'].toDate(),
+        startDate: mission['startDate'].toDate(),
+        endDate: mission['endDate'].toDate(),
+        percent: mission['percent'],
+        staffId: mission['staffId'],
+      );
 }

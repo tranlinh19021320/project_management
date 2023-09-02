@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/model/project.dart';
+import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 class ProjectDetailScreen extends StatefulWidget {
-  final Project project;
-  const ProjectDetailScreen({super.key, required this.project});
+  final Project? project;
+  const ProjectDetailScreen({super.key, this.project = null});
 
   @override
   State<ProjectDetailScreen> createState() => _ProjectDetailScreenState();
@@ -24,8 +27,13 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
   late DateTime startDate;
   late DateTime endDate;
 
+  late bool isManager;
+
+  
+
   @override
   void initState() {
+    
     super.initState();
     nameFocus = FocusNode();
     nameFocus.addListener(() {
@@ -39,10 +47,23 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         setState(() {});
       }
     });
-    startDate = widget.project.startDate;
-    endDate = widget.project.endDate;
-    nameProject.text = widget.project.nameProject;
-    description.text = widget.project.description;
+    init();
+    
+    
+  }
+  
+  init() {
+    GroupProvider groupProvider = Provider.of<GroupProvider>(context, listen: false);
+    isManager = groupProvider.getIsManager;
+    if (widget.project != null) {
+    startDate = widget.project!.startDate;
+    endDate = widget.project!.endDate;
+    nameProject.text = widget.project!.nameProject;
+    description.text = widget.project!.description;
+    } else {
+      startDate = DateTime.now();
+      endDate = DateTime.now();
+    }
   }
 
   @override
@@ -55,11 +76,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
     descriptionScroll.dispose();
   }
 
-  bool ischanged() {
-    return (nameProject.text != widget.project.nameProject ||
-        description.text != widget.project.description ||
-        !startDate.isAtSameMomentAs(widget.project.startDate) ||
-        !endDate.isAtSameMomentAs(widget.project.endDate));
+  bool ischanged()  {
+    return (nameProject.text != widget.project!.nameProject ||
+        description.text != widget.project!.description ||
+        !startDate.isAtSameMomentAs(widget.project!.startDate) ||
+        !endDate.isAtSameMomentAs(widget.project!.endDate));
   }
 
   updateProject() async {
@@ -68,7 +89,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
           context: context,
           builder: (_) => const NotifyDialog(content: 'loading'));
       String res = await FirebaseMethods().updateProject(
-          project: widget.project,
+          project: widget.project!,
           nameProject: nameProject.text,
           description: description.text,
           startDate: startDate,
@@ -90,6 +111,30 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       }
     }
   }
+
+  createproject() async {
+    if (nameProject.text != "") {
+      String projectId = const Uuid().v1();
+      String res = await FirebaseMethods().createProject(
+          projectId: projectId,
+          nameProject: nameProject.text,
+          description: description.text,
+          startDate: startDate,
+          endDate: endDate);
+      if (res == 'success') {
+        if (context.mounted) {
+          showSnackBar(context:context,content: "tạo project thành công",);
+          Navigator.pop(context);
+        }
+      } else {
+        if (context.mounted) {
+          showSnackBar(context:context,content: res, isError: true);
+        }
+      }
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -115,8 +160,9 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                   helperText: (nameProject.text != "")
                       ? ""
                       : 'Vui lòng điền tên dự án!',
-                  fillColor: backgroundWhiteColor,
+                  fillColor: (isManager) ? backgroundWhiteColor : defaultColor,
                 ),
+                readOnly: !isManager,
                 onTapOutside: (_) => nameFocus.unfocus(),
                 onSubmitted: (value) =>
                     FocusScope.of(context).requestFocus(descriptionFocus),
@@ -135,15 +181,17 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                 controller: description,
                 focusNode: descriptionFocus,
                 style: const TextStyle(color: blackColor),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   filled: true,
                   helperText: "",
-                  fillColor: backgroundWhiteColor,
+                  fillColor: (isManager) ? backgroundWhiteColor : defaultColor,
                 ),
                 keyboardType: TextInputType.multiline,
                 minLines: 3,
                 maxLines: null,
+                
                 scrollController: descriptionScroll,
+                readOnly: !isManager,
                 onTapOutside: (event) => descriptionFocus.unfocus(),
               ),
 
@@ -162,7 +210,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
               Row(
                 children: [
                   InkWell(
-                    onTap: () async {
+                    onTap:  !isManager ? () {} : () async {
                       final DateTime? date = await showDatePicker(
                         context: context,
                         initialDate: startDate,
@@ -203,7 +251,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                   ),
                   const Text('  -  '),
                   InkWell(
-                    onTap: () async {
+                    onTap:!isManager ? () {} : () async {
                       final DateTime? date = await showDatePicker(
                         context: context,
                         initialDate: endDate,
@@ -250,10 +298,14 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton:!isManager ? null: (widget.project != null) ? FloatingActionButton(
         onPressed: updateProject,
         child: const Icon(Icons.update),
-      ),
+      ) : FloatingActionButton(
+          onPressed: createproject,
+          tooltip: "Tạo",
+          child: const Icon(Icons.add),
+        ),
     );
   }
 }
