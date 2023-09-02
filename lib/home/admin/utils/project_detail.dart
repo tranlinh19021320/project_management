@@ -11,7 +11,7 @@ import 'package:uuid/uuid.dart';
 
 class ProjectDetailScreen extends StatefulWidget {
   final Project? project;
-  const ProjectDetailScreen({super.key, this.project = null});
+  const ProjectDetailScreen({super.key, this.project});
 
   @override
   State<ProjectDetailScreen> createState() => _ProjectDetailScreenState();

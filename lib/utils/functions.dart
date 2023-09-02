@@ -1,6 +1,7 @@
 //funtions
 
 //funtion to show snack bar for events
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -92,22 +93,8 @@ Image getImageFromUrl({
 
       if (totalSize != null && downloadSize != null) {
         var loadPercent = (downloadSize / totalSize).toDouble();
-        var loadPercentString = (loadPercent * 100).toStringAsFixed(2);
 
-        return CircularPercentIndicator(
-          radius: size / 2,
-          percent: loadPercent,
-          center: Text(
-            "$loadPercentString%",
-          ),
-          progressColor: (loadPercent <= 0.2)
-              ? Colors.red
-              : (loadPercent <= 0.4)
-                  ? Colors.orange
-                  : (loadPercent <= 0.7)
-                      ? Colors.yellow
-                      : Colors.green,
-        );
+        return circularPercentIndicator(percent: loadPercent, radius: size / 2);
       }
 
       return child;
@@ -115,24 +102,64 @@ Image getImageFromUrl({
   );
 }
 
-ListTile userCard({required CurrentUser user}) {
-  return ListTile(
-    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-    dense: true,
-    visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-    leading: ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: getImageFromUrl(url: user.photoURL, size: 40),
-    ),
-    title: Text(
-      user.nameDetails,
-      style: const TextStyle(fontSize: 16),
-    ),
-    subtitle: Text(user.group),
-    trailing: (user.group == manager)
-        ? resizedIcon(keyImage, 18)
-        : resizedIcon(staffImage, 18),
+CircularPercentIndicator circularPercentIndicator(
+    {required double percent,
+    required double radius,
+    double lineWidth = 5,
+    double? fontSize}) {
+  return CircularPercentIndicator(
+    radius: radius,
+    lineWidth: lineWidth,
+    percent: percent,
+    center: Text("${(percent * 100).toStringAsFixed(0)}%",
+        style: (fontSize == null) ? null : TextStyle(fontSize: fontSize)),
+    progressColor: (percent <= 0.2)
+        ? Colors.red
+        : (percent <= 0.4)
+            ? Colors.orange
+            : (percent <= 0.7)
+                ? Colors.yellow
+                : Colors.green,
   );
+}
+
+Widget user1Card({required CurrentUser user, double size = 40}) {
+  return ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+          dense: true,
+          visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(size/2),
+            child: getImageFromUrl(url: user.photoURL, size: size),
+          ),
+          title: Text(
+            user.nameDetails,
+            style: const TextStyle(fontSize: 16),
+          ),
+          subtitle: Text(user.group),
+          trailing: (user.group == manager)
+              ? resizedIcon(keyImage, 18)
+              : resizedIcon(staffImage, 18),
+        );
+}
+Widget userCard({required String userId, double size = 40}) {
+  return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData) {
+          return const Text("Not User");
+        }
+
+        CurrentUser user = CurrentUser.fromSnap(user: snapshot.data!);
+
+        return user1Card(user: user, size: size);
+      });
 }
 
 Color notifyColor({required int state}) {

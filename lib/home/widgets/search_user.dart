@@ -5,9 +5,6 @@ import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/parameters.dart';
-import 'package:project_management/utils/paths.dart';
 
 class SearchUser extends StatefulWidget {
   final String companyId;
@@ -50,7 +47,7 @@ class _SearchUserState extends State<SearchUser> {
               usersId.add(doc['userId']);
               users.addAll({doc['userId']: CurrentUser.fromSnap(user: doc)});
             }
-            return Container(
+            return SizedBox(
               height: 50,
               
                 child: DropdownButtonHideUnderline(
@@ -87,7 +84,7 @@ class _SearchUserState extends State<SearchUser> {
                                     'Trống',
                                     style: TextStyle(color: defaultColor),
                                   ),
-                              ) : userCard(user: users[value]!),
+                              ) : user1Card(user: users[value]!),
                             ),
                       );
                     }).toList(),

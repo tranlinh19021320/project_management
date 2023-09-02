@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
+import 'package:project_management/home/admin/utils/mission_detail.dart';
 import 'package:project_management/home/widgets/missions_screen.dart';
 import 'package:project_management/home/admin/utils/project_detail.dart';
 import 'package:project_management/home/widgets/text_button.dart';
+import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/notify_dialog.dart';
@@ -10,15 +12,16 @@ import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
 import 'package:project_management/utils/paths.dart';
 
-class ProjectHomeScreen extends StatefulWidget {
+class MissionHomeScreen extends StatefulWidget {
   final Project project;
-  const ProjectHomeScreen({super.key, required this.project});
+  final Mission mission;
+  const MissionHomeScreen({super.key, required this.project, required this.mission});
 
   @override
-  State<ProjectHomeScreen> createState() => _ProjectHomeScreenState();
+  State<MissionHomeScreen> createState() => _MissionHomeScreenState();
 }
 
-class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
+class _MissionHomeScreenState extends State<MissionHomeScreen> {
   int page = 0;
   PageController pageController = PageController();
   late bool isManager;
@@ -48,7 +51,7 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
               title: Column(
                 children: [
                   Text(
-                      "Bạn chắc muốn xóa dự án '' ${widget.project.nameProject} '' ?",
+                      "Bạn chắc muốn xóa nhiem vu '' ${widget.mission.nameMission} '' ?",
                       style: const TextStyle(fontSize: 18)),
                   const SizedBox(
                     height: 8,
@@ -98,7 +101,7 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
           showDialog(
               context: context,
               builder: (_) => const NotifyDialog(
-                    content: "Đã xóa dự án thành công!",
+                    content: "Đã xóa nhiem vu thành công!",
                   ));
         }
       } else {
@@ -127,7 +130,7 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: darkblueAppbarColor,
-          title: const Text('Dự án'),
+          title: const Text('Nhiệm vụ'),
           actions: [
             IconButton(
                 onPressed: delete,
@@ -142,7 +145,7 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
           controller: pageController,
           onPageChanged: onPageChanged,
           children: [
-            ProjectDetailScreen(project: widget.project,),
+            MissionDetailScreen(project: widget.project,mission: widget.mission,),
             MissionsScreen(project: widget.project),
           ],
         ),
@@ -151,7 +154,7 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
         currentIndex: page,
         items: [
           BottomNavigationBarItem(icon: projectIcon, label: "Chi tiết", ),
-          BottomNavigationBarItem(icon: missionIcon, label: "Nhiệm vụ",),
+          BottomNavigationBarItem(icon: missionIcon, label: "Tiến độ",),
         ],
         
         onTap: (page) => pageController.jumpToPage(page),

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/home/admin/utils/mission_detail.dart';
+import 'package:project_management/home/widgets/mission.dart';
 import 'package:project_management/home/widgets/mission_card.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/project.dart';
@@ -56,7 +57,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
 
                 return ListView.builder(
                   itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) => MissionCard(mission: Mission.fromSnap(mission: snapshot.data!.docs[index]),));
+                  itemBuilder: (context, index) => MissionHomeScreen(project: widget.project!,mission: Mission.fromSnap(mission: snapshot.data!.docs[index]),));
               }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: (widget.project == null)
