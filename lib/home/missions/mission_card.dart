@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/admin/utils/mission_detail.dart';
+import 'package:project_management/home/missions/mission.dart';
 import 'package:project_management/model/mission.dart';
-import 'package:project_management/model/project.dart';
+import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
+import 'package:provider/provider.dart';
 
 class MissionCard extends StatefulWidget {
-  final Project project;
   final Mission mission;
-  const MissionCard({super.key, required this.mission, required this.project});
+  const MissionCard({super.key, required this.mission,});
 
   @override
   State<MissionCard> createState() => _MissionCardState();
 }
 
 class _MissionCardState extends State<MissionCard> {
+  late bool isManager;
+  @override
+  void initState() {
+    super.initState();
+    GroupProvider groupProvider = Provider.of<GroupProvider>(context, listen: false);
+    isManager = groupProvider.getIsManager;
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,7 +34,7 @@ class _MissionCardState extends State<MissionCard> {
       padding: const EdgeInsets.all(4),
       width: MediaQuery.of(context).size.width * 0.95,
       child: ListTile(
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MissionDetailScreen(project: widget.project, mission: widget.mission,))),
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MissionHomeScreen(mission: widget.mission,))),
         contentPadding: EdgeInsets.zero,
         dense: true,
         visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
@@ -54,9 +60,9 @@ class _MissionCardState extends State<MissionCard> {
             const SizedBox(
               height: 4,
             ),
-            Row(
+            (!isManager) ? Text('Dự án: ${widget.mission.nameProject}',style: const TextStyle(fontSize: 14),) : Row(
               children: [
-                Text('Phu trach: '),
+                const Text('Phu trach: '),
                 Expanded(
                   child: Container(
                     

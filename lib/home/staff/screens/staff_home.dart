@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_management/home/missions/missions_screen.dart';
 import 'package:project_management/home/staff/utils/staff_drawer.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
@@ -35,7 +36,7 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
           ],
         ),
         drawer:const StaffDrawerMenu(selectedPage: IS_QUEST_PAGE,),
-        body: const Text("..."),
+        body: const MissionsScreen(),
       ),
     );
   }

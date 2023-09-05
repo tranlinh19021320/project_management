@@ -4,6 +4,7 @@ class Mission {
   final String companyId;
   final String projectId;
   final String missionId;
+  final String nameProject;
   final String nameMission;
   final String description;
   final DateTime createDate;
@@ -13,6 +14,7 @@ class Mission {
   final String staffId;
 
   const Mission({
+    required this.nameProject,
     required this.companyId,
     required this.projectId,
     required this.missionId,
@@ -26,6 +28,7 @@ class Mission {
   });
 
   Map<String, dynamic> toJson() => {
+    'nameProject' : nameProject,
         'companyId': companyId,
         'projectId': projectId,
         'missionId': missionId,
@@ -39,6 +42,7 @@ class Mission {
       };
 
   static Mission fromSnap({required DocumentSnapshot mission}) => Mission(
+    nameProject: mission['nameProject'],
         companyId: mission['companyId'],
         projectId: mission['projectId'],
         missionId: mission['missionId'],

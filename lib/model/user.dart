@@ -11,8 +11,10 @@ class CurrentUser {
   final String companyId;
   final String companyName;
   final int notifyNumber;
+  final List timekeeping;
 
   const CurrentUser({
+    required this.timekeeping,
     required this.notifyNumber,
     required this.email,
     required this.username,
@@ -26,6 +28,7 @@ class CurrentUser {
   });
 
   Map<String, dynamic> toJson() => {
+    'timekeeping' : timekeeping,
         'email': email,
         'username': username,
         'password': password,
@@ -39,6 +42,7 @@ class CurrentUser {
       };
 
   static CurrentUser fromSnap({required DocumentSnapshot user}) => CurrentUser(
+    timekeeping: user['timekeeping'],
       notifyNumber: user['notifyNumber'],
       email: user['email'],
       username: user['username'],

@@ -3,8 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/admin/utils/drawer_bar.dart';
-import 'package:project_management/home/admin/utils/project_card.dart';
-import 'package:project_management/home/admin/utils/project_detail.dart';
+import 'package:project_management/home/projects/project_card.dart';
+import 'package:project_management/home/projects/project_detail.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/colors.dart';
@@ -98,6 +98,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.endFloat,
                 floatingActionButton: FloatingActionButton(
+                  heroTag: "createProjectButton",
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => Container(

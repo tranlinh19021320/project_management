@@ -11,6 +11,4 @@ const int IS_EVENT_PAGE = 3;
 const int IS_QUEST_PAGE = 4;
 
 
-
-
 String manager = "Manager";

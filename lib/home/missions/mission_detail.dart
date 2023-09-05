@@ -6,17 +6,19 @@ import 'package:project_management/home/widgets/group_dropdown_button.dart';
 import 'package:project_management/home/widgets/search_user.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/project.dart';
+import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/paths.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class MissionDetailScreen extends StatefulWidget {
-  final Project project;
+  final Project? project;
   final Mission? mission;
-  const MissionDetailScreen({super.key, required this.project, this.mission});
+  const MissionDetailScreen({super.key, this.project, this.mission});
 
   @override
   State<MissionDetailScreen> createState() => _MissionDetailScreenState();
@@ -33,9 +35,11 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
 
   late DateTime startDate;
   late DateTime endDate;
-
+  late bool isManager;
   String selectuserId = '';
-
+  late String companyId;
+  late String projectId;
+  late String nameProject;
   String groupSelect = "Tất cả";
 
   int missionState = IS_DEFAULT_STATE;
@@ -48,7 +52,9 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
   @override
   void initState() {
     super.initState();
-
+    GroupProvider groupProvider =
+        Provider.of<GroupProvider>(context, listen: false);
+    isManager = groupProvider.getIsManager;
     nameFocus.addListener(() {
       if (!nameFocus.hasFocus) {
         updateMissionState();
@@ -59,23 +65,31 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
         });
       }
     });
-
-    DateTime now = DateTime.now();
-    startDate = (now.isBefore(widget.project.startDate))
-        ? widget.project.startDate
-        : now;
-    endDate = startDate;
+    if (widget.project != null) {
+      nameProject = widget.project!.nameProject;
+      companyId = widget.project!.companyId;
+      projectId = widget.project!.projectId;
+      DateTime now = DateTime.now();
+      startDate = (now.isBefore(widget.project!.startDate))
+          ? widget.project!.startDate
+          : now;
+      endDate = startDate;
+    }
     if (widget.mission != null) {
+      nameProject = widget.mission!.nameProject;
+      companyId = widget.mission!.companyId;
+      projectId = widget.mission!.projectId;
       nameMission.text = widget.mission!.nameMission;
       description.text = widget.mission!.description;
       startDate = widget.mission!.startDate;
       endDate = widget.mission!.endDate;
       selectuserId = widget.mission!.staffId;
       percent = widget.mission!.percent;
+      missionState = IS_CORRECT_STATE;
     }
 
     groupDropdownButton = GroupDropdownButton(
-        companyId: widget.project.companyId,
+        companyId: companyId,
         groupSelect: groupSelect,
         isWordAtHead: "Tất cả",
         onSelectValue: (group) {
@@ -91,7 +105,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
 
   refreshSearchUser() {
     searchUser = SearchUser(
-      companyId: widget.project.companyId,
+      companyId: companyId,
       groupSelect: groupSelect,
       selectuserId: selectuserId,
       onSelectValue: (value) {
@@ -109,8 +123,14 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
     });
     var snap = await FirebaseFirestore.instance
         .collection('missions')
-        .where('companyId', isEqualTo: widget.project.companyId)
-        .where('projectId', isEqualTo: widget.project.projectId)
+        .where(
+          'companyId',
+          isEqualTo: companyId,
+        )
+        .where(
+          'projectId',
+          isEqualTo: projectId,
+        )
         .where('nameMission', isEqualTo: nameMission.text)
         .get();
 
@@ -137,7 +157,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
           builder: (_) => const NotifyDialog(content: "loading"));
       String missionId = const Uuid().v1();
       String res = await FirebaseMethods().createMission(
-          project: widget.project,
+          project: widget.project!,
           missionId: missionId,
           nameMission: nameMission.text,
           description: description.text,
@@ -164,6 +184,44 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
     }
   }
 
+  bool ischanged() {
+    return (nameMission.text != widget.mission!.nameMission ||
+        description.text != widget.mission!.description ||
+        selectuserId != widget.mission!.staffId ||
+        !startDate.isAtSameMomentAs(widget.mission!.startDate) ||
+        !endDate.isAtSameMomentAs(widget.mission!.endDate));
+  }
+
+  updateMission() async {
+    if (ischanged()) {
+      showDialog(
+          context: context,
+          builder: (_) => const NotifyDialog(content: 'loading'));
+      String res = await FirebaseMethods().updateMission(
+          mission: widget.mission!,
+          nameMission: nameMission.text,
+          description: description.text,
+          staffId: selectuserId,
+          startDate: startDate,
+          endDate: endDate);
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
+      if (res == 'success') {
+        if (context.mounted) {
+          showDialog(
+              context: context,
+              builder: (_) =>
+                  const NotifyDialog(content: 'Cập nhật thành công!'));
+        }
+      } else {
+        if (context.mounted) {
+          showSnackBar(context: context, content: res, isError: true);
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -173,11 +231,6 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: darkblueAppbarColor,
-          title: const Text('Nhiem vu moi'),
-          centerTitle: true,
-        ),
         body: Padding(
           padding: const EdgeInsets.only(top: 8, left: 8, right: 8, bottom: 20),
           child: SingleChildScrollView(
@@ -187,7 +240,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                 const Divider(),
                 Center(
                     child: Text(
-                  'Dự án: ${widget.project.nameProject}',
+                  'Dự án: $nameProject',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 17, fontWeight: FontWeight.w500),
@@ -217,13 +270,15 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                     style: const TextStyle(color: blackColor),
                     decoration: InputDecoration(
                       filled: true,
-                      helperText: (missionState == IS_DEFAULT_STATE)
-                          ? 'Vui lòng điền tên nhiệm vụ!'
-                          : (missionState == IS_ERROR_STATE)
-                              ? "Tên nhiệm vụ trùng lặp"
-                              : (missionState == IS_ERROR_FORMAT_STATE)
-                                  ? "..."
-                                  : "",
+                      helperText: (!isManager)
+                          ? ""
+                          : (missionState == IS_DEFAULT_STATE)
+                              ? 'Vui lòng điền tên nhiệm vụ!'
+                              : (missionState == IS_ERROR_STATE)
+                                  ? "Tên nhiệm vụ trùng lặp"
+                                  : (missionState == IS_ERROR_FORMAT_STATE)
+                                      ? "..."
+                                      : "",
                       helperStyle: TextStyle(
                           color: (missionState == IS_ERROR_STATE)
                               ? errorRedColor
@@ -234,8 +289,10 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                               Icons.check,
                               color: correctGreenColor,
                             ),
-                      fillColor: backgroundWhiteColor,
+                      fillColor:
+                          (!isManager) ? defaultColor : backgroundWhiteColor,
                     ),
+                    readOnly: !isManager,
                     onEditingComplete: () {
                       FocusScope.of(context).requestFocus(descriptionFocus);
                     }),
@@ -256,15 +313,17 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                   controller: description,
                   focusNode: descriptionFocus,
                   style: const TextStyle(color: blackColor),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     filled: true,
                     helperText: "",
-                    fillColor: backgroundWhiteColor,
+                    fillColor:
+                        (!isManager) ? defaultColor : backgroundWhiteColor,
                   ),
                   keyboardType: TextInputType.multiline,
                   minLines: 3,
                   maxLines: null,
                   scrollController: descriptionScroll,
+                  readOnly: !isManager,
                   onTapOutside: (event) => descriptionFocus.unfocus(),
                 ),
 
@@ -284,24 +343,26 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                           fontWeight: FontWeight.w500),
                     ),
                     InkWell(
-                      onTap: () async {
-                        final DateTime? date = await showDatePicker(
-                          context: context,
-                          initialDate: startDate,
-                          firstDate: DateTime.now(),
-                          lastDate: DateTime(DateTime.now().year + 10),
-                          locale: const Locale('vi'),
-                          currentDate: startDate,
-                        );
-                        if (date != null) {
-                          setState(() {
-                            startDate = date;
-                            if (startDate.isAfter(endDate)) {
-                              endDate = startDate;
-                            }
-                          });
-                        }
-                      },
+                      onTap: (!isManager)
+                          ? () {}
+                          : () async {
+                              final DateTime? date = await showDatePicker(
+                                context: context,
+                                initialDate: startDate,
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime(DateTime.now().year + 10),
+                                locale: const Locale('vi'),
+                                currentDate: startDate,
+                              );
+                              if (date != null) {
+                                setState(() {
+                                  startDate = date;
+                                  if (startDate.isAfter(endDate)) {
+                                    endDate = startDate;
+                                  }
+                                });
+                              }
+                            },
                       child: Container(
                         padding: const EdgeInsets.only(left: 4),
                         decoration: ShapeDecoration(
@@ -325,25 +386,27 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                     ),
                     const Text('  -  '),
                     InkWell(
-                      onTap: () async {
-                        final DateTime? date = await showDatePicker(
-                          context: context,
-                          initialDate: endDate,
-                          firstDate: startDate,
-                          lastDate: DateTime(DateTime.now().year + 10),
-                          locale: const Locale('vi'),
-                          currentDate: endDate,
-                        );
-                        if (date != null) {
-                          setState(() {
-                            if (startDate.isAfter(date)) {
-                              endDate = startDate;
-                            } else {
-                              endDate = date;
-                            }
-                          });
-                        }
-                      },
+                      onTap: (!isManager)
+                          ? () {}
+                          : () async {
+                              final DateTime? date = await showDatePicker(
+                                context: context,
+                                initialDate: endDate,
+                                firstDate: startDate,
+                                lastDate: DateTime(DateTime.now().year + 10),
+                                locale: const Locale('vi'),
+                                currentDate: endDate,
+                              );
+                              if (date != null) {
+                                setState(() {
+                                  if (startDate.isAfter(date)) {
+                                    endDate = startDate;
+                                  } else {
+                                    endDate = date;
+                                  }
+                                });
+                              }
+                            },
                       child: Container(
                         padding: const EdgeInsets.only(left: 4),
                         decoration: ShapeDecoration(
@@ -371,111 +434,55 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                 const SizedBox(
                   height: 6,
                 ),
-                Row(
-                  children: [
-                    const Text("Nhóm: "),
-                    groupDropdownButton,
-                  ],
+                const Divider(
+                  height: 5,
+                  thickness: 2,
                 ),
+                (!isManager)
+                    ? const Center(
+                        child: Text(
+                          'Tiến độ',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 16),
+                        ),
+                      )
+                    : Row(
+                        children: [
+                          const Text("Nhóm: "),
+                          groupDropdownButton,
+                        ],
+                      ),
                 const SizedBox(
                   height: 8,
                 ),
-                searchUser,
-                // StreamBuilder(
-                //     stream: FirebaseMethods()
-                //         .searchSnapshot(groupSelect: groupSelect),
-                //     builder: (context, snapshot) {
-                //       if (snapshot.connectionState == ConnectionState.waiting) {
-                //         return LoadingAnimationWidget.hexagonDots(
-                //             color: darkblueAppbarColor, size: 20);
-                //       }
-                //       List<String> usersId = [''];
-                //       Map<String, CurrentUser> users = {};
-                //       for (DocumentSnapshot doc in snapshot.data!.docs) {
-                //         usersId.add(doc['userId']);
-                //         users.addAll(
-                //             {doc['userId']: CurrentUser.fromSnap(user: doc)});
-                //       }
-                //       return Container(
-                //         height: 50,
-                //         child: DropdownButtonHideUnderline(
-                //           child: DropdownButton(
-                //             itemHeight: kMinInteractiveDimension,
-                //             padding: EdgeInsets.zero,
-                //             menuMaxHeight: 200,
-                //             // alignment: Alignment.center,
-                //             value: selectuserId,
-                //             style: const TextStyle(
-                //               fontSize: 13,
-                //             ),
-                //             isExpanded: true,
-                //             // isDense: true,
+                (!isManager)
+                    ? Center(
+                        child: circularPercentIndicator(percent: widget.mission!.percent, radius: 60, fontSize: 20, lineWidth: 30),
+                      )
+                    : searchUser,
 
-                //             items: usersId.map((String value) {
-                //               return DropdownMenuItem<String>(
-                //                 value: value,
-                //                 child: Container(
-                //                   height: 50,
-                //                   decoration: BoxDecoration(
-                //                     borderRadius: BorderRadius.circular(8),
-                //                     border: Border.all(color: focusBlueColor),
-                //                     color: (value == selectuserId && value != '')
-                //                         ? focusBlueColor
-                //                         : Colors.transparent,
-                //                   ),
-                //                   child: (value == "")
-                //                       ? const Center(
-                //                           child: Text(
-                //                             'Trống',
-                //                             style:
-                //                                 TextStyle(color: defaultColor),
-                //                           ),
-                //                         )
-                //                       : ListTile(
-                //                           contentPadding:
-                //                               const EdgeInsets.symmetric(
-                //                                   horizontal: 12),
-                //                           dense: true,
-                //                           visualDensity: const VisualDensity(
-                //                               horizontal: -4, vertical: -4),
-                //                           leading: CircleAvatar(
-                //                             backgroundImage: NetworkImage(
-                //                                 users[value]!.photoURL),
-                //                             radius: 20,
-                //                           ),
-                //                           title: Text(
-                //                             users[value]!.nameDetails,
-                //                             style:
-                //                                 const TextStyle(fontSize: 16),
-                //                           ),
-                //                           subtitle: Text(users[value]!.group),
-                //                           trailing:
-                //                               (users[value]!.group == manager)
-                //                                   ? resizedIcon(keyImage, 18)
-                //                                   : resizedIcon(staffImage, 18),
-                //                         ),
-                //                 ),
-                //               );
-                //             }).toList(),
-                //             onChanged: (val) {
-                //               setState(() {
-                //                 selectuserId = val!;
-                //               });
-                //             },
-                //           ),
-                //         ),
-                //       );
-                //     }),
+                const SizedBox(
+                  height: 8,
+                ),
               ],
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-            onPressed: createmission,
-            tooltip: "Tạo nhiệm vụ mới",
-            child: const Icon(
-              Icons.add,
-            )),
+        floatingActionButton: (widget.mission != null)
+            ? FloatingActionButton(
+                heroTag: "updateMissionButton",
+                onPressed: updateMission,
+                tooltip: "Cập nhật nhiệm vụ",
+                child: const Icon(
+                  Icons.update,
+                ))
+            : FloatingActionButton(
+                heroTag: "createMissionButton",
+                onPressed: createmission,
+                tooltip: "Tạo nhiệm vụ mới",
+                child: const Icon(
+                  Icons.add,
+                )),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );

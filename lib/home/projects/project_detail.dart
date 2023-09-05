@@ -299,9 +299,11 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton:!isManager ? null: (widget.project != null) ? FloatingActionButton(
+        heroTag: "updateProjectButton",
         onPressed: updateProject,
         child: const Icon(Icons.update),
       ) : FloatingActionButton(
+        heroTag: "createProjectButton",
           onPressed: createproject,
           tooltip: "Tạo",
           child: const Icon(Icons.add),
