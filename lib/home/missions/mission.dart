@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/missions/mission_detail.dart';
+import 'package:project_management/home/progress/progress_screen.dart';
 import 'package:project_management/home/widgets/text_button.dart';
 import 'package:project_management/model/mission.dart';
+import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
 import 'package:project_management/utils/paths.dart';
+import 'package:provider/provider.dart';
 
 class MissionHomeScreen extends StatefulWidget {
   final Mission mission;
@@ -24,11 +27,8 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
   @override
   void initState() {
     super.initState();
-    init();
-  }
-
-  init() async {
-    isManager =await currentUserIsManager();
+    GroupProvider groupProvider = Provider.of<GroupProvider>(context, listen: false);
+    isManager = groupProvider.getIsManager;
   }
 
   @override
@@ -62,7 +62,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
               actionsPadding: const EdgeInsets.only(bottom: 14),
               actions: [
                 TextBoxButton(
-                    color: dartblueColor,
+                    color: darkblueColor,
                     text: "Ok",
                     fontSize: 14,
                     width: 64,
@@ -86,9 +86,8 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                   content: "loading",
                 ));
       }
-      String res = await FirebaseMethods().deleteProject(
-          companyId: widget.mission.companyId,
-          projectId: widget.mission.projectId);
+      String res = await FirebaseMethods().deleteMission(
+          mission: widget.mission);
 
       if (res == 'success') {
         if (context.mounted) {
@@ -110,9 +109,9 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
   }
 
 
-  onPageChanged(int page) {
+  onPageChanged(int pageNumber) {
     setState(() {
-      page = page;
+      page = pageNumber;
     });
   }
   @override
@@ -128,7 +127,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
           backgroundColor: darkblueAppbarColor,
           title: const Text('Nhiệm vụ'),
           actions: [
-            IconButton(
+            (!isManager) ? Container() : IconButton(
                 onPressed: delete,
                 tooltip: "Xóa vĩnh viễn",
                 icon: const Icon(
@@ -142,7 +141,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
           onPageChanged: onPageChanged,
           children: [
             MissionDetailScreen(mission: widget.mission,),
-            Text('${widget.mission.percent}'),
+            ProgressScreen(mission: widget.mission),
           ],
         ),
        bottomNavigationBar: BottomNavigationBar(

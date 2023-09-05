@@ -34,6 +34,7 @@ class _ProjectCardState extends State<ProjectCard> {
         Container(
           decoration: BoxDecoration(
               border: Border.all(color: focusBlueColor),
+              borderRadius: BorderRadius.circular(12),
               color: darkblueAppbarColor),
           padding: const EdgeInsets.all(8),
           width: MediaQuery.of(context).size.width * 0.95,

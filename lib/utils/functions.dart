@@ -106,12 +106,13 @@ CircularPercentIndicator circularPercentIndicator(
     {required double percent,
     required double radius,
     double lineWidth = 5,
-    double? fontSize}) {
+    double? fontSize, 
+    bool textCenter = true}) {
   return CircularPercentIndicator(
     radius: radius,
     lineWidth: lineWidth,
     percent: percent,
-    center: Text("${(percent * 100).toStringAsFixed(0)}%",
+    center:(!textCenter)? null : Text("${(percent * 100).toStringAsFixed(0)}%",
         style: (fontSize == null) ? null : TextStyle(fontSize: fontSize)),
     progressColor: (percent <= 0.2)
         ? Colors.red
@@ -180,6 +181,10 @@ Icon? notifyIcon({required int state}) {
 
 String dayToString({required DateTime time}) {
   return DateFormat("dd-MM-yyyy").format(time);
+}
+
+bool isToDay({required String day}) {
+  return dayToString(time: DateTime.now()) == day;
 }
 
 Future<bool> currentUserIsManager() async {

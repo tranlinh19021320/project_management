@@ -63,7 +63,7 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
               actionsPadding: const EdgeInsets.only(bottom: 14),
               actions: [
                 TextBoxButton(
-                    color: dartblueColor,
+                    color: darkblueColor,
                     text: "Ok",
                     fontSize: 14,
                     width: 64,
@@ -111,9 +111,9 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
   }
 
 
-  onPageChanged(int page) {
+  onPageChanged(int pageNumber) {
     setState(() {
-      page = page;
+      page = pageNumber;
     });
   }
   @override

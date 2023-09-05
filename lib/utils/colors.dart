@@ -14,5 +14,6 @@ const Color focusBlueColor = Color.fromARGB(255, 0, 170, 255);
 const Color darkblueAppbarColor = Color.fromARGB(255, 14, 92, 181);
 const Color blueDrawerColor = Color.fromARGB(255, 33, 108, 169);
 const Color notifyIconColor = Color.fromARGB(255, 247, 229, 70);
-const Color dartblueColor = Color.fromARGB(255, 8, 0, 248);
+const Color darkblueColor = Color.fromARGB(255, 9, 1, 255);
+const Color defaultblueColor = Color.fromARGB(255, 48, 46, 90);
 

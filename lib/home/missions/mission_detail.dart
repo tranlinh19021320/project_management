@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
+import 'package:project_management/home/progress/progress_card.dart';
 import 'package:project_management/home/widgets/group_dropdown_button.dart';
 import 'package:project_management/home/widgets/search_user.dart';
 import 'package:project_management/model/mission.dart';
+import 'package:project_management/model/progress.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/colors.dart';
@@ -439,13 +442,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                   thickness: 2,
                 ),
                 (!isManager)
-                    ? const Center(
-                        child: Text(
-                          'Tiến độ',
-                          style: TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 16),
-                        ),
-                      )
+                    ? Container()
                     : Row(
                         children: [
                           const Text("Nhóm: "),
@@ -455,11 +452,56 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                 const SizedBox(
                   height: 8,
                 ),
-                (!isManager)
-                    ? Center(
-                        child: circularPercentIndicator(percent: widget.mission!.percent, radius: 60, fontSize: 20, lineWidth: 30),
-                      )
-                    : searchUser,
+                (!isManager) ? Container() : searchUser,
+                const SizedBox(
+                  height: 8,
+                ),
+                (widget.mission == null)
+                    ? Container()
+                    : Column(
+                      
+                        children: [
+                          const Center(
+                            child: Text(
+                              'Tiến độ',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 16),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Center(
+                            child: circularPercentIndicator(
+                                percent: widget.mission!.percent,
+                                radius: 60,
+                                fontSize: 20,
+                                lineWidth: 30),
+                          ),
+                          const Divider(),
+                          const Text("Hoàn thành hôm nay"),
+                          StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection('missions')
+                                  .doc(widget.mission!.missionId)
+                                  .collection('progress')
+                                  .where('date',isEqualTo: dayToString(time: DateTime.now()))
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return LoadingAnimationWidget.inkDrop(
+                                      color: darkblueAppbarColor, size: 32);
+                                }
+
+                                if (snapshot.data!.docs.isEmpty) {
+                                  return Text("Chưa có bài nào");
+                                }
+
+                                return ProgressCard(progress:Progress.fromSnap(doc: snapshot.data!.docs.first) );
+                              })
+                        ],
+                      ),
 
                 const SizedBox(
                   height: 8,
@@ -468,7 +510,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
             ),
           ),
         ),
-        floatingActionButton: (widget.mission != null)
+        floatingActionButton: (!isManager) ? null : (widget.mission != null)
             ? FloatingActionButton(
                 heroTag: "updateMissionButton",
                 onPressed: updateMission,
