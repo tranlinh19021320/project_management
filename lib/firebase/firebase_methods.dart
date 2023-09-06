@@ -451,7 +451,10 @@ class FirebaseMethods {
           .doc(missionId)
           .set(mission.toJson());
       res = await updateMissionProgress(
-          missionId: missionId, description: 'create', percent: 0);
+          missionId: missionId,
+          description: 'create',
+          percent: 0,
+          date: dayToString(time: DateTime.now()));
 
       if (res == 'success') {
         await _firestore
@@ -494,28 +497,45 @@ class FirebaseMethods {
     return res;
   }
 
-  Future<String> deleteMission(
-      {required Mission mission}) async {
+  Future<String> updatePercentMission(
+      {required String missionId, required double percent}) async {
     String res = 'error';
     try {
-      _firestore
-          .collection('missions')
-          .doc(mission.missionId)
-          .delete();
-      var snap = await _firestore.collection('companies')
-            .doc(mission.companyId)
-            .collection('projects')
-            .doc(mission.projectId).get();
-      int missions = snap.data()!['missions'];
+      var snap = await _firestore.collection('missions').doc(missionId).get();
+      double percentMission = snap.data()!['percent'];
+      if (percentMission <= percent) {
         await _firestore
-            .collection('companies')
-            .doc(mission.companyId)
-            .collection('projects')
-            .doc(mission.projectId)
-            .update({
-          'missions': missions - 1,
-        });
-      
+            .collection('missions')
+            .doc(missionId)
+            .update({'percent': percent});
+      }
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+    return res;
+  }
+
+  Future<String> deleteMission({required Mission mission}) async {
+    String res = 'error';
+    try {
+      _firestore.collection('missions').doc(mission.missionId).delete();
+      var snap = await _firestore
+          .collection('companies')
+          .doc(mission.companyId)
+          .collection('projects')
+          .doc(mission.projectId)
+          .get();
+      int missions = snap.data()!['missions'];
+      await _firestore
+          .collection('companies')
+          .doc(mission.companyId)
+          .collection('projects')
+          .doc(mission.projectId)
+          .update({
+        'missions': missions - 1,
+      });
+
       res = 'success';
     } catch (er) {
       res = er.toString();
@@ -523,18 +543,16 @@ class FirebaseMethods {
     return res;
   }
 
-
-
   Future<String> updateMissionProgress(
       {required String missionId,
       required String description,
-      required double percent}) async {
+      required double percent,
+      required String date}) async {
     String res = "error";
-    String today = dayToString(time: DateTime.now());
     try {
       Progress progress = Progress(
           createDate: DateTime.now(),
-          date: today,
+          date: date,
           description: description,
           isCompleted: false,
           missionId: missionId,
@@ -543,14 +561,30 @@ class FirebaseMethods {
           .collection('missions')
           .doc(missionId)
           .collection('progress')
-          .doc(today)
+          .doc(date)
           .set(progress.toJson());
 
-      res = 'success';
+      res = await updatePercentMission(missionId: missionId, percent: percent);
     } catch (e) {
       res = e.toString();
     }
 
+    return res;
+  }
+
+  Future<String> changeStateProgress({required Progress progress}) async {
+    String res = 'error';
+    try {
+      await _firestore
+          .collection('missions')
+          .doc(progress.missionId)
+          .collection('progress')
+          .doc(progress.date)
+          .update({'isCompleted': !progress.isCompleted});
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
     return res;
   }
 }

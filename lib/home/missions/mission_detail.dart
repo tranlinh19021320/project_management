@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/progress/progress_card.dart';
+import 'package:project_management/home/progress/progress_detail.dart';
 import 'package:project_management/home/widgets/group_dropdown_button.dart';
 import 'package:project_management/home/widgets/search_user.dart';
 import 'package:project_management/model/mission.dart';
@@ -459,7 +461,6 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                 (widget.mission == null)
                     ? Container()
                     : Column(
-                      
                         children: [
                           const Center(
                             child: Text(
@@ -480,12 +481,17 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                           ),
                           const Divider(),
                           const Text("Hoàn thành hôm nay"),
+                          const SizedBox(
+                            height: 8,
+                          ),
                           StreamBuilder(
                               stream: FirebaseFirestore.instance
                                   .collection('missions')
                                   .doc(widget.mission!.missionId)
                                   .collection('progress')
-                                  .where('date',isEqualTo: dayToString(time: DateTime.now()))
+                                  .where('date',
+                                      isEqualTo:
+                                          dayToString(time: DateTime.now()))
                                   .snapshots(),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
@@ -495,10 +501,27 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                                 }
 
                                 if (snapshot.data!.docs.isEmpty) {
-                                  return Text("Chưa có bài nào");
+                                  return InkWell(
+                                    onTap: (isManager) ? () {} : () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (_) =>
+                                                ProgressDetailScreen(
+                                                  mission: widget.mission,
+                                                ))),
+                                    child: DottedBorder(
+                                        color: defaultColor,
+                                        borderType: BorderType.RRect,
+                                        radius: const Radius.circular(10),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
+                                        child: Center(
+                                            child: (isManager) ? const Text("Chưa có hoàn thành hôm nay") :const Icon(Icons.add))),
+                                  );
                                 }
 
-                                return ProgressCard(progress:Progress.fromSnap(doc: snapshot.data!.docs.first) );
+                                return ProgressCard(
+                                    progress: Progress.fromSnap(
+                                        doc: snapshot.data!.docs.first));
                               })
                         ],
                       ),
@@ -510,21 +533,23 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
             ),
           ),
         ),
-        floatingActionButton: (!isManager) ? null : (widget.mission != null)
-            ? FloatingActionButton(
-                heroTag: "updateMissionButton",
-                onPressed: updateMission,
-                tooltip: "Cập nhật nhiệm vụ",
-                child: const Icon(
-                  Icons.update,
-                ))
-            : FloatingActionButton(
-                heroTag: "createMissionButton",
-                onPressed: createmission,
-                tooltip: "Tạo nhiệm vụ mới",
-                child: const Icon(
-                  Icons.add,
-                )),
+        floatingActionButton: (!isManager)
+            ? null
+            : (widget.mission != null)
+                ? FloatingActionButton(
+                    heroTag: "updateMissionButton",
+                    onPressed: updateMission,
+                    tooltip: "Cập nhật nhiệm vụ",
+                    child: const Icon(
+                      Icons.update,
+                    ))
+                : FloatingActionButton(
+                    heroTag: "createMissionButton",
+                    onPressed: createmission,
+                    tooltip: "Tạo nhiệm vụ mới",
+                    child: const Icon(
+                      Icons.add,
+                    )),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );

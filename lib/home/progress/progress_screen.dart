@@ -39,6 +39,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   .collection('missions')
                   .doc(widget.mission.missionId)
                   .collection('progress')
+                  .orderBy('createDate', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {

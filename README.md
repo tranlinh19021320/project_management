@@ -32,6 +32,9 @@
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/create_project.png" alt="Create Project">
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/create_mission.png" alt="Create Mission">
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/mission_screen.png" alt="Mission Screen">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/mission_detail.png" alt="Mission Detail">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/progress_screen.png" alt="Progress Screen">
+
 </p>
 
 
