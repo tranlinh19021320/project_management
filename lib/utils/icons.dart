@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/utils/colors.dart';
 
@@ -128,37 +130,68 @@ Image resizedIcon(String imagePath, double size) {
 }
 
 // Icon with having notifications
-Widget notifications(int notificationsNumber) {
+Widget menuIcon() {
   return SizedBox(
-    width: 30,
-    height: 30,
+    width: 35,
+    height: 35,
     child: Stack(children: [
-      defaultnotifyIcon,
-      (notificationsNumber != 0)
-          ? Container(
-              width: 30,
-              height: 30,
-              alignment: Alignment.bottomRight,
+      const Icon(
+        Icons.menu,
+        size: 35,
+      ),
+      getNumberNotifications()
+    ]),
+  );
+}
+
+getNumberNotifications(
+    {double locate = 35,
+    double size = 20,
+    double fontSize = 10,
+    bool isBottom = true}) {
+  return StreamBuilder(
+    stream: FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .snapshots(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Icon(Icons.menu);
+      }
+      int notificationsNumber = 0;
+      final notifyNumber = snapshot.data!['notifyNumber'];
+      if (notifyNumber != null) {
+        notificationsNumber = notifyNumber;
+      }
+
+      return (notificationsNumber == 0)
+          ? SizedBox(
+            width: locate,
+            height: locate,
+          )
+          : Container(
+              width: locate,
+              height: locate,
+              alignment: (isBottom) ? Alignment.bottomRight : Alignment.center,
               margin: const EdgeInsets.only(bottom: 3),
               child: Container(
-                width: 15,
-                height: 15,
+                width: size,
+                height: size,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: errorRedColor,
-                    border: Border.all(color: blueDrawerColor, width: 1)),
+                    border: Border.all(color: darkblueAppbarColor, width: 1)),
                 child: Padding(
                   padding: const EdgeInsets.all(0.0),
                   child: Text(
-                    "$notificationsNumber",
-                    style: const TextStyle(
-                        fontSize: 10, color: backgroundWhiteColor),
+                    (notificationsNumber < 99) ? "$notificationsNumber" : "99+",
+                    style: TextStyle(
+                        fontSize: fontSize, color: backgroundWhiteColor),
                   ),
                 ),
               ),
-            )
-          : Container(),
-    ]),
+            );
+    },
   );
 }

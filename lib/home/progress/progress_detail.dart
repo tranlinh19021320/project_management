@@ -45,6 +45,19 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
         setState(() {
           percent.text = '';
         });
+      } else if (!percentFocus.hasFocus) {
+        final num = double.tryParse(percent.text);
+        double number = min;
+        if (num != null) {
+          number = num;
+        }
+        if (number < min) {
+          number = min;
+        } else if (number > max) {
+          number = max;
+        }
+
+        percent.text = number.toStringAsFixed(0);
       }
     });
     //state
@@ -195,7 +208,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                   const SizedBox(
                     height: 8,
                   ),
-                  (isManager)
+                  (isManager || state == IS_CLOSING)
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

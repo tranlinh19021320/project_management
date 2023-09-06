@@ -34,7 +34,6 @@ class _DrawerMenuState extends State<DrawerMenu> {
   bool isOpenProfile = false;
   bool isLoadingImage = false;
 
-
   signOut() {
     FirebaseMethods().signOut();
     Navigator.of(context)
@@ -97,9 +96,9 @@ class _DrawerMenuState extends State<DrawerMenu> {
                 ),
               ],
             ));
-            setState(() {
-              isLoadingImage = false;
-            });
+    setState(() {
+      isLoadingImage = false;
+    });
   }
 
   changeProfileImage(Uint8List image) async {
@@ -120,7 +119,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
                   .doc(FirebaseAuth.instance.currentUser!.uid)
                   .snapshots(),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting || isLoadingImage) {
+                if (snapshot.connectionState == ConnectionState.waiting ||
+                    isLoadingImage) {
                   return UserAccountsDrawerHeader(
                     currentAccountPicture: const CircleAvatar(
                       foregroundColor: backgroundWhiteColor,
@@ -148,7 +148,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(64),
                           clipBehavior: Clip.antiAliasWithSaveLayer,
-                          child:getImageFromUrl(url: snapshot.data!['photoURL']),
+                          child:
+                              getImageFromUrl(url: snapshot.data!['photoURL']),
                         ),
                       ),
                       (isOpenProfile)
@@ -236,18 +237,27 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             shape: RoundedRectangleBorder(
                                 side: const BorderSide(color: focusBlueColor),
                                 borderRadius: BorderRadius.circular(12)),
-                            leading: notifications(0),
+                            leading: defaultnotifyIcon,
                             trailing: (widget.selectedPage == IS_NOTIFY_PAGE)
                                 ? rightArrowPageIcon
-                                : null,
+                                : getNumberNotifications(
+                                    isBottom: false, size: 28, fontSize: 13),
                             title: const Text(
                               "Thông báo",
                               style: TextStyle(fontSize: 16),
                             ),
-                            onTap: () {
+                            onTap: () async {
                               Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (_) => const NotifyScreen()));
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const NotifyScreen()));
+                              String res =
+                                  await FirebaseMethods().refreshNotifyNumber();
+                              if (res != 'success') {
+                                if (context.mounted) {
+                                  showSnackBar(context: context, content: res, isError: true);
+                                }
+                              }
                             },
                           ),
                           //event select
@@ -275,12 +285,12 @@ class _DrawerMenuState extends State<DrawerMenu> {
                         ],
                       ),
                       floatingActionButton: TextBoxButton(
-        color: errorRedColor,
-        text: "Đăng xuất",
-        fontSize: 14,
-        width: 80,
-        height: 36,
-        funtion: signOut),
+                          color: errorRedColor,
+                          text: "Đăng xuất",
+                          fontSize: 14,
+                          width: 80,
+                          height: 36,
+                          funtion: signOut),
                       floatingActionButtonLocation:
                           FloatingActionButtonLocation.endFloat,
                     )),

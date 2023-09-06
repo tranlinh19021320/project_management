@@ -63,15 +63,16 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
             ),
             child: Scaffold(
                 backgroundColor: Colors.transparent,
+                drawerEnableOpenDragGesture: false,
                 appBar: AppBar(
                   backgroundColor: darkblueAppbarColor,
+                  leading: Builder(
+                    builder: (context) => IconButton(
+                        onPressed: () => Scaffold.of(context).openDrawer(),
+                        icon: menuIcon()),
+                  ),
                   title: const Text("Dự án"),
-                  actions: [
-                    Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: notifications(3),
-                    )
-                  ],
+                  
                 ),
                 drawer: const DrawerMenu(
                   selectedPage: IS_PROJECTS_PAGE,

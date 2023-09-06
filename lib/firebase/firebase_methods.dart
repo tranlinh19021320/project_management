@@ -450,11 +450,7 @@ class FirebaseMethods {
           .collection('missions')
           .doc(missionId)
           .set(mission.toJson());
-      res = await updateMissionProgress(
-          missionId: missionId,
-          description: 'create',
-          percent: 0,
-          date: dayToString(time: DateTime.now()));
+      res = 'success';
 
       if (res == 'success') {
         await _firestore
@@ -585,6 +581,44 @@ class FirebaseMethods {
     } catch (e) {
       res = e.toString();
     }
+    return res;
+  }
+
+  Future<String> refreshNotifyNumber() async {
+    String res = "error";
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_auth.currentUser!.uid)
+          .update({'notifyNumber': 0});
+      res = "success";
+    } catch (e) {
+      res = e.toString();
+    }
+
+    return res;
+  }
+
+  Future<String> inclementNotifyNumber() async {
+    String res = "error";
+    try {
+      var snap = await _firestore
+          .collection('users')
+          .doc(_auth.currentUser!.uid).get();
+      final number = snap.data()!['notifyNumber'];
+      double notifyNumber = 0;
+      if (number != null) {
+        notifyNumber = number+1;
+      }
+      await _firestore
+          .collection('users')
+          .doc(_auth.currentUser!.uid)
+          .update({'notifyNumber': notifyNumber});
+      res = "success";
+    } catch (e) {
+      res = e.toString();
+    }
+
     return res;
   }
 }

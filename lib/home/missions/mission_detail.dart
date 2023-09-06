@@ -53,7 +53,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
   late SearchUser searchUser;
 
   double percent = 0;
-
+  bool isMissionTime = false;
   @override
   void initState() {
     super.initState();
@@ -61,15 +61,18 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
         Provider.of<GroupProvider>(context, listen: false);
     isManager = groupProvider.getIsManager;
     nameFocus.addListener(() {
-      if (!nameFocus.hasFocus) {
-        updateMissionState();
-        setState(() {});
-      } else {
-        setState(() {
-          missionState = IS_DEFAULT_STATE;
-        });
+      if (isManager) {
+        if (!nameFocus.hasFocus) {
+          updateMissionState();
+          setState(() {});
+        } else {
+          setState(() {
+            missionState = IS_DEFAULT_STATE;
+          });
+        }
       }
     });
+
     if (widget.project != null) {
       nameProject = widget.project!.nameProject;
       companyId = widget.project!.companyId;
@@ -91,6 +94,8 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
       selectuserId = widget.mission!.staffId;
       percent = widget.mission!.percent;
       missionState = IS_CORRECT_STATE;
+      isMissionTime =
+          startDate.isBefore(DateTime.now()) && endDate.isAfter(DateTime.now());
     }
 
     groupDropdownButton = GroupDropdownButton(
@@ -354,8 +359,8 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                               final DateTime? date = await showDatePicker(
                                 context: context,
                                 initialDate: startDate,
-                                firstDate: DateTime.now(),
-                                lastDate: DateTime(DateTime.now().year + 10),
+                                firstDate:(widget.project != null) ? widget.project!.startDate : DateTime.now(),
+                                lastDate:(widget.project != null) ? widget.project!.endDate : DateTime(DateTime.now().year + 10),
                                 locale: const Locale('vi'),
                                 currentDate: startDate,
                               );
@@ -398,7 +403,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                                 context: context,
                                 initialDate: endDate,
                                 firstDate: startDate,
-                                lastDate: DateTime(DateTime.now().year + 10),
+                                lastDate:(widget.project != null) ? widget.project!.endDate : DateTime(DateTime.now().year + 10),
                                 locale: const Locale('vi'),
                                 currentDate: endDate,
                               );
@@ -502,12 +507,14 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
 
                                 if (snapshot.data!.docs.isEmpty) {
                                   return InkWell(
-                                    onTap: (isManager) ? () {} : () => Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (_) =>
-                                                ProgressDetailScreen(
-                                                  mission: widget.mission,
-                                                ))),
+                                    onTap: (isManager || !isMissionTime)
+                                        ? () {}
+                                        : () => Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (_) =>
+                                                    ProgressDetailScreen(
+                                                      mission: widget.mission,
+                                                    ))),
                                     child: DottedBorder(
                                         color: defaultColor,
                                         borderType: BorderType.RRect,
@@ -515,7 +522,13 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 12),
                                         child: Center(
-                                            child: (isManager) ? const Text("Chưa có hoàn thành hôm nay") :const Icon(Icons.add))),
+                                            child: (!isMissionTime)
+                                                ? const Text(
+                                                    "Không trong thời gian nhiệm vụ!")
+                                                : (isManager)
+                                                    ? const Text(
+                                                        "Chưa có hoàn thành hôm nay")
+                                                    : const Icon(Icons.add))),
                                   );
                                 }
 

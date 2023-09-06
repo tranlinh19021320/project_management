@@ -206,19 +206,27 @@ class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
                             shape: RoundedRectangleBorder(
                                 side: const BorderSide(color: focusBlueColor),
                                 borderRadius: BorderRadius.circular(12)),
-                            leading: notifications(0),
+                            leading: defaultnotifyIcon,
                             trailing: (widget.selectedPage == IS_NOTIFY_PAGE)
                                 ? rightArrowPageIcon
-                                : null,
+                                : getNumberNotifications(
+                                    isBottom: false, size: 28, fontSize: 13),
                             title: const Text(
                               "Thông báo",
                               style: TextStyle(fontSize: 16),
                             ),
-                            onTap: () {
+                            onTap: () async {
                               Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (_) =>
-                                          const StaffNotifyScreen()));
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const StaffNotifyScreen()));
+                              String res =
+                                  await FirebaseMethods().refreshNotifyNumber();
+                              if (res != 'success') {
+                                if (context.mounted) {
+                                  showSnackBar(context: context, content: res, isError: true);
+                                }
+                              }
                             },
                           ),
                           //event select

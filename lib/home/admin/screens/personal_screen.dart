@@ -125,12 +125,11 @@ class _PersonalScreenState extends State<PersonalScreen> {
               appBar: AppBar(
                 backgroundColor: darkblueAppbarColor,
                 title: const Text("Nhân viên"),
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: notifications(3),
-                  )
-                ],
+                leading: Builder(
+                    builder: (context) => IconButton(
+                        onPressed: () => Scaffold.of(context).openDrawer(),
+                        icon: menuIcon()),
+                  ),
               ),
               drawer: const DrawerMenu(
                 selectedPage: IS_PERSONAL_PAGE,
