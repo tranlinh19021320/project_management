@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_management/home/notifications/notifications_screen.dart';
 import 'package:project_management/home/staff/utils/staff_drawer.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
@@ -33,7 +34,7 @@ class _StaffNotifyScreenState extends State<StaffNotifyScreen> {
                   ),
         ),
         drawer:const StaffDrawerMenu(selectedPage: IS_NOTIFY_PAGE,),
-        body: const Text("..."),
+        body: const NotificationsScreen()
       ),
     );
   }

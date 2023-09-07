@@ -3,12 +3,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:project_management/firebase/storage_method.dart';
 import 'package:project_management/model/mission.dart';
+import 'package:project_management/model/notification.dart';
 import 'package:project_management/model/progress.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/paths.dart';
 import 'package:project_management/model/user.dart';
+import 'package:uuid/uuid.dart';
 
 class FirebaseMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -450,8 +452,10 @@ class FirebaseMethods {
           .collection('missions')
           .doc(missionId)
           .set(mission.toJson());
-      res = 'success';
 
+      await createNotification(
+          uid: staffId, mission: mission, type: STAFF_RECIEVE_MISSION);
+      res = 'success';
       if (res == 'success') {
         await _firestore
             .collection('companies')
@@ -485,7 +489,12 @@ class FirebaseMethods {
         'endDate': endDate,
         'createDate': DateTime.now(),
       });
-
+      if (staffId != mission.staffId) {
+        await createNotification(
+            uid: staffId, mission: mission, type: STAFF_RECIEVE_MISSION);
+        await createNotification(
+            uid: mission.staffId, mission: mission, type: MISSION_CHANGE_STAFF);
+      }
       res = 'success';
     } catch (e) {
       res = e.toString();
@@ -515,7 +524,9 @@ class FirebaseMethods {
   Future<String> deleteMission({required Mission mission}) async {
     String res = 'error';
     try {
+      
       _firestore.collection('missions').doc(mission.missionId).delete();
+      
       var snap = await _firestore
           .collection('companies')
           .doc(mission.companyId)
@@ -531,6 +542,7 @@ class FirebaseMethods {
           .update({
         'missions': missions - 1,
       });
+      await createNotification(uid: mission.staffId, mission: mission, type: MISSION_IS_DELETED);
 
       res = 'success';
     } catch (er) {
@@ -599,26 +611,56 @@ class FirebaseMethods {
     return res;
   }
 
-  Future<String> inclementNotifyNumber() async {
-    String res = "error";
-    try {
-      var snap = await _firestore
-          .collection('users')
-          .doc(_auth.currentUser!.uid).get();
-      final number = snap.data()!['notifyNumber'];
-      double notifyNumber = 0;
-      if (number != null) {
-        notifyNumber = number+1;
-      }
-      await _firestore
-          .collection('users')
-          .doc(_auth.currentUser!.uid)
-          .update({'notifyNumber': notifyNumber});
-      res = "success";
-    } catch (e) {
-      res = e.toString();
+  Future<void> imclementNotifyNumber({required String uid}) async {
+    var snap = await _firestore.collection('users').doc(uid).get();
+    final number = snap.data()!['notifyNumber'];
+    int notifyNumber = 0;
+    if (number != null) {
+      notifyNumber = number + 1;
     }
+    await _firestore
+        .collection('users')
+        .doc(uid)
+        .update({'notifyNumber': notifyNumber});
+  }
 
-    return res;
+  Future<void> createNotification({
+    required String uid,
+    required Mission mission,
+    required int type,
+  }) async {
+    String notifyId = const Uuid().v1();
+    if (type != MISSION_IS_DELETED) {
+    
+    Notify notification = Notify(
+        notifyId: notifyId,
+        isRead: false,
+        mission: mission,
+        userId: uid,
+        createDate: DateTime.now(),
+        type: type);
+    await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('notifications')
+        .doc(notifyId)
+        .set(notification.toJson());
+    } else {
+      _firestore
+          .collection('users')
+          .doc(mission.staffId)
+          .collection('notifications')
+          .doc(notifyId)
+          .set({
+        'notifyId': notifyId,
+        'isRead': false,
+        'type': type,
+        'nameMission': mission.nameMission,
+        'nameProject': mission.nameProject,
+        'createDate': DateTime.now(),
+        'userId' : mission.staffId,
+      });
+    }
+    imclementNotifyNumber(uid: uid);
   }
 }

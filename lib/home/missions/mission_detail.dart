@@ -6,6 +6,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/progress/progress_card.dart';
 import 'package:project_management/home/progress/progress_detail.dart';
+import 'package:project_management/home/projects/project_detail.dart';
 import 'package:project_management/home/widgets/group_dropdown_button.dart';
 import 'package:project_management/home/widgets/search_user.dart';
 import 'package:project_management/model/mission.dart';
@@ -54,6 +55,8 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
 
   double percent = 0;
   bool isMissionTime = false;
+  bool isLoadingProject = false;
+
   @override
   void initState() {
     super.initState();
@@ -232,6 +235,43 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
     }
   }
 
+  navigaToProject() async {
+    setState(() {
+      isLoadingProject = true;
+    });
+    var snap = await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(companyId)
+        .collection('projects')
+        .doc(projectId)
+        .get();
+
+    Project project = Project.fromSnap(snap);
+    if (context.mounted) {
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (_) => Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage(backgroundImage), fit: BoxFit.fill),
+                ),
+                child: Scaffold(
+                  backgroundColor: Colors.transparent,
+                  appBar: AppBar(
+                    title: const Text("Dự án"),
+                    centerTitle: true,
+                    backgroundColor: darkblueAppbarColor,
+                  ),
+                  body: ProjectDetailScreen(
+                    project: project,
+                  ),
+                ),
+              )));
+    }
+    setState(() {
+      isLoadingProject = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -249,18 +289,27 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
               children: [
                 const Divider(),
                 Center(
-                    child: Text(
-                  'Dự án: $nameProject',
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 17, fontWeight: FontWeight.w500),
+                    child: InkWell(
+                  onTap: isManager ? () {} : navigaToProject,
+                  child: Text(
+                    'Dự án: $nameProject',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 17, fontWeight: FontWeight.w500),
+                  ),
                 )),
-                const Divider(
-                  color: focusBlueColor,
-                  indent: 12,
-                  endIndent: 12,
-                  thickness: 1,
-                ),
+                (isLoadingProject)
+                    ? const LinearProgressIndicator(
+                        color: correctGreenColor,
+                        semanticsLabel: "Đang chuyển sang dự án",
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      )
+                    : const Divider(
+                        color: focusBlueColor,
+                        indent: 12,
+                        endIndent: 12,
+                        thickness: 1,
+                      ),
                 const SizedBox(
                   height: 8,
                 ),
@@ -359,8 +408,12 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                               final DateTime? date = await showDatePicker(
                                 context: context,
                                 initialDate: startDate,
-                                firstDate:(widget.project != null) ? widget.project!.startDate : DateTime.now(),
-                                lastDate:(widget.project != null) ? widget.project!.endDate : DateTime(DateTime.now().year + 10),
+                                firstDate: (widget.project != null)
+                                    ? widget.project!.startDate
+                                    : DateTime.now(),
+                                lastDate: (widget.project != null)
+                                    ? widget.project!.endDate
+                                    : DateTime(DateTime.now().year + 10),
                                 locale: const Locale('vi'),
                                 currentDate: startDate,
                               );
@@ -403,7 +456,9 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                                 context: context,
                                 initialDate: endDate,
                                 firstDate: startDate,
-                                lastDate:(widget.project != null) ? widget.project!.endDate : DateTime(DateTime.now().year + 10),
+                                lastDate: (widget.project != null)
+                                    ? widget.project!.endDate
+                                    : DateTime(DateTime.now().year + 10),
                                 locale: const Locale('vi'),
                                 currentDate: endDate,
                               );
