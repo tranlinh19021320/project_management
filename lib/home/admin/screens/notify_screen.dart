@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_management/home/notifications/notifications_list.dart';
 
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
@@ -34,7 +35,7 @@ class _NotifyScreenState extends State<NotifyScreen> {
                   ),
         ),
         drawer:const  DrawerMenu(selectedPage: IS_NOTIFY_PAGE,),
-        body: const Text("..."),
+        body: const NotificationsScreen()
       ),
     );
   }

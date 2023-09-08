@@ -37,6 +37,11 @@
 
 </p>
 
+- Page Notifications
+<p align = "center">
+<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/notification.png" alt="Notification Screen">
+</p>
+
 
 
 

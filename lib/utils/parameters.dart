@@ -22,6 +22,7 @@ const int STAFF_COMPLETE_MISSION = 1;
 const int MANAGER_APPROVE_PROGRESS = 2;
 const int MISSION_IS_DELETED = 3;
 const int MISSION_CHANGE_STAFF = 4;
+const int MISSION_IS_OPEN = 5;
 
 
 

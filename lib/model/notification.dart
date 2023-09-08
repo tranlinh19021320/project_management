@@ -1,43 +1,54 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:project_management/model/mission.dart';
 
 class Notify {
   final String notifyId;
   final bool isRead;
   final String userId;
   final DateTime createDate;
-  final Mission mission;
+  final String missionId;
+  final String nameMission;
+  final String nameProject;
+  final String username;
+  final String description;
+  final double percent;
   final int type;
   const Notify(
-      {required this.notifyId,
-        required this.isRead,
-      required this.mission,
+      {
+        required this.percent,
+        required this.username,
+        required this.description,
+        required this.notifyId,
+      required this.isRead,
+      required this.missionId,
+      required this.nameMission,
+      required this.nameProject,
       required this.userId,
       required this.createDate,
       required this.type});
   Map<String, dynamic> toJson() => {
-    'notifyId' : notifyId,
+    'percent' : percent,
+    'username' : username,
+    'description' : description,
+        'notifyId': notifyId,
         'type': type,
         'isRead': isRead,
         'userId': userId,
         'createDate': createDate,
-        'missionId': mission.missionId,
+        'missionId': missionId,
+        'nameMission': nameMission,
+        'nameProject': nameProject
       };
-  static Future<Notify> fromSnap({required DocumentSnapshot doc}) async {
-    String missionId = doc['missionId'];
-    var snap = await FirebaseFirestore.instance
-        .collection('missions')
-        .doc(missionId)
-        .get();
-    Mission mission = Mission.fromSnap(mission: snap);
-
-    return Notify(
-      notifyId : doc['notifyId'],
-      type: doc['type'],
-      isRead: doc['isRead'],
-      userId: doc['userId'],
-      createDate: doc['createDate'].toDate(),
-      mission: mission,
-    );
-  }
+  static Notify fromSnap({required DocumentSnapshot doc}) => Notify(
+    percent: doc['percent'],
+    description : doc['description'],
+    username: doc['username'],
+        missionId: doc['missionId'],
+        nameMission: doc['nameMission'],
+        nameProject: doc['nameProject'],
+        notifyId: doc['notifyId'],
+        type: doc['type'],
+        isRead: doc['isRead'],
+        userId: doc['userId'],
+        createDate: doc['createDate'].toDate(),
+      );
 }

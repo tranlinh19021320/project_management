@@ -182,6 +182,23 @@ Icon? notifyIcon({required int state}) {
 String dayToString({required DateTime time}) {
   return DateFormat("dd-MM-yyyy").format(time);
 }
+String timeDateWithNow({required DateTime date}) {
+  DateTime now = DateTime.now();
+  
+  if (now.year == date.year && now.month == date.month && now.day == date.day) {
+    final deffirence = now.difference(date);
+    if (deffirence.inHours != 0) {
+      return "${deffirence.inHours} giờ trước";
+    } else {
+      if (deffirence.inMinutes != 0) {
+        return "${deffirence.inMinutes} phút trước";
+      } else {
+        return "${deffirence.inSeconds} giây trước";
+      }
+    }
+  } 
+  return DateFormat('lúc HH:mm, dd tháng MM năm yyyy').format(date);
+}
 
 bool isToDay({required String day}) {
   return dayToString(time: DateTime.now()) == day;

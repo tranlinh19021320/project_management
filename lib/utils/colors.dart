@@ -15,6 +15,6 @@ const Color darkblueAppbarColor = Color.fromARGB(255, 14, 92, 181);
 const Color blueDrawerColor = Color.fromARGB(255, 33, 108, 169);
 const Color notifyIconColor = Color.fromARGB(255, 247, 229, 70);
 const Color darkblueColor = Color.fromARGB(255, 9, 1, 255);
-const Color defaultblueColor = Color.fromARGB(255, 55, 54, 79);
+const Color defaultblueColor = Color.fromARGB(255, 80, 72, 160);
 const Color darkgreenColor = Color.fromARGB(255, 60, 133, 60);
 

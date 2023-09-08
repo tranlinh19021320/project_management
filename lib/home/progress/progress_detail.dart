@@ -108,7 +108,9 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
         missionId: missionId,
         description: description.text,
         percent: number,
-        date: date);
+        date: date,
+        state: state
+        );
 
     if (context.mounted) {
       Navigator.pop(context);

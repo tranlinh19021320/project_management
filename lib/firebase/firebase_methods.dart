@@ -385,7 +385,7 @@ class FirebaseMethods {
       {required String companyId, required String projectId}) async {
     String res = 'error';
     try {
-      _firestore
+      await _firestore
           .collection('companies')
           .doc(companyId)
           .collection('projects')
@@ -524,9 +524,8 @@ class FirebaseMethods {
   Future<String> deleteMission({required Mission mission}) async {
     String res = 'error';
     try {
-      
       _firestore.collection('missions').doc(mission.missionId).delete();
-      
+
       var snap = await _firestore
           .collection('companies')
           .doc(mission.companyId)
@@ -542,7 +541,8 @@ class FirebaseMethods {
           .update({
         'missions': missions - 1,
       });
-      await createNotification(uid: mission.staffId, mission: mission, type: MISSION_IS_DELETED);
+      await createNotification(
+          uid: mission.staffId, mission: mission, type: MISSION_IS_DELETED);
 
       res = 'success';
     } catch (er) {
@@ -551,11 +551,13 @@ class FirebaseMethods {
     return res;
   }
 
-  Future<String> updateMissionProgress(
-      {required String missionId,
-      required String description,
-      required double percent,
-      required String date}) async {
+  Future<String> updateMissionProgress({
+    required String missionId,
+    required String description,
+    required double percent,
+    required String date,
+    int state = IS_DOING,
+  }) async {
     String res = "error";
     try {
       Progress progress = Progress(
@@ -571,7 +573,23 @@ class FirebaseMethods {
           .collection('progress')
           .doc(date)
           .set(progress.toJson());
-
+          print(state == IS_SUBMIT);
+      if (state == IS_SUBMIT) {
+        var snap = await _firestore
+            .collection('missions')
+            .doc(progress.missionId)
+            .get();
+        Mission mission = Mission.fromSnap(mission: snap);
+        CurrentUser user =
+            await getCurrentUserByUserId(userId: mission.staffId);
+        createNotification(
+            mission: mission,
+            type: STAFF_COMPLETE_MISSION,
+            group: manager,
+            description: description,
+            username: user.nameDetails,
+            percent: percent);
+      }
       res = await updatePercentMission(missionId: missionId, percent: percent);
     } catch (e) {
       res = e.toString();
@@ -583,12 +601,24 @@ class FirebaseMethods {
   Future<String> changeStateProgress({required Progress progress}) async {
     String res = 'error';
     try {
+      var snap =
+          await _firestore.collection('missions').doc(progress.missionId).get();
+      Mission mission = Mission.fromSnap(mission: snap);
       await _firestore
           .collection('missions')
           .doc(progress.missionId)
           .collection('progress')
           .doc(progress.date)
           .update({'isCompleted': !progress.isCompleted});
+      if (progress.isCompleted) {
+        createNotification(
+            uid: mission.staffId, mission: mission, type: MISSION_IS_OPEN);
+      } else {
+        createNotification(
+            uid: mission.staffId,
+            mission: mission,
+            type: MANAGER_APPROVE_PROGRESS);
+      }
       res = 'success';
     } catch (e) {
       res = e.toString();
@@ -624,43 +654,81 @@ class FirebaseMethods {
         .update({'notifyNumber': notifyNumber});
   }
 
-  Future<void> createNotification({
-    required String uid,
-    required Mission mission,
-    required int type,
-  }) async {
-    String notifyId = const Uuid().v1();
-    if (type != MISSION_IS_DELETED) {
-    
-    Notify notification = Notify(
-        notifyId: notifyId,
-        isRead: false,
-        mission: mission,
-        userId: uid,
-        createDate: DateTime.now(),
-        type: type);
-    await _firestore
-        .collection('users')
-        .doc(uid)
-        .collection('notifications')
-        .doc(notifyId)
-        .set(notification.toJson());
-    } else {
-      _firestore
+  Future<void> createNotification(
+      {String? uid,
+      required Mission mission,
+      required int type,
+      String? group,
+      String username = "",
+      String description = "",
+      double percent = 0}) async {
+    if (group != null) {
+      var snapshot = await _firestore
           .collection('users')
-          .doc(mission.staffId)
+          .where('group', isEqualTo: group)
+          .get();
+      snapshot.docs.forEach((element) async {
+        String userId = (element as dynamic)['userId'];
+        String notifyId = const Uuid().v1();
+        Notify notification = Notify(
+          percent: percent,
+            username: username,
+            description: description,
+            notifyId: notifyId,
+            isRead: (type == MISSION_IS_DELETED),
+            missionId: mission.missionId,
+            nameMission: mission.nameMission,
+            nameProject: mission.nameProject,
+            userId: userId,
+            createDate: DateTime.now(),
+            type: type);
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('notifications')
+            .doc(notifyId)
+            .set(notification.toJson());
+
+        imclementNotifyNumber(uid: userId);
+      });
+    } else {
+      String notifyId = const Uuid().v1();
+      Notify notification = Notify(
+        percent: percent,
+          username: username,
+          description: description,
+          notifyId: notifyId,
+          isRead: (type == MISSION_IS_DELETED),
+          missionId: mission.missionId,
+          nameMission: mission.nameMission,
+          nameProject: mission.nameProject,
+          userId: uid!,
+          createDate: DateTime.now(),
+          type: type);
+      await _firestore
+          .collection('users')
+          .doc(uid)
           .collection('notifications')
           .doc(notifyId)
-          .set({
-        'notifyId': notifyId,
-        'isRead': false,
-        'type': type,
-        'nameMission': mission.nameMission,
-        'nameProject': mission.nameProject,
-        'createDate': DateTime.now(),
-        'userId' : mission.staffId,
-      });
+          .set(notification.toJson());
+
+      imclementNotifyNumber(uid: uid);
     }
-    imclementNotifyNumber(uid: uid);
+  }
+
+  Future<String> deleteNotification({required Notify notify}) async {
+    String res = 'error';
+    try {
+      await _firestore
+          .collection('users')
+          .doc(notify.userId)
+          .collection('notifications')
+          .doc(notify.notifyId)
+          .delete();
+      res = 'success';
+    } catch (er) {
+      res = er.toString();
+    }
+    return res;
   }
 }
