@@ -14,10 +14,8 @@ import 'package:project_management/utils/paths.dart';
 import '../utils/drawer_bar.dart';
 
 class PersonalScreen extends StatefulWidget {
- 
   const PersonalScreen({
     super.key,
- 
   });
 
   @override
@@ -33,7 +31,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
   String companyName = "";
   late String userId;
   late SizedBox groupDropdownButton;
-  
+
   // late GroupDropdownButton groupDropdownButton;
 
   bool isLoading = false;
@@ -126,14 +124,13 @@ class _PersonalScreenState extends State<PersonalScreen> {
                 backgroundColor: darkblueAppbarColor,
                 title: const Text("Nhân viên"),
                 leading: Builder(
-                    builder: (context) => IconButton(
-                        onPressed: () => Scaffold.of(context).openDrawer(),
-                        icon: menuIcon()),
-                  ),
+                  builder: (context) => IconButton(
+                      onPressed: () => Scaffold.of(context).openDrawer(),
+                      icon: menuIcon()),
+                ),
               ),
               drawer: const DrawerMenu(
                 selectedPage: IS_PERSONAL_PAGE,
-             
               ),
               body: Padding(
                 padding: const EdgeInsets.all(12),
@@ -174,21 +171,6 @@ class _PersonalScreenState extends State<PersonalScreen> {
                         ),
                         groupDropdownButton,
                         // button to create user
-                        Padding(
-                          padding: const EdgeInsets.only(left: 2),
-                          child: IconButton(
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (_) => CreateStaff(
-                                        companyId: companyId,
-                                        companyName: companyName,
-                                      ));
-                            },
-                            icon: addIcon,
-                            highlightColor: focusBlueColor,
-                          ),
-                        )
                       ],
                     ),
                     const Divider(),
@@ -214,13 +196,24 @@ class _PersonalScreenState extends State<PersonalScreen> {
                                 itemCount: documents.length,
                                 itemBuilder: (context, index) => StaffCard(
                                       staff: documents[index],
-                                     
                                     )));
                       },
                     )
                   ],
                 ),
               ),
+              floatingActionButton: FloatingActionButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (_) => CreateStaff(
+                            companyId: companyId,
+                            companyName: companyName,
+                          ));
+                },
+                child: const Icon(Icons.add),
+              ),
+              floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             ),
           );
   }

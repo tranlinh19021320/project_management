@@ -491,9 +491,11 @@ class FirebaseMethods {
       });
       if (staffId != mission.staffId) {
         await createNotification(
-            uid: staffId, mission: mission, type: STAFF_RECIEVE_MISSION);
+            uid: staffId, mission: mission, type: STAFF_RECIEVE_MISSION_FROM_OTHER);
         await createNotification(
             uid: mission.staffId, mission: mission, type: MISSION_CHANGE_STAFF);
+      } else {
+        await createNotification(uid: mission.staffId,mission: mission, type: MISSION_IS_CHANGED,);
       }
       res = 'success';
     } catch (e) {
@@ -598,7 +600,7 @@ class FirebaseMethods {
     return res;
   }
 
-  Future<String> changeStateProgress({required Progress progress}) async {
+  Future<String> changeStateProgress({required Progress progress, int state = IS_OPENING}) async {
     String res = 'error';
     try {
       var snap =
@@ -610,7 +612,8 @@ class FirebaseMethods {
           .collection('progress')
           .doc(progress.date)
           .update({'isCompleted': !progress.isCompleted});
-      if (progress.isCompleted) {
+      print(state != IS_OPENING);
+      if (state != IS_OPENING) {
         createNotification(
             uid: mission.staffId, mission: mission, type: MISSION_IS_OPEN);
       } else {
