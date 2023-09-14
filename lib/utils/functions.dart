@@ -124,7 +124,7 @@ CircularPercentIndicator circularPercentIndicator(
   );
 }
 
-Widget user1Card({required CurrentUser user, double size = 40}) {
+Widget user1Card({required CurrentUser user, double size = 40, double fontsize = 16}) {
   return ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
           dense: true,
@@ -135,15 +135,15 @@ Widget user1Card({required CurrentUser user, double size = 40}) {
           ),
           title: Text(
             user.nameDetails,
-            style: const TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: fontsize),
           ),
-          subtitle: Text(user.group),
+          subtitle: Text(user.group, style: TextStyle(fontSize:  fontsize-2),),
           trailing: (user.group == manager)
               ? resizedIcon(keyImage, 18)
               : resizedIcon(staffImage, 18),
         );
 }
-Widget userCard({required String userId, double size = 40}) {
+Widget userCard({required String userId, double size = 40,double fontsize = 16}) {
   return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('users')
@@ -159,7 +159,7 @@ Widget userCard({required String userId, double size = 40}) {
 
         CurrentUser user = CurrentUser.fromSnap(user: snapshot.data!);
 
-        return user1Card(user: user, size: size);
+        return user1Card(user: user, size: size, fontsize: fontsize);
       });
 }
 
@@ -197,7 +197,7 @@ String timeDateWithNow({required DateTime date}) {
       }
     }
   } 
-  return DateFormat('lúc HH:mm, dd tháng MM năm yyyy').format(date);
+  return "lúc${DateFormat('HH:mm, dd').format(date)}tháng${DateFormat('MM, yyyy').format(date)}";
 }
 
 bool isToDay({required String day}) {

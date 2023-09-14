@@ -58,7 +58,7 @@ class _MissionCardState extends State<MissionCard> {
                   softWrap: true,
                   style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                      fontSize: 16,
                       fontStyle: FontStyle.italic),
                 ),
                 const SizedBox(
@@ -74,7 +74,7 @@ class _MissionCardState extends State<MissionCard> {
                           borderRadius: BorderRadius.circular(16),
                           color: focusBlueColor,
                         ),
-                        child: userCard(userId: widget.mission.staffId, size: 28)),
+                        child: userCard(userId: widget.mission.staffId, size: 28, fontsize: 14)),
                     ),
                   ],
                 ),

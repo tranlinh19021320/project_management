@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/widgets/numeric_range_formatter.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/progress.dart';
 import 'package:project_management/provider/group_provider.dart';
@@ -35,18 +34,16 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
   double max = 100;
   int state = IS_SUBMIT;
   String date = dayToString(time: DateTime.now());
+
   @override
   void initState() {
     super.initState();
     GroupProvider groupProvider =
         Provider.of<GroupProvider>(context, listen: false);
     isManager = groupProvider.getIsManager;
+
     percentFocus.addListener(() {
-      if (percentFocus.hasFocus && state != IS_CLOSING) {
-        setState(() {
-          percent.text = '';
-        });
-      } else if (!percentFocus.hasFocus) {
+      if (!percentFocus.hasFocus) {
         final num = double.tryParse(percent.text);
         double number = min;
         if (num != null) {
@@ -114,12 +111,12 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
     }
   }
 
-  changeStateProgress(Progress progress) async {
+  changeStateProgress() async {
     showDialog(
         context: context,
         builder: (_) => const NotifyDialog(content: 'loading'));
     String res = await FirebaseMethods()
-        .changeStateProgress(progress: progress, state: state);
+        .changeStateProgress(progress: widget.progress!, state: state);
     if (context.mounted) {
       Navigator.pop(context);
     }
@@ -130,9 +127,6 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
           content: (state == IS_OPENING) ? "Đã phê duyệt!" : "Đã mở lại!",
         );
       }
-      setState(() {
-        (state == IS_OPENING) ? state = IS_CLOSING : state = IS_OPENING;
-      });
     } else {
       if (context.mounted) {
         showSnackBar(context: context, content: res, isError: true);
@@ -158,50 +152,14 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                   ? "Hôm nay"
                   : widget.progress!.date),
         ),
-        body: StreamBuilder(
-            stream: FirebaseFirestore.instance
-                .collection('missions')
-                .doc(missionId)
-                .collection('progress')
-                .doc((widget.progress != null) ? widget.progress!.date : "")
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-
-              if (!snapshot.hasData) {
-                state = IS_SUBMIT;
-              }
-              Progress? progress;
-              if (snapshot.hasData) {
-                progress = Progress.fromSnap(doc: snapshot.requireData);
-                if (description.text == "") {
-                  description.text = progress.description;
-                }
-                //state
-
-                if (progress.isCompleted) {
-                  state = IS_CLOSING;
-                } else if (isManager) {
-                  state = IS_OPENING;
-                } else {
-                  state = IS_DOING;
-                }
-              }
-              return Padding(
+        body: (widget.progress == null)
+            ? Padding(
                 padding: const EdgeInsets.only(
                     top: 8, left: 8, right: 8, bottom: 20),
                 child: SingleChildScrollView(
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Divider(),
-                        const SizedBox(
-                          height: 6,
-                        ),
                         // description textfield
                         TextField(
                           controller: description,
@@ -213,93 +171,59 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                             ),
                             filled: true,
                             helperText: "",
-                            fillColor: (state == IS_CLOSING)
-                                ? defaultColor
-                                : backgroundWhiteColor,
+                            fillColor: backgroundWhiteColor,
                           ),
                           keyboardType: TextInputType.multiline,
                           minLines: 3,
                           maxLines: null,
                           scrollController: descriptionScroll,
-                          readOnly: (state == IS_CLOSING),
                           onTapOutside: (event) => descriptionFocus.unfocus(),
                         ),
 
                         const SizedBox(
                           height: 8,
                         ),
-                        (isManager || state == IS_CLOSING)
-                            ? Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Text("Tiến độ: "),
-                                  circularPercentIndicator(
-                                      percent: widget.progress!.percent,
-                                      radius: 40,
-                                      lineWidth: 20,
-                                      fontSize: 13),
-                                ],
-                              )
-                            : Row(
-                                children: [
-                                  Text("Đánh giá tiến độ: ${min.toInt()}< "),
-                                  SizedBox(
-                                    width: 50,
-                                    height: 30,
-                                    child: TextField(
-                                      controller: percent,
-                                      focusNode: percentFocus,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(color: blackColor),
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                          contentPadding: const EdgeInsets.only(
-                                              left: 4,
-                                              right: 4,
-                                              top: 0,
-                                              bottom: 0),
-                                          filled: true,
-                                          fillColor: (state == IS_CLOSING)
-                                              ? defaultColor
-                                              : backgroundWhiteColor,
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(6),
-                                          )),
-                                      inputFormatters: [
-                                        NumericRangeFormatter(
-                                            min: min, max: max),
-                                        FilteringTextInputFormatter.digitsOnly,
-                                        LengthLimitingTextInputFormatter(3),
-                                      ],
-                                      readOnly: (state == IS_CLOSING),
-                                    ),
-                                  ),
-                                  Text(" <${max.toInt()}"),
+                        Row(
+                          children: [
+                            Text("Đánh giá tiến độ: ${min.toInt()}< "),
+                            SizedBox(
+                              width: 50,
+                              height: 30,
+                              child: TextField(
+                                controller: percent,
+                                focusNode: percentFocus,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: blackColor),
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                    contentPadding: const EdgeInsets.only(
+                                        left: 4, right: 4, top: 0, bottom: 0),
+                                    filled: true,
+                                    fillColor: backgroundWhiteColor,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                    )),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(3),
                                 ],
                               ),
+                            ),
+                            Text(" <${max.toInt()}"),
+                          ],
+                        ),
                         const SizedBox(
                           height: 18,
                         ),
 
                         Center(
-                          child: InkWell(
-                            onTap: (state == IS_SUBMIT || state == IS_DOING)
-                                ? updateProgress
-                                : (isManager)
-                                    ? changeStateProgress(progress!)
-                                    : () {},
+                          child: GestureDetector(
+                            onTap: updateProgress,
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                   vertical: 10, horizontal: 12),
                               decoration: BoxDecoration(
-                                color: (state == IS_SUBMIT)
-                                    ? darkgreenColor
-                                    : (state == IS_DOING)
-                                        ? blueDrawerColor
-                                        : (state == IS_OPENING)
-                                            ? correctGreenColor
-                                            : darkblueAppbarColor,
+                                color: darkblueColor,
                                 boxShadow: const [
                                   BoxShadow(
                                     color: defaultIconColor,
@@ -312,24 +236,183 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                                 ],
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Text(
-                                (state == IS_SUBMIT)
-                                    ? 'Xác nhận'
-                                    : (state == IS_DOING)
-                                        ? 'Lưu lại'
-                                        : (state == IS_OPENING)
-                                            ? 'Phê duyệt'
-                                            : (isManager)
-                                                ? 'Mở lại'
-                                                : "Đã phê duyệt",
+                              child: const Text(
+                                'Xác nhận',
                               ),
                             ),
                           ),
                         )
                       ]),
                 ),
-              );
-            }),
+              )
+            : StreamBuilder(
+                stream: FirebaseFirestore.instance
+                    .collection('missions')
+                    .doc(missionId)
+                    .collection('progress')
+                    .doc(widget.progress!.date)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  if (!snapshot.data!.exists) {
+                    state = IS_SUBMIT;
+                    print(state);
+                  } else {
+                    Progress? progress;
+                    progress = Progress.fromSnap(doc: snapshot.requireData);
+                    
+                    if (description.text == "") {
+                      description.text = progress.description;
+                    }
+                    //state
+
+                    if (progress.isCompleted) {
+                      state = IS_CLOSING;
+                    } else if (isManager) {
+                      state = IS_OPENING;
+                    } else {
+                      state = IS_DOING;
+                    }
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                        top: 8, left: 8, right: 8, bottom: 20),
+                    child: SingleChildScrollView(
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // description textfield
+                            TextField(
+                              controller: description,
+                              focusNode: descriptionFocus,
+                              style: const TextStyle(color: blackColor),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                filled: true,
+                                helperText: "",
+                                fillColor: (state == IS_CLOSING)
+                                    ? defaultColor
+                                    : backgroundWhiteColor,
+                              ),
+                              keyboardType: TextInputType.multiline,
+                              minLines: 3,
+                              maxLines: null,
+                              scrollController: descriptionScroll,
+                              readOnly: (state == IS_CLOSING),
+                              onTapOutside: (event) =>
+                                  descriptionFocus.unfocus(),
+                            ),
+
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            (isManager || state == IS_CLOSING)
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text("Tiến độ: "),
+                                      circularPercentIndicator(
+                                          percent: widget.progress!.percent,
+                                          radius: 40,
+                                          lineWidth: 20,
+                                          fontSize: 13),
+                                    ],
+                                  )
+                                : Row(
+                                    children: [
+                                      Text(
+                                          "Đánh giá tiến độ: ${min.toInt()}< "),
+                                      SizedBox(
+                                        width: 50,
+                                        height: 30,
+                                        child: TextField(
+                                          controller: percent,
+                                          focusNode: percentFocus,
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                              color: blackColor),
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(
+                                              contentPadding:
+                                                  const EdgeInsets.only(
+                                                      left: 4,
+                                                      right: 4,
+                                                      top: 0,
+                                                      bottom: 0),
+                                              filled: true,
+                                              fillColor: (state == IS_CLOSING)
+                                                  ? defaultColor
+                                                  : backgroundWhiteColor,
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              )),
+                                          inputFormatters: [
+                                            
+                                            FilteringTextInputFormatter
+                                                .digitsOnly,
+                                          ],
+                                          readOnly: (state == IS_CLOSING),
+                                        ),
+                                      ),
+                                      Text(" <${max.toInt()}"),
+                                    ],
+                                  ),
+                            const SizedBox(
+                              height: 18,
+                            ),
+
+                            Center(
+                              child: GestureDetector(
+                                onTap: (state == IS_DOING)
+                                    ? updateProgress
+                                    : (isManager)
+                                        ? changeStateProgress
+                                        : () {},
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 12),
+                                  decoration: BoxDecoration(
+                                    color: (state == IS_DOING)
+                                            ? blueDrawerColor
+                                            : (state == IS_OPENING)
+                                                ? correctGreenColor
+                                                : darkblueAppbarColor,
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: defaultIconColor,
+                                        offset: Offset(1, 2),
+                                      ),
+                                      BoxShadow(
+                                        color: backgroundWhiteColor,
+                                        offset: Offset(2, 1),
+                                      ),
+                                    ],
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    (state == IS_DOING)
+                                            ? 'Lưu lại'
+                                            : (state == IS_OPENING)
+                                                ? 'Phê duyệt'
+                                                : (isManager)
+                                                    ? 'Mở lại'
+                                                    : "Đã phê duyệt",
+                                  ),
+                                ),
+                              ),
+                            )
+                          ]),
+                    ),
+                  );
+                }),
       ),
     );
   }

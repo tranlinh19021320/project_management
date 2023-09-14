@@ -520,79 +520,82 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                 ),
                 (widget.mission == null)
                     ? Container()
-                    : Column(
-                        children: [
-                          const Center(
-                            child: Text(
-                              'Tiến độ',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w700, fontSize: 16),
+                    : Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                          children: [
+                            const Center(
+                              child: Text(
+                                'Tiến độ',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 16),
+                              ),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Center(
-                            child: circularPercentIndicator(
-                                percent: widget.mission!.percent,
-                                radius: 60,
-                                fontSize: 20,
-                                lineWidth: 30),
-                          ),
-                          const Divider(),
-                          const Text("Hoàn thành hôm nay"),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          StreamBuilder(
-                              stream: FirebaseFirestore.instance
-                                  .collection('missions')
-                                  .doc(widget.mission!.missionId)
-                                  .collection('progress')
-                                  .where('date',
-                                      isEqualTo:
-                                          dayToString(time: DateTime.now()))
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return LoadingAnimationWidget.inkDrop(
-                                      color: darkblueAppbarColor, size: 32);
-                                }
-
-                                if (snapshot.data!.docs.isEmpty) {
-                                  return InkWell(
-                                    onTap: (isManager || !isMissionTime)
-                                        ? () {}
-                                        : () => Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (_) =>
-                                                    ProgressDetailScreen(
-                                                      mission: widget.mission,
-                                                    ))),
-                                    child: DottedBorder(
-                                        color: defaultColor,
-                                        borderType: BorderType.RRect,
-                                        radius: const Radius.circular(10),
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 12),
-                                        child: Center(
-                                            child: (!isMissionTime)
-                                                ? const Text(
-                                                    "Không trong thời gian nhiệm vụ!")
-                                                : (isManager)
-                                                    ? const Text(
-                                                        "Chưa có hoàn thành hôm nay")
-                                                    : const Icon(Icons.add))),
-                                  );
-                                }
-
-                                return ProgressCard(
-                                    progress: Progress.fromSnap(
-                                        doc: snapshot.data!.docs.first));
-                              })
-                        ],
-                      ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            Center(
+                              child: circularPercentIndicator(
+                                  percent: widget.mission!.percent,
+                                  radius: 60,
+                                  fontSize: 20,
+                                  lineWidth: 30),
+                            ),
+                            const Divider(),
+                            const Text("Hoàn thành hôm nay"),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            StreamBuilder(
+                                stream: FirebaseFirestore.instance
+                                    .collection('missions')
+                                    .doc(widget.mission!.missionId)
+                                    .collection('progress')
+                                    .where('date',
+                                        isEqualTo:
+                                            dayToString(time: DateTime.now()))
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return LoadingAnimationWidget.inkDrop(
+                                        color: darkblueAppbarColor, size: 32);
+                                  }
+                    
+                                  if (snapshot.data!.docs.isEmpty) {
+                                    return InkWell(
+                                      onTap: (isManager || !isMissionTime)
+                                          ? () {}
+                                          : () => Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      ProgressDetailScreen(
+                                                        mission: widget.mission,
+                                                      ))),
+                                      child: DottedBorder(
+                                          color: defaultColor,
+                                          borderType: BorderType.RRect,
+                                          radius: const Radius.circular(10),
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 12),
+                                          child: Center(
+                                              child: (!isMissionTime)
+                                                  ? const Text(
+                                                      "Không trong thời gian nhiệm vụ!")
+                                                  : (isManager)
+                                                      ? const Text(
+                                                          "Chưa có hoàn thành hôm nay")
+                                                      : const Icon(Icons.add))),
+                                    );
+                                  }
+                    
+                                  return ProgressCard(
+                                      progress: Progress.fromSnap(
+                                          doc: snapshot.data!.docs.first));
+                                })
+                          ],
+                        ),
+                    ),
 
                 const SizedBox(
                   height: 8,

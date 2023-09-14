@@ -7,11 +7,13 @@ import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/missions/mission.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/notification.dart';
+import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/icons.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/parameters.dart';
+import 'package:provider/provider.dart';
 
 class NotificationCard extends StatefulWidget {
   final Notify notify;
@@ -23,6 +25,14 @@ class NotificationCard extends StatefulWidget {
 
 class _NotificationCardState extends State<NotificationCard> {
   bool isFocus = false;
+  late bool isManager;
+  @override
+  void initState() {
+    super.initState();
+    GroupProvider groupProvider =
+        Provider.of<GroupProvider>(context, listen: false);
+    isManager = groupProvider.getIsManager;
+  }
 
   navigaToMission() async {
     showDialog(
@@ -67,7 +77,7 @@ class _NotificationCardState extends State<NotificationCard> {
                       content: 'Nhiệm vụ đã bị xóa !',
                       isError: true,
                     ))
-            :(mission.staffId != FirebaseAuth.instance.currentUser!.uid) ?showDialog(
+            :(mission.staffId != FirebaseAuth.instance.currentUser!.uid && !isManager) ?showDialog(
                 context: context,
                 builder: (_) => const NotifyDialog(
                       content: 'Bạn không còn phụ trách nhiệm vụ này!',

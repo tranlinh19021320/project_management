@@ -611,7 +611,7 @@ class FirebaseMethods {
           .doc(progress.missionId)
           .collection('progress')
           .doc(progress.date)
-          .update({'isCompleted': !progress.isCompleted});
+          .update({'isCompleted': (state != IS_CLOSING) ? true : false});
       print(state != IS_OPENING);
       if (state != IS_OPENING) {
         createNotification(
