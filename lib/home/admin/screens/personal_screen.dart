@@ -195,7 +195,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
                             child: ListView.builder(
                                 itemCount: documents.length,
                                 itemBuilder: (context, index) => StaffCard(
-                                      staff: documents[index],
+                                      staff: CurrentUser.fromSnap(user: documents[index]) ,
                                     )));
                       },
                     )

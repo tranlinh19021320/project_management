@@ -1,11 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
+import 'package:project_management/home/timetracking/time_keeping_table.dart';
 import 'package:project_management/home/widgets/group_dropdown_button.dart';
 import 'package:project_management/home/widgets/text_button.dart';
+import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/colors.dart';
@@ -13,7 +14,7 @@ import 'package:project_management/utils/icons.dart';
 import 'package:project_management/utils/paths.dart';
 
 class StaffCard extends StatefulWidget {
-  final DocumentSnapshot staff;
+  final CurrentUser staff;
   const StaffCard({
     super.key,
     required this.staff,
@@ -35,8 +36,8 @@ class _StaffCardState extends State<StaffCard> {
   void initState() {
     super.initState();
     managerId = FirebaseAuth.instance.currentUser!.uid;
-    companyId = widget.staff['companyId'];
-    userGroup = widget.staff['group'];
+    companyId = widget.staff.companyId;
+    userGroup = widget.staff.group;
   }
 
   deleteUser() async {
@@ -50,7 +51,7 @@ class _StaffCardState extends State<StaffCard> {
               title: Column(
                 children: [
                   Text(
-                      "Bạn chắc muốn xóa tài khoản ${widget.staff['username']} ?",
+                      "Bạn chắc muốn xóa tài khoản ${widget.staff.username} ?",
                       style: const TextStyle(fontSize: 14)),
                   const SizedBox(
                     height: 8,
@@ -81,7 +82,7 @@ class _StaffCardState extends State<StaffCard> {
               ],
             ));
     if (comfirm) {
-      FirebaseMethods().deleteUser(deleteUserId: widget.staff['userId']);
+      FirebaseMethods().deleteUser(deleteUserId: widget.staff.userId);
       if (context.mounted) {
         showDialog(
             context: context,
@@ -93,10 +94,10 @@ class _StaffCardState extends State<StaffCard> {
 
   String details() {
     return '''
-Họ và tên: ${widget.staff['nameDetails']}
-Tài khoản: ${widget.staff['username']}
-Email: ${widget.staff['email']}
-password: ${widget.staff['password']}
+Họ và tên: ${widget.staff.nameDetails}
+Tài khoản: ${widget.staff.userId}
+Email: ${widget.staff.email}
+password: ${widget.staff.password}
 Nhóm: $userGroup''';
   }
 
@@ -105,7 +106,7 @@ Nhóm: $userGroup''';
       isLoadingGroup = true;
     });
     String res = await FirebaseMethods()
-        .changeUserGroup(userId: widget.staff['userId'], group: userGroup);
+        .changeUserGroup(userId: widget.staff.userId, group: userGroup);
     setState(() {
       isLoadingGroup = false;
       isChangeGroup = false;
@@ -123,7 +124,7 @@ Nhóm: $userGroup''';
 
   @override
   Widget build(BuildContext context) {
-    return (managerId == widget.staff['userId'])
+    return (managerId == widget.staff.userId)
         ? Container()
         : Column(
           children: [
@@ -163,7 +164,7 @@ Nhóm: $userGroup''';
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             child: Center(
                                 child: Text(
-                              widget.staff['nameDetails'],
+                              widget.staff.nameDetails,
                               style: const TextStyle(
                                   fontWeight: FontWeight.w700, fontSize: 16),
                             )),
@@ -178,7 +179,7 @@ Nhóm: $userGroup''';
                             leading: CircleAvatar(
                               backgroundColor: backgroundWhiteColor,
                               backgroundImage: NetworkImage(
-                                widget.staff['photoURL'],
+                                widget.staff.photoURL,
                               ),
                               radius: 22,
                             ),
@@ -187,11 +188,11 @@ Nhóm: $userGroup''';
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Tài khoản: ${widget.staff['username']}",
+                                  "Tài khoản: ${widget.staff.username}",
                                   style: const TextStyle(fontSize: 13),
                                 ),
                                 Text(
-                                  "Email: ${widget.staff['email']}",
+                                  "Email: ${widget.staff.email}",
                                   style: const TextStyle(fontSize: 13),
                                 ),
                                 Padding(
@@ -235,7 +236,7 @@ Nhóm: $userGroup''';
                                                         setState(() {
                                                           isChangeGroup = false;
                                                           userGroup =
-                                                              widget.staff['group'];
+                                                              widget.staff.group;
                                                         });
                                                       }, // comfirm change group
                                                       child: Container(
@@ -269,27 +270,18 @@ Nhóm: $userGroup''';
                                                         : InkWell(
                                                             onTap: () {
                                                               setState(() {
-                                                                isChangeGroup =
-                                                                    true;
+                                                                isChangeGroup =true;
                                                               });
                                                             },
                                                             child: Container(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .all(0),
+                                                                padding: const EdgeInsets.all(0),
                                                                 width: 20,
                                                                 height: 20,
                                                                 child:
                                                                     const Padding(
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .all(0.0),
-                                                                  child: Icon(
-                                                                    Icons
-                                                                        .change_circle,
-                                                                    color:
-                                                                        buttonGreenColor,
-                                                                    size: 20,
+                                                                  padding:EdgeInsets.all(0.0),
+                                                                  child: Icon(Icons.change_circle,
+                                                                    color:buttonGreenColor,size: 20,
                                                                   ),
                                                                 )),
                                                           ),
@@ -311,7 +303,10 @@ Nhóm: $userGroup''';
                                         height: 20,
                                         padding: 0,
                                         radius: 2,
-                                        funtion: () {})
+                                        funtion: () {
+                                          Navigator.of(context).push(MaterialPageRoute(
+                                            builder: (_) => TimeKeepingTable(userId:widget.staff.userId )));
+                                        })
                               ],
                             ),
                           ),

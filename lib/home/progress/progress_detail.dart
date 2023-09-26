@@ -125,6 +125,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
     }
     String res = await FirebaseMethods()
         .changeStateProgress(progress: widget.progress!, state: state);
+    
     if (context.mounted) {
       Navigator.pop(context);
     }

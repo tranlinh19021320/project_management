@@ -617,6 +617,9 @@ class FirebaseMethods {
         createNotification(
             uid: mission.staffId, mission: mission, type: MISSION_IS_OPEN);
       } else {
+        await _firestore.collection('users').doc(mission.staffId).update({
+          'timekeeping.${progress.date}': state,
+        });
         createNotification(
             uid: mission.staffId,
             mission: mission,
@@ -628,6 +631,8 @@ class FirebaseMethods {
     }
     return res;
   }
+
+
 
   Future<String> refreshNotifyNumber() async {
     String res = "error";
