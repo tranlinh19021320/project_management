@@ -34,7 +34,8 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
   double max = 100;
   int state = IS_SUBMIT;
   String date = dayToString(time: DateTime.now());
-
+  bool isAutoEvaluate = true;
+  int pre_state = IS_COMPLETE;
   @override
   void initState() {
     super.initState();
@@ -64,8 +65,8 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
       missionId = widget.progress!.missionId;
       date = widget.progress!.date;
       percent.text = (widget.progress!.percent * 100).toStringAsFixed(0);
-      if (widget.progress!.isCompleted) {
-        state = IS_CLOSING;
+      if (widget.progress!.state != IS_DOING) {
+        state = widget.progress!.state;
       }
     }
     if (widget.mission != null) {
@@ -115,6 +116,13 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
     showDialog(
         context: context,
         builder: (_) => const NotifyDialog(content: 'loading'));
+    if (state != IS_DOING) {
+      state = IS_DOING;
+    } else if (isAutoEvaluate) {
+      state = pre_state;
+    } else {
+      state = IS_CLOSING;
+    }
     String res = await FirebaseMethods()
         .changeStateProgress(progress: widget.progress!, state: state);
     if (context.mounted) {
@@ -124,7 +132,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
       if (context.mounted) {
         showSnackBar(
           context: context,
-          content: (state == IS_OPENING) ? "Đã phê duyệt!" : "Đã mở lại!",
+          content: (state != IS_DOING) ? "Đã phê duyệt!" : "Đã mở lại!",
         );
       }
     } else {
@@ -271,13 +279,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                     }
                     //state
 
-                    if (progress.isCompleted) {
-                      state = IS_CLOSING;
-                    } else if (isManager) {
-                      state = IS_OPENING;
-                    } else {
-                      state = IS_DOING;
-                    }
+                    state = progress.state;
                   }
                   return Padding(
                     padding: const EdgeInsets.only(
@@ -297,7 +299,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                                 ),
                                 filled: true,
                                 helperText: "",
-                                fillColor: (state == IS_CLOSING)
+                                fillColor: (state != IS_DOING)
                                     ? defaultColor
                                     : backgroundWhiteColor,
                               ),
@@ -305,7 +307,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                               minLines: 3,
                               maxLines: null,
                               scrollController: descriptionScroll,
-                              readOnly: (state == IS_CLOSING),
+                              readOnly: (state != IS_DOING),
                               onTapOutside: (event) =>
                                   descriptionFocus.unfocus(),
                             ),
@@ -313,16 +315,63 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                             const SizedBox(
                               height: 8,
                             ),
-                            (isManager || state == IS_CLOSING)
+                            (isManager || state == IS_CLOSING || state == IS_COMPLETE || state == IS_LATE)
                                 ? Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       const Text("Tiến độ: "),
+                                      const SizedBox(height: 8,),
                                       circularPercentIndicator(
                                           percent: widget.progress!.percent,
                                           radius: 40,
                                           lineWidth: 20,
                                           fontSize: 13),
+                                          const SizedBox(height: 14,),
+                                      state != IS_DOING ? Row(
+                                        children: [
+                                          const Text("Trạng thái: "),
+                                          evaluate(state: state),
+                                        ],
+                                      ) : Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Checkbox(value: isAutoEvaluate, onChanged:(value) {
+                                                setState(() {
+                                                  isAutoEvaluate = value!;
+                                                });
+                                              }),
+                                              const Text("Đánh giá và tự động chấm công", style: TextStyle(fontSize: 16),),
+                                            ],
+                                          ),
+                                          (!isAutoEvaluate) ? Container() : Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  const SizedBox(width: 20,),
+                                                  Checkbox(value: pre_state == IS_COMPLETE, onChanged:(value) {
+                                                    setState(() {
+                                                      value! ? pre_state = IS_COMPLETE : pre_state = IS_LATE;
+                                                     });
+                                                  }),
+                                                   evaluate(state: IS_COMPLETE),
+                                                ],
+                                              ), 
+                                              Row(
+                                                children: [
+                                                  const SizedBox(width: 20,),
+                                                  Checkbox(value: pre_state == IS_LATE, onChanged:(value) {
+                                                    setState(() {
+                                                      value! ? pre_state = IS_LATE : pre_state = IS_COMPLETE;
+                                                     });
+                                                  }),
+                                                   evaluate(state: IS_LATE),
+                                                ],
+                                              )
+                                            ],
+                                          )
+                                        ],
+                                      )
+                                     
                                     ],
                                   )
                                 : Row(
@@ -371,19 +420,14 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
 
                             Center(
                               child: GestureDetector(
-                                onTap: (state == IS_DOING)
-                                    ? updateProgress
-                                    : (isManager)
-                                        ? changeStateProgress
-                                        : () {},
+                                onTap: isManager ? changeStateProgress : updateProgress,
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 12),
                                   decoration: BoxDecoration(
-                                    color: (state == IS_DOING)
-                                            ? blueDrawerColor
-                                            : (state == IS_OPENING)
-                                                ? correctGreenColor
+                                    color: isManager ? (state == IS_DOING)
+                                            ? correctGreenColor
+                                                : blueDrawerColor
                                                 : darkblueAppbarColor,
                                     boxShadow: const [
                                       BoxShadow(
@@ -398,13 +442,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    (state == IS_DOING)
-                                            ? 'Lưu lại'
-                                            : (state == IS_OPENING)
-                                                ? 'Phê duyệt'
-                                                : (isManager)
-                                                    ? 'Mở lại'
-                                                    : "Đã phê duyệt",
+                                    isManager ? state == IS_DOING ? "Phê duyệt" : "Mở lại" : state == IS_SUBMIT ? "Tạo mới" : state == IS_DOING ? "Lưu lại" : "Đã phê duyệt",
                                   ),
                                 ),
                               ),

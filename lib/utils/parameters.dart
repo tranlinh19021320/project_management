@@ -12,9 +12,10 @@ const int IS_EVENT_PAGE = 3;
 const int IS_QUEST_PAGE = 4;
 
 const int IS_SUBMIT = 0;
-const int IS_DOING = 3;
-const int IS_OPENING = 1;
+const int IS_DOING = 1;
 const int IS_CLOSING = 2;
+const int IS_COMPLETE = 3;
+const int IS_LATE = 4;
 
 // notification type
 const int STAFF_RECIEVE_MISSION = 0;

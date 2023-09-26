@@ -81,7 +81,7 @@ class FirebaseMethods {
           companyId: companyId,
           companyName: companyName,
           notifyNumber: 0,
-          timekeeping: []);
+          timekeeping: {});
 
       await _firestore.collection('users').doc(userId).set(user.toJson());
       res = "success";
@@ -566,7 +566,7 @@ class FirebaseMethods {
           createDate: DateTime.now(),
           date: date,
           description: description,
-          isCompleted: false,
+          state: IS_DOING,
           missionId: missionId,
           percent: percent);
       await _firestore
@@ -600,7 +600,7 @@ class FirebaseMethods {
     return res;
   }
 
-  Future<String> changeStateProgress({required Progress progress, int state = IS_OPENING}) async {
+  Future<String> changeStateProgress({required Progress progress, int state = IS_DOING}) async {
     String res = 'error';
     try {
       var snap =
@@ -611,9 +611,9 @@ class FirebaseMethods {
           .doc(progress.missionId)
           .collection('progress')
           .doc(progress.date)
-          .update({'isCompleted': (state != IS_CLOSING) ? true : false});
-      print(state != IS_OPENING);
-      if (state != IS_OPENING) {
+          .update({'state' : state});
+      print(state == IS_DOING);
+      if (state == IS_DOING) {
         createNotification(
             uid: mission.staffId, mission: mission, type: MISSION_IS_OPEN);
       } else {

@@ -197,7 +197,7 @@ String timeDateWithNow({required DateTime date}) {
       }
     }
   } 
-  return "lúc${DateFormat('HH:mm, dd').format(date)}tháng${DateFormat('MM, yyyy').format(date)}";
+  return "lúc ${DateFormat('HH:mm, dd').format(date)} tháng ${DateFormat('MM, yyyy').format(date)}";
 }
 
 bool isToDay({required String day}) {
@@ -209,4 +209,26 @@ Future<bool> currentUserIsManager() async {
       .getCurrentUserByUserId(userId: FirebaseAuth.instance.currentUser!.uid);
 
   return (user.group == manager);
+}
+
+Widget evaluate({ required int state}) {
+  return Container(
+    child: state == IS_CLOSING ? const Row(
+      children: [
+        Icon(Icons.circle, size: 12, color: defaultColor,),
+        Text(" Chưa được đánh giá."),
+      ],
+    ) : state == IS_COMPLETE ? const Row(
+      children: [
+        Icon(Icons.circle, size: 12, color: correctGreenColor,),
+        Text(" Hoàn thành tốt."),
+      ],
+    ) : const Row(
+      children: [
+        Icon(Icons.circle, size: 12, color: errorRedColor,),
+        Text(" Chậm tiến độ."),
+      ],
+    ),
+  );
+
 }

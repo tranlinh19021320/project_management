@@ -11,7 +11,7 @@ class CurrentUser {
   final String companyId;
   final String companyName;
   final int notifyNumber;
-  final List timekeeping;
+  final Map<String, dynamic> timekeeping;
 
   const CurrentUser({
     required this.timekeeping,
@@ -42,7 +42,7 @@ class CurrentUser {
       };
 
   static CurrentUser fromSnap({required DocumentSnapshot user}) => CurrentUser(
-    timekeeping: user['timekeeping'],
+    timekeeping: user['timekeeping'] ,
       notifyNumber: user['notifyNumber'],
       email: user['email'],
       username: user['username'],

@@ -6,13 +6,13 @@ class Progress {
   final String missionId;
   final DateTime createDate;
   final double percent;
-  final bool isCompleted;
+  final int state;
 
   const Progress({
     required this.createDate,
     required this.date,
     required this.description,
-    required this.isCompleted,
+    required this.state,
     required this.missionId,
     required this.percent,
   });
@@ -23,7 +23,7 @@ class Progress {
         'createDate': createDate,
         'percent': percent,
         'date': date,
-        'isCompleted': isCompleted
+        'state': state
       };
 
   static Progress fromSnap({required DocumentSnapshot doc}) => Progress(
@@ -32,6 +32,6 @@ class Progress {
         createDate: doc['createDate'].toDate(),
         percent: doc['percent'],
         date: doc['date'],
-        isCompleted: doc['isCompleted'],
+        state: doc['state'],
       );
 }

@@ -321,6 +321,13 @@ Nhóm: $userGroup''';
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
+                                      onPressed: deleteUser,
+                                      icon: const Icon(
+                                        Icons.delete_forever,
+                                        color: textErrorRedColor,
+                                        size: 24,
+                                      )),
+                                  IconButton(
                                       onPressed: () async {
                                         await Clipboard.setData(
                                             ClipboardData(text: details()));
@@ -330,13 +337,7 @@ Nhóm: $userGroup''';
                                         color: defaultColor,
                                         size: 17,
                                       )),
-                                  IconButton(
-                                      onPressed: deleteUser,
-                                      icon: const Icon(
-                                        Icons.delete_forever,
-                                        color: textErrorRedColor,
-                                        size: 24,
-                                      )),
+                                  
                                 ],
                               )
                             : Container(),

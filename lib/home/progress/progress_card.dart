@@ -5,6 +5,7 @@ import 'package:project_management/model/progress.dart';
 import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
+import 'package:project_management/utils/parameters.dart';
 import 'package:provider/provider.dart';
 
 class ProgressCard extends StatefulWidget {
@@ -70,9 +71,9 @@ class _ProgressCardState extends State<ProgressCard> {
                   )}",
                   style: const TextStyle(fontSize: 11),
                 ),
-                (widget.progress.isCompleted == true)
+                (widget.progress.state != IS_DOING)
                     ? const Text(
-                        'Đã hoàn thành',
+                        'Đã kiểm duyệt',
                         style:
                             TextStyle(color: correctGreenColor, fontSize: 13),
                       )
