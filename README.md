@@ -40,9 +40,19 @@
 
 - Page Notifications
 <p align = "center">
-<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/notification.png" alt="Notification Screen">
+<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/notification_admin.png" alt="Notification Screen">
+<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/notification_staff.png" alt="Notification Screen">
 </p>
 
+- Page Time Tracking Table
+<p align = "center">
+<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/time_keeping.png" alt="Time Keeping">
+</p>
+
+## Technology
+- frontend: Flutter, 
+- backend: Google Firebase, firebase_auth, cloud_firestore, firebase_core, firebase_storage, v.v.
+- database: Cloud Firestore Database, Cloud Storage
 
 
 

@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:project_management/home/staff/screens/staff_event.dart';
+import 'package:project_management/home/staff/screens/staff_time_keeping.dart';
 import 'package:project_management/home/staff/screens/staff_home.dart';
 import 'package:project_management/home/staff/screens/staff_notify_screen.dart';
 import 'package:project_management/home/widgets/text_button.dart';
@@ -242,14 +242,14 @@ class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
                                 ? rightArrowPageIcon
                                 : null,
                             title: const Text(
-                              "Sự kiện",
+                              "Bảng chấm công",
                               style: TextStyle(fontSize: 16),
                             ),
                             onTap: () {
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
                                       builder: (_) =>
-                                          const StaffEventScreen()));
+                                          const StaffTimeKeepingScreen()));
                             },
                           )
                         ],

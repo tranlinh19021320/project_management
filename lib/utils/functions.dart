@@ -106,14 +106,16 @@ CircularPercentIndicator circularPercentIndicator(
     {required double percent,
     required double radius,
     double lineWidth = 5,
-    double? fontSize, 
+    double? fontSize,
     bool textCenter = true}) {
   return CircularPercentIndicator(
     radius: radius,
     lineWidth: lineWidth,
     percent: percent,
-    center:(!textCenter)? null : Text("${(percent * 100).toStringAsFixed(0)}%",
-        style: (fontSize == null) ? null : TextStyle(fontSize: fontSize)),
+    center: (!textCenter)
+        ? null
+        : Text("${(percent * 100).toStringAsFixed(0)}%",
+            style: (fontSize == null) ? null : TextStyle(fontSize: fontSize)),
     progressColor: (percent <= 0.2)
         ? Colors.red
         : (percent <= 0.4)
@@ -124,26 +126,32 @@ CircularPercentIndicator circularPercentIndicator(
   );
 }
 
-Widget user1Card({required CurrentUser user, double size = 40, double fontsize = 16}) {
+Widget user1Card(
+    {required CurrentUser user, double size = 40, double fontsize = 16}) {
   return ListTile(
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-          dense: true,
-          visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(size/2),
-            child: getImageFromUrl(url: user.photoURL, size: size),
-          ),
-          title: Text(
-            user.nameDetails,
-            style: TextStyle(fontSize: fontsize),
-          ),
-          subtitle: Text(user.group, style: TextStyle(fontSize:  fontsize-2),),
-          trailing: (user.group == manager)
-              ? resizedIcon(keyImage, 18)
-              : resizedIcon(staffImage, 18),
-        );
+    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+    dense: true,
+    visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+    leading: ClipRRect(
+      borderRadius: BorderRadius.circular(size / 2),
+      child: getImageFromUrl(url: user.photoURL, size: size),
+    ),
+    title: Text(
+      user.nameDetails,
+      style: TextStyle(fontSize: fontsize),
+    ),
+    subtitle: Text(
+      user.group,
+      style: TextStyle(fontSize: fontsize - 2),
+    ),
+    trailing: (user.group == manager)
+        ? resizedIcon(keyImage, 18)
+        : resizedIcon(staffImage, 18),
+  );
 }
-Widget userCard({required String userId, double size = 40,double fontsize = 16}) {
+
+Widget userCard(
+    {required String userId, double size = 40, double fontsize = 16}) {
   return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('users')
@@ -179,12 +187,13 @@ Icon? notifyIcon({required int state}) {
           : errorIcon;
 }
 
-String dayToString({required DateTime time}) {
-  return DateFormat("dd-MM-yyyy").format(time);
+String dayToString({required DateTime time, int type = 0}) {
+  return (type == 0) ? DateFormat("dd-MM-yyyy").format(time) : DateFormat("MM-yyyy").format(time);
 }
+
 String timeDateWithNow({required DateTime date}) {
   DateTime now = DateTime.now();
-  
+
   if (now.year == date.year && now.month == date.month && now.day == date.day) {
     final deffirence = now.difference(date);
     if (deffirence.inHours != 0) {
@@ -196,7 +205,7 @@ String timeDateWithNow({required DateTime date}) {
         return "${deffirence.inSeconds} giây trước";
       }
     }
-  } 
+  }
   return "lúc ${DateFormat('HH:mm, dd').format(date)} tháng ${DateFormat('MM, yyyy').format(date)}";
 }
 
@@ -211,24 +220,47 @@ Future<bool> currentUserIsManager() async {
   return (user.group == manager);
 }
 
-Widget evaluate({ required int state}) {
-  return Container(
-    child: state == IS_CLOSING ? const Row(
-      children: [
-        Icon(Icons.circle, size: 12, color: defaultColor,),
-        Text(" Chưa được đánh giá."),
-      ],
-    ) : state == IS_COMPLETE ? const Row(
-      children: [
-        Icon(Icons.circle, size: 12, color: correctGreenColor,),
-        Text(" Hoàn thành tốt."),
-      ],
-    ) : const Row(
-      children: [
-        Icon(Icons.circle, size: 12, color: errorRedColor,),
-        Text(" Chậm tiến độ."),
-      ],
-    ),
-  );
+Icon evaluateIcon({required int state, double size = 20}) {
+  return (state == IS_COMPLETE)
+      ? Icon(
+          Icons.check,
+          size: size,
+          color: correctGreenColor,
+        )
+      : (state == IS_LATE)
+          ? Icon(
+              Icons.assignment_late_rounded,
+              size: size,
+              color: errorRedColor,
+            )
+          : Icon(
+              Icons.circle,
+              size: size,
+              color: defaultColor,
+            );
+}
 
+Widget evaluate({required int state, double size = 20}) {
+  return Container(
+    child: state == IS_CLOSING
+        ? Row(
+            children: [
+              evaluateIcon(state: state, size: size),
+              const Text(" Chưa được đánh giá."),
+            ],
+          )
+        : state == IS_COMPLETE
+            ? Row(
+                children: [
+                  evaluateIcon(state: state, size: size),
+                  const Text(" Hoàn thành tốt."),
+                ],
+              )
+            : Row(
+                children: [
+                  evaluateIcon(state: state, size: size),
+                  const Text(" Chậm tiến độ."),
+                ],
+              ),
+  );
 }

@@ -50,8 +50,7 @@ class _StaffCardState extends State<StaffCard> {
               icon: loudspeakerIcon,
               title: Column(
                 children: [
-                  Text(
-                      "Bạn chắc muốn xóa tài khoản ${widget.staff.username} ?",
+                  Text("Bạn chắc muốn xóa tài khoản ${widget.staff.username} ?",
                       style: const TextStyle(fontSize: 14)),
                   const SizedBox(
                     height: 8,
@@ -113,7 +112,10 @@ Nhóm: $userGroup''';
     });
     if (res == 'success') {
       if (context.mounted) {
-        showSnackBar(context:context, content: "Thay đổi thành công!",);
+        showSnackBar(
+          context: context,
+          content: "Thay đổi thành công!",
+        );
       }
     } else {
       if (context.mounted) {
@@ -127,11 +129,13 @@ Nhóm: $userGroup''';
     return (managerId == widget.staff.userId)
         ? Container()
         : Column(
-          children: [
-            const SizedBox(height: 8,),
-            Container(
-                decoration:
-                    BoxDecoration(border: Border.all(color: focusBlueColor),
+            children: [
+              const SizedBox(
+                height: 8,
+              ),
+              Container(
+                decoration: BoxDecoration(
+                    border: Border.all(color: focusBlueColor),
                     borderRadius: BorderRadius.circular(8)),
                 padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
                 child: Column(
@@ -205,7 +209,8 @@ Nhóm: $userGroup''';
                                       ),
                                       isLoadingGroup
                                           ? LoadingAnimationWidget.waveDots(
-                                              color: backgroundWhiteColor, size: 20)
+                                              color: backgroundWhiteColor,
+                                              size: 20)
                                           : (isChangeGroup)
                                               ? Row(
                                                   children: [
@@ -235,14 +240,16 @@ Nhóm: $userGroup''';
                                                       onTap: () {
                                                         setState(() {
                                                           isChangeGroup = false;
-                                                          userGroup =
-                                                              widget.staff.group;
+                                                          userGroup = widget
+                                                              .staff.group;
                                                         });
                                                       }, // comfirm change group
                                                       child: Container(
                                                         padding:
-                                                            const EdgeInsets.all(4),
-                                                        color: Colors.transparent,
+                                                            const EdgeInsets
+                                                                .all(4),
+                                                        color:
+                                                            Colors.transparent,
                                                         width: 28,
                                                         height: 28,
                                                         child: const Center(
@@ -270,18 +277,28 @@ Nhóm: $userGroup''';
                                                         : InkWell(
                                                             onTap: () {
                                                               setState(() {
-                                                                isChangeGroup =true;
+                                                                isChangeGroup =
+                                                                    true;
                                                               });
                                                             },
                                                             child: Container(
-                                                                padding: const EdgeInsets.all(0),
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(0),
                                                                 width: 20,
                                                                 height: 20,
                                                                 child:
                                                                     const Padding(
-                                                                  padding:EdgeInsets.all(0.0),
-                                                                  child: Icon(Icons.change_circle,
-                                                                    color:buttonGreenColor,size: 20,
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .all(
+                                                                              0.0),
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .change_circle,
+                                                                    color:
+                                                                        buttonGreenColor,
+                                                                    size: 20,
                                                                   ),
                                                                 )),
                                                           ),
@@ -304,8 +321,32 @@ Nhóm: $userGroup''';
                                         padding: 0,
                                         radius: 2,
                                         funtion: () {
-                                          Navigator.of(context).push(MaterialPageRoute(
-                                            builder: (_) => TimeKeepingTable(userId:widget.staff.userId )));
+                                          Navigator.of(context)
+                                              .push(MaterialPageRoute(
+                                                  builder: (_) => Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          image: DecorationImage(
+                                                              image: AssetImage(
+                                                                  backgroundImage),
+                                                              fit: BoxFit.fill),
+                                                        ),
+                                                        child: Scaffold(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent,
+                                                            appBar: AppBar(
+                                                              title: const Text(
+                                                                  "Bảng chấm công"),
+                                                              centerTitle: true,
+                                                              backgroundColor:
+                                                                  darkblueAppbarColor,
+                                                            ),
+                                                            body: TimeKeepingTable(
+                                                                userId: widget
+                                                                    .staff
+                                                                    .userId)),
+                                                      )));
                                         })
                               ],
                             ),
@@ -332,7 +373,6 @@ Nhóm: $userGroup''';
                                         color: defaultColor,
                                         size: 17,
                                       )),
-                                  
                                 ],
                               )
                             : Container(),
@@ -341,7 +381,7 @@ Nhóm: $userGroup''';
                   ],
                 ),
               ),
-          ],
-        );
+            ],
+          );
   }
 }

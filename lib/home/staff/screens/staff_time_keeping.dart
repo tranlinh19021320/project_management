@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:project_management/home/timetracking/time_keeping_table.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
 import 'package:project_management/utils/parameters.dart';
@@ -6,14 +8,14 @@ import 'package:project_management/utils/paths.dart';
 
 import '../utils/staff_drawer.dart';
 
-class StaffEventScreen extends StatefulWidget {
-  const StaffEventScreen({super.key});
+class StaffTimeKeepingScreen extends StatefulWidget {
+  const StaffTimeKeepingScreen({super.key});
 
   @override
-  State<StaffEventScreen> createState() => _StaffEventScreenState();
+  State<StaffTimeKeepingScreen> createState() => _StaffTimeKeepingScreenState();
 }
 
-class _StaffEventScreenState extends State<StaffEventScreen> {
+class _StaffTimeKeepingScreenState extends State<StaffTimeKeepingScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,7 +27,7 @@ class _StaffEventScreenState extends State<StaffEventScreen> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: darkblueAppbarColor,
-          title: const Text("Sự kiện"),
+          title: const Text("Bảng chấm công"),
           leading: Builder(
                     builder: (context) => IconButton(
                         onPressed: () => Scaffold.of(context).openDrawer(),
@@ -33,7 +35,7 @@ class _StaffEventScreenState extends State<StaffEventScreen> {
                   ),
         ),
         drawer:const StaffDrawerMenu(selectedPage: IS_EVENT_PAGE,),
-        body: const Text("..."),
+        body: TimeKeepingTable(userId: FirebaseAuth.instance.currentUser!.uid),
       ),
     );
   }
