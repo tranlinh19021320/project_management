@@ -214,7 +214,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                       final DateTime? date = await showDatePicker(
                         context: context,
                         initialDate: startDate,
-                        firstDate: DateTime.now(),
+                        firstDate: (startDate.isBefore(DateTime.now())) ? startDate :  DateTime.now(),
                         lastDate: DateTime(DateTime.now().year + 10),
                         locale: const Locale('vi'),
                         currentDate: startDate,

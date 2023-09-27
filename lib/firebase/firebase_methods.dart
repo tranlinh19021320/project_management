@@ -471,7 +471,20 @@ class FirebaseMethods {
     }
     return res;
   }
-
+  Future<Mission?> getMissionInDay({required String userId, required DateTime date}) async {
+    try {
+      var snap = await _firestore.collection('missions').where('staffId', isEqualTo: userId).get();
+      var docs = snap.docs;
+      docs.removeWhere((element) => (date.isBefore(element['startDate'].toDate()) || date.isAfter(element['endDate'].toDate())));
+ 
+      if (docs.isNotEmpty) {
+        return Mission.fromSnap(mission: docs.first);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+    return null;
+  } 
   Future<String> updateMission(
       {required Mission mission,
       required String nameMission,
@@ -491,11 +504,17 @@ class FirebaseMethods {
       });
       if (staffId != mission.staffId) {
         await createNotification(
-            uid: staffId, mission: mission, type: STAFF_RECIEVE_MISSION_FROM_OTHER);
+            uid: staffId,
+            mission: mission,
+            type: STAFF_RECIEVE_MISSION_FROM_OTHER);
         await createNotification(
             uid: mission.staffId, mission: mission, type: MISSION_CHANGE_STAFF);
       } else {
-        await createNotification(uid: mission.staffId,mission: mission, type: MISSION_IS_CHANGED,);
+        await createNotification(
+          uid: mission.staffId,
+          mission: mission,
+          type: MISSION_IS_CHANGED,
+        );
       }
       res = 'success';
     } catch (e) {
@@ -575,7 +594,6 @@ class FirebaseMethods {
           .collection('progress')
           .doc(date)
           .set(progress.toJson());
-          print(state == IS_SUBMIT);
       if (state == IS_SUBMIT) {
         var snap = await _firestore
             .collection('missions')
@@ -600,7 +618,8 @@ class FirebaseMethods {
     return res;
   }
 
-  Future<String> changeStateProgress({required Progress progress, int state = IS_DOING}) async {
+  Future<String> changeStateProgress(
+      {required Progress progress, int state = IS_DOING}) async {
     String res = 'error';
     try {
       var snap =
@@ -611,8 +630,7 @@ class FirebaseMethods {
           .doc(progress.missionId)
           .collection('progress')
           .doc(progress.date)
-          .update({'state' : state});
-      print(state == IS_DOING);
+          .update({'state': state});
       if (state == IS_DOING) {
         createNotification(
             uid: mission.staffId, mission: mission, type: MISSION_IS_OPEN);
@@ -632,7 +650,22 @@ class FirebaseMethods {
     return res;
   }
 
+  Future<String> updateTimeKeeping(
+      {required String userId,
+      required String date,
+      required int state}) async {
+    String res = "error";
+    try {
+      await _firestore.collection('users').doc(userId).update({
+        'timekeeping.$date': state,
+      });
+      res = "success";
+    } catch (e) {
+      res = e.toString();
+    }
 
+    return res;
+  }
 
   Future<String> refreshNotifyNumber() async {
     String res = "error";
@@ -679,7 +712,7 @@ class FirebaseMethods {
         String userId = (element as dynamic)['userId'];
         String notifyId = const Uuid().v1();
         Notify notification = Notify(
-          percent: percent,
+            percent: percent,
             username: username,
             description: description,
             notifyId: notifyId,
@@ -702,7 +735,7 @@ class FirebaseMethods {
     } else {
       String notifyId = const Uuid().v1();
       Notify notification = Notify(
-        percent: percent,
+          percent: percent,
           username: username,
           description: description,
           notifyId: notifyId,

@@ -410,7 +410,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                                 initialDate: startDate,
                                 firstDate: (widget.project != null)
                                     ? widget.project!.startDate
-                                    : DateTime.now(),
+                                    :(startDate.isBefore(DateTime.now())) ? startDate : DateTime.now(),
                                 lastDate: (widget.project != null)
                                     ? widget.project!.endDate
                                     : DateTime(DateTime.now().year + 10),

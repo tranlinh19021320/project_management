@@ -47,6 +47,7 @@
 - Page Time Tracking Table
 <p align = "center">
 <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/time_keeping.png" alt="Time Keeping">
+<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/change_state_day.png" alt="Change State Day">
 </p>
 
 ## Technology

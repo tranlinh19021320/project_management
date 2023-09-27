@@ -240,26 +240,26 @@ Icon evaluateIcon({required int state, double size = 20}) {
             );
 }
 
-Widget evaluate({required int state, double size = 20}) {
+Widget evaluate({required int state, double size = 20, Color color = backgroundWhiteColor}) {
   return Container(
     child: state == IS_CLOSING
         ? Row(
             children: [
               evaluateIcon(state: state, size: size),
-              const Text(" Chưa được đánh giá."),
+              Text(" Chưa được đánh giá.", style: TextStyle(color: color),),
             ],
           )
         : state == IS_COMPLETE
             ? Row(
                 children: [
                   evaluateIcon(state: state, size: size),
-                  const Text(" Hoàn thành tốt."),
+                  Text(" Hoàn thành tốt.", style: TextStyle(color: color),),
                 ],
               )
             : Row(
                 children: [
                   evaluateIcon(state: state, size: size),
-                  const Text(" Chậm tiến độ."),
+                  Text(" Chậm tiến độ.", style: TextStyle(color: color),),
                 ],
               ),
   );
