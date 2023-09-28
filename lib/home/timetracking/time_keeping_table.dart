@@ -29,6 +29,8 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
   int isCompleteStateDays = 0;
   int isLateStateDays = 0;
   int isClosingStateDays = 0;
+  Mission? mission;
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -90,7 +92,7 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
   changeStateOfDay({required int day, required int state}) async {
     Navigator.pop(context);
     showDialog(
-      barrierDismissible: false,
+        barrierDismissible: false,
         context: context,
         builder: (_) => const NotifyDialog(content: 'loading'));
     String key = dayToString(time: DateTime(year, month, day));
@@ -108,24 +110,6 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
     }
   }
 
-  navigateToMission({required int day}) async {
-  Navigator.pop(context);
-    showDialog(
-      barrierDismissible: false,
-        context: context,
-        builder: (_) => const NotifyDialog(content: 'loading'));
-  Mission? mission = await FirebaseMethods().getMissionInDay(userId: widget.userId, date: DateTime(year, month, day));
-  if (context.mounted) {
-    Navigator.pop(context);
-  }
-  if (mission == null) {
-    if (context.mounted) {
-      showSnackBar(context: context, content: "Không có nghiệm vụ trong ngày $day/$month/$year");
-    }
-  } else if (context.mounted) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => MissionHomeScreen(mission: mission)));
-  }
-  }
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width / 8;
@@ -182,30 +166,15 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        user.nameDetails,
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      Text("Email: ${user.email}",
-                          style: const TextStyle(
-                            fontSize: 14,
-                          )),
-                      Text("Tài khoản: ${user.username}",
-                          style: const TextStyle(
-                            fontSize: 14,
-                          )),
-                      Text("Nhóm: ${user.group}",
-                          style: const TextStyle(
-                            fontSize: 14,
-                          )),
+                      Text(user.nameDetails, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
+                      Text("Email: ${user.email}", style: const TextStyle(fontSize: 14,)),
+                      Text("Tài khoản: ${user.username}", style: const TextStyle(fontSize: 14,)),
+                      Text("Nhóm: ${user.group}", style: const TextStyle(fontSize: 14,)),
                     ],
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 12,
-              ),
+              const SizedBox(height: 12,),
               // choose month
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -214,10 +183,7 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                       onPressed: prevMonth,
                       icon: const Icon(Icons.arrow_back_ios_new)),
                   CupertinoButton.filled(
-                      child: Text(
-                        "Tháng $month, $year",
-                        style: const TextStyle(fontSize: 15),
-                      ),
+                      child: Text("Tháng $month, $year",style: const TextStyle(fontSize: 15),),
                       onPressed: () => showCupertinoModalPopup(
                             context: context,
                             builder: (_) => SizedBox(
@@ -228,9 +194,7 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                                   Expanded(
                                     child: CupertinoPicker(
                                       itemExtent: 30,
-                                      scrollController:
-                                          FixedExtentScrollController(
-                                              initialItem: month - 1),
+                                      scrollController:FixedExtentScrollController(initialItem: month - 1),
                                       looping: true,
                                       onSelectedItemChanged: (int value) {
                                         setState(() {
@@ -247,10 +211,7 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                                   Expanded(
                                     child: CupertinoPicker(
                                       itemExtent: 30,
-                                      scrollController:
-                                          FixedExtentScrollController(
-                                        initialItem: year - 11,
-                                      ),
+                                      scrollController: FixedExtentScrollController(initialItem: year - 11,),
                                       looping: true,
                                       onSelectedItemChanged: (int value) {
                                         setState(() {
@@ -281,9 +242,7 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                   width: double.infinity,
                   child: GridView.builder(
                     itemCount: 49,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 7),
+                    gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
                     itemBuilder: ((context, index) {
                       if (index < 7) {
                         return Container(
@@ -294,36 +253,21 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                           child: Center(
                               child: (index != 6)
                                   ? Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        const Text(
-                                          "Thứ",
-                                          style: TextStyle(
-                                              fontSize: 18, color: blackColor),
-                                        ),
-                                        Text(
-                                          "${index + 2}",
-                                          style: const TextStyle(
-                                              fontSize: 18,
-                                              color: blueDrawerColor),
-                                        )
+                                        const Text("Thứ",style: TextStyle(fontSize: 18, color: blackColor),),
+                                        Text("${index + 2}", style: const TextStyle(fontSize: 18, color: blueDrawerColor),),
                                       ],
                                     )
-                                  : const Text(
-                                      "Chủ nhật",
-                                      style: TextStyle(
-                                          fontSize: 18, color: errorRedColor),
-                                    )),
+                                  : const Text("Chủ nhật", style: TextStyle(fontSize: 18, color: errorRedColor),)),
                         );
                       }
                       if (dayList[index - 6] == 1) {
                         isInMonth = !isInMonth;
                       }
-                      int? state = user.timekeeping[dayToString(
-                          time: DateTime(year, month, dayList[index - 6]))];
+                      int? state = user.timekeeping[dayToString(time: DateTime(year, month, dayList[index - 6]))];
+
                       return (!isInMonth)
                           ? Container(
                               padding: const EdgeInsets.all(6),
@@ -332,178 +276,104 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                               decoration: BoxDecoration(
                                   color: backgroundWhiteColor,
                                   border: Border.all(color: defaultColor)),
-                              child: Text(
-                                "${dayList[index - 6]}",
-                                style: const TextStyle(color: defaultColor),
-                              ),
+                              child: Text("${dayList[index - 6]}",style: const TextStyle(color: defaultColor),),
                             )
                           : InkWell(
-                              onLongPress: (isManager)
-                                  ? () => showDialog(
-                                        context: context,
-                                        builder: (_) => AlertDialog(
-                                          scrollable: true,
-                                          titlePadding: const EdgeInsets.only(
-                                              top: 4,
-                                              right: 2,
-                                              left: 2,
-                                              bottom: 0),
-                                          backgroundColor: backgroundWhiteColor,
-                                          title: InkWell(
-                                            onTap: () {
-                                              navigateToMission(day: dayList[index - 6]);
-                                            },
-                                            child: Container(
-                                              width: 100,
+                              onLongPress: () async {
+                                mission = await FirebaseMethods().getMissionInDay(userId: widget.userId, date: DateTime(year, month, dayList[index - 6]));
+                                if (context.mounted) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      scrollable: true,
+                                      titlePadding: const EdgeInsets.only(top: 4, right: 2, left: 2, bottom: 0),
+                                      backgroundColor: backgroundWhiteColor,
+                                      title: InkWell(
+                                        onTap: (mission == null)
+                                            ? null
+                                            : () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => MissionHomeScreen(mission:mission!))),
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                                width: double.infinity,
+                                                child: Center(
+                                                  child: Text("${dayList[index - 6]}/$month/$year", style: const TextStyle(color: defaultColor,fontSize: 15),)
+                                                  ),
+                                            ),
+                                            const SizedBox( height: 8,),
+                                            Container(
+                                              width: double.infinity,
                                               padding: const EdgeInsets.all(4),
                                               decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: blueDrawerColor,
+                                                border: Border.all(color: (mission == null) ? errorRedColor : focusBlueColor),
+                                                borderRadius: BorderRadius.circular(8),
+                                                color: (mission == null) ? backgroundWhiteColor : blueDrawerColor,
                                               ),
-                                              child: const Center(
-                                                child: Text("Nhiệm vụ"),
+                                              child: Center(
+                                                child: (mission == null)
+                                                    ? const Text( "Không có nhiệm vụ", style: TextStyle(color: errorRedColor),)
+                                                    : const Text("Nhiệm vụ"),
                                               ),
                                             ),
-                                          ),
-                                          contentPadding:
-                                              const EdgeInsets.all(2),
-                                          content: Column(children: [
-                                            const Divider(
-                                              color: defaultColor,
-                                            ),
-                                            const Text(
-                                              "Thay đổi đánh giá",
-                                              style: TextStyle(
-                                                  color: defaultColor),
-                                            ),
-                                            const SizedBox(
-                                              height: 5,
-                                            ),
-                                            // change state to complete
-                                            ListTile(
-                                              onTap: () async {
-                                                changeStateOfDay(
-                                                    day: dayList[index - 6],
-                                                    state: IS_COMPLETE);
-                                              },
-                                              contentPadding:
-                                                  const EdgeInsets.only(
-                                                      left: 20),
-                                              dense: true,
-                                              visualDensity:
-                                                  const VisualDensity(
-                                                      horizontal: -4,
-                                                      vertical: -4),
-                                              tileColor: (state == IS_COMPLETE)
-                                                  ? focusBlueColor
-                                                  : Colors.transparent,
-                                              shape: RoundedRectangleBorder(
-                                                  side: const BorderSide(
-                                                      color: defaultColor),
-                                                  borderRadius:
-                                                      BorderRadius.circular(4)),
-                                              title: evaluate(
-                                                  state: IS_COMPLETE,
-                                                  color: (state == IS_COMPLETE)
-                                                      ? backgroundWhiteColor
-                                                      : blackColor),
-                                            ),
-                                            const SizedBox(
-                                              height: 1,
-                                            ),
-                                            // change state to late
-                                            ListTile(
-                                              onTap: () async {
-                                                changeStateOfDay(
-                                                    day: dayList[index - 6],
-                                                    state: IS_LATE);
-                                              },
-                                              contentPadding:
-                                                  const EdgeInsets.only(
-                                                      left: 20),
-                                              dense: true,
-                                              visualDensity:
-                                                  const VisualDensity(
-                                                      horizontal: -4,
-                                                      vertical: -4),
-                                              tileColor: (state == IS_LATE)
-                                                  ? focusBlueColor
-                                                  : Colors.transparent,
-                                              shape: RoundedRectangleBorder(
-                                                  side: const BorderSide(
-                                                      color: defaultColor),
-                                                  borderRadius:
-                                                      BorderRadius.circular(4)),
-                                              title: evaluate(
-                                                  state: IS_LATE,
-                                                  color: (state == IS_LATE)
-                                                      ? backgroundWhiteColor
-                                                      : blackColor),
-                                            ),
-                                            const SizedBox(
-                                              height: 1,
-                                            ),
-                                            // change state to closing
-                                            ListTile(
-                                              onTap: () async {
-                                                changeStateOfDay(
-                                                    day: dayList[index - 6],
-                                                    state: IS_CLOSING);
-                                              },
-                                              contentPadding:
-                                                  const EdgeInsets.only(
-                                                      left: 20),
-                                              dense: true,
-                                              visualDensity:
-                                                  const VisualDensity(
-                                                      horizontal: -4,
-                                                      vertical: -4),
-                                              tileColor: (state == IS_CLOSING)
-                                                  ? focusBlueColor
-                                                  : Colors.transparent,
-                                              shape: RoundedRectangleBorder(
-                                                  side: const BorderSide(
-                                                      color: defaultColor),
-                                                  borderRadius:
-                                                      BorderRadius.circular(4)),
-                                              title: evaluate(
-                                                  state: IS_CLOSING,
-                                                  color: (state == IS_CLOSING)
-                                                      ? backgroundWhiteColor
-                                                      : blackColor),
-                                            ),
-                                          ]),
+                                          ],
                                         ),
-                                      )
-                                  : () => showDialog(
-                                      context: context,
-                                      builder: (_) => AlertDialog(
-                                            titlePadding:
-                                                const EdgeInsets.all(2),
-                                            scrollable: true,
-                                            backgroundColor:
-                                                backgroundWhiteColor,
-                                            clipBehavior: Clip.antiAlias,
-                                            title: InkWell(
-                                              onTap: () {
-                                                navigateToMission(day: dayList[index - 6]);
-                                              },
-                                              child: Container(
-                                                width: 100,
-                                                padding:
-                                                    const EdgeInsets.all(4),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                  color: blueDrawerColor,
-                                                ),
-                                                child: const Center(
-                                                  child: Text("Nhiệm vụ"),
-                                                ),
+                                      ),
+                                      contentPadding: const EdgeInsets.all(2),
+                                      content: (!isManager)
+                                          ? const SizedBox(height: 6,)
+                                          : Column(children: [
+                                              const Divider( color: defaultColor,),
+                                              const Text( "Thay đổi đánh giá", style: TextStyle( color: defaultColor),),
+                                              const SizedBox( height: 5,),
+                                              // change state to complete
+                                              ListTile(
+                                                onTap: () async {
+                                                  changeStateOfDay( day: dayList[index - 6], state: IS_COMPLETE);
+                                                },
+                                                contentPadding: const EdgeInsets.only(left: 20),
+                                                dense: true,
+                                                visualDensity: const VisualDensity( horizontal: -4, vertical: -4),
+                                                tileColor: (state == IS_COMPLETE) ? focusBlueColor : Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                    side: const BorderSide( color: defaultColor),
+                                                    borderRadius: BorderRadius.circular(4)),
+                                                title: evaluate( state: IS_COMPLETE, color: (state == IS_COMPLETE) ? backgroundWhiteColor : blackColor),
                                               ),
-                                            ),
-                                          )),
+                                              const SizedBox( height: 1,),
+                                              // change state to late
+                                              ListTile(
+                                                onTap: () async {
+                                                  changeStateOfDay( day: dayList[index - 6], state: IS_LATE);
+                                                },
+                                                contentPadding: const EdgeInsets.only(left: 20),
+                                                dense: true,
+                                                visualDensity: const VisualDensity( horizontal: -4, vertical: -4),
+                                                tileColor: (state == IS_LATE) ? focusBlueColor : Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                    side: const BorderSide(color: defaultColor),
+                                                    borderRadius: BorderRadius.circular(4)),
+                                                title: evaluate(state: IS_LATE, color: (state == IS_LATE) ? backgroundWhiteColor : blackColor),
+                                              ),
+                                              const SizedBox(height: 1,),
+                                              // change state to closing
+                                              ListTile(
+                                                onTap: () async {
+                                                  changeStateOfDay(day: dayList[index - 6], state: IS_CLOSING);
+                                                },
+                                                contentPadding: const EdgeInsets.only(left: 20),
+                                                dense: true,
+                                                visualDensity: const VisualDensity( horizontal: -4, vertical: -4),
+                                                tileColor: (state == IS_CLOSING) ? focusBlueColor : Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                    side: const BorderSide(color: defaultColor),
+                                                    borderRadius: BorderRadius.circular(4)),
+                                                title: evaluate(state: IS_CLOSING, color: (state == IS_CLOSING) ? backgroundWhiteColor : blackColor),
+                                              ),
+                                            ]),
+                                    ),
+                                  );
+                                }
+                              },
                               child: Tooltip(
                                 message: (state == IS_COMPLETE)
                                     ? "Hoàn thành tốt"
@@ -519,23 +389,13 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                                   padding: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
                                       color: backgroundWhiteColor,
-                                      border: Border.all(
-                                        color: defaultColor,
-                                      )),
+                                      border: Border.all(color: defaultColor,)),
                                   child: Center(
                                       child: Column(
                                     children: [
-                                      Text(
-                                        "${dayList[index - 6]}",
-                                        style:
-                                            const TextStyle(color: blackColor),
-                                      ),
-                                      const SizedBox(
-                                        height: 4,
-                                      ),
-                                      state == null
-                                          ? Container()
-                                          : evaluateIcon(state: state, size: 20)
+                                      Text("${dayList[index - 6]}", style: const TextStyle(color: blackColor),),
+                                      const SizedBox(height: 4,),
+                                      state == null ? Container() : evaluateIcon(state: state, size: 20)
                                     ],
                                   )),
                                 ),
@@ -549,9 +409,7 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
 
               Row(
                 children: [
-                  const SizedBox(
-                    width: 30,
-                  ),
+                  const SizedBox(width: 30,),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

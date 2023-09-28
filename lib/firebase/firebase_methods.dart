@@ -475,7 +475,14 @@ class FirebaseMethods {
     try {
       var snap = await _firestore.collection('missions').where('staffId', isEqualTo: userId).get();
       var docs = snap.docs;
-      docs.removeWhere((element) => (date.isBefore(element['startDate'].toDate()) || date.isAfter(element['endDate'].toDate())));
+      docs.removeWhere((element) { 
+        DateTime startDate = element['startDate'].toDate();
+        startDate = DateTime(startDate.year, startDate.month, startDate.day);
+        DateTime endDate = element['endDate'].toDate();
+        endDate = DateTime(endDate.year, endDate.month, endDate.day);
+
+        return (date.isBefore(startDate) || date.isAfter(endDate));
+        });
  
       if (docs.isNotEmpty) {
         return Mission.fromSnap(mission: docs.first);
@@ -711,9 +718,10 @@ class FirebaseMethods {
       snapshot.docs.forEach((element) async {
         String userId = (element as dynamic)['userId'];
         String notifyId = const Uuid().v1();
-        Notify notification = Notify(
+        
+        Notify? notification = Notify.getNotify(
             percent: percent,
-            username: username,
+            nameDetails: username,
             description: description,
             notifyId: notifyId,
             isRead: (type == MISSION_IS_DELETED),
@@ -723,20 +731,22 @@ class FirebaseMethods {
             userId: userId,
             createDate: DateTime.now(),
             type: type);
-        await _firestore
+        if (notification != null) {
+          await _firestore
             .collection('users')
             .doc(userId)
             .collection('notifications')
             .doc(notifyId)
             .set(notification.toJson());
-
         imclementNotifyNumber(uid: userId);
+        }
+        
       });
     } else {
       String notifyId = const Uuid().v1();
-      Notify notification = Notify(
+      Notify? notification = Notify.getNotify(
           percent: percent,
-          username: username,
+          nameDetails: username,
           description: description,
           notifyId: notifyId,
           isRead: (type == MISSION_IS_DELETED),
@@ -746,7 +756,8 @@ class FirebaseMethods {
           userId: uid!,
           createDate: DateTime.now(),
           type: type);
-      await _firestore
+      if (notification != null) {
+        await _firestore
           .collection('users')
           .doc(uid)
           .collection('notifications')
@@ -754,6 +765,8 @@ class FirebaseMethods {
           .set(notification.toJson());
 
       imclementNotifyNumber(uid: uid);
+      }
+      
     }
   }
 

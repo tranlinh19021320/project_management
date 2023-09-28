@@ -26,9 +26,7 @@ const int STAFF_RECIEVE_MISSION_FROM_OTHER = 4;
 const int MISSION_CHANGE_STAFF = 6;
 const int MISSION_IS_OPEN = 5;
 const int MISSION_IS_CHANGED = 7;
-
-
-
+const int TIME_KEEPING = 8;
 
 String manager = "Manager";
 

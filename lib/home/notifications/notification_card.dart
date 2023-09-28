@@ -16,8 +16,8 @@ import 'package:project_management/utils/parameters.dart';
 import 'package:provider/provider.dart';
 
 class NotificationCard extends StatefulWidget {
-  final Notify notify;
-  const NotificationCard({super.key, required this.notify});
+  final DocumentSnapshot doc;
+  const NotificationCard({super.key, required this.doc});
 
   @override
   State<NotificationCard> createState() => _NotificationCardState();
@@ -26,12 +26,36 @@ class NotificationCard extends StatefulWidget {
 class _NotificationCardState extends State<NotificationCard> {
   bool isFocus = false;
   late bool isManager;
+  
+  var notify;
+  late int type = widget.doc['type'];
+
   @override
   void initState() {
     super.initState();
     GroupProvider groupProvider =
         Provider.of<GroupProvider>(context, listen: false);
     isManager = groupProvider.getIsManager;
+    
+    notify = Notify.getNotify(doc: widget.doc, type: type);
+    switch (type) {
+      case TIME_KEEPING:
+        notify as TimekeepingStaffNotify;
+        break;
+      case MISSION_IS_DELETED || MISSION_CHANGE_STAFF:
+        notify as DeleteChangeMissionStaffNotify;
+        break;
+      case STAFF_COMPLETE_MISSION:
+        notify as StaffCompleteMissionManagerNotify;
+        break;
+      case STAFF_RECIEVE_MISSION ||
+            STAFF_RECIEVE_MISSION_FROM_OTHER ||
+            MISSION_IS_CHANGED ||
+            MANAGER_APPROVE_PROGRESS ||
+            MISSION_IS_OPEN:
+        notify as MissionNotify;
+        break;
+    }
   }
 
   navigaToMission() async {
@@ -45,16 +69,16 @@ class _NotificationCardState extends State<NotificationCard> {
     try {
       snap = await FirebaseFirestore.instance
           .collection('missions')
-          .doc(widget.notify.missionId)
+          .doc((notify!).missionId)
           .get();
       if (snap.exists) {
         mission = Mission.fromSnap(mission: snap);
-        if (!widget.notify.isRead) {
+        if (!notify!.isRead) {
           await FirebaseFirestore.instance
               .collection('users')
-              .doc(widget.notify.userId)
+              .doc(notify.userId)
               .collection('notifications')
-              .doc(widget.notify.notifyId)
+              .doc(notify.notifyId)
               .update({
             'isRead': true,
           });
@@ -138,7 +162,7 @@ class _NotificationCardState extends State<NotificationCard> {
             builder: (_) => const NotifyDialog(content: 'loading'));
       }
       String res =
-          await FirebaseMethods().deleteNotification(notify: widget.notify);
+          await FirebaseMethods().deleteNotification(notify: notify);
       if (context.mounted) {
         Navigator.of(context).pop();
       }
@@ -152,7 +176,7 @@ class _NotificationCardState extends State<NotificationCard> {
   }
 
   String description() {
-    String description = widget.notify.description;
+    String description = notify.description;
     int maxlength = 65;
     if (description.length > maxlength) {
     description = description.substring(0, maxlength);
@@ -173,7 +197,7 @@ class _NotificationCardState extends State<NotificationCard> {
           decoration: BoxDecoration(
             border: Border.all(color: focusBlueColor),
             borderRadius: BorderRadius.circular(6),
-            color: (widget.notify.isRead)
+            color: (notify.isRead)
                 ? Colors.transparent
                 : darkblueAppbarColor,
           ),
@@ -183,17 +207,17 @@ class _NotificationCardState extends State<NotificationCard> {
             onFocusChange: (value) => setState(() {
               isFocus = value;
             }),
-            onTap: (widget.notify.type == MISSION_IS_DELETED
-            || widget.notify.type == MISSION_CHANGE_STAFF)
+            onTap: (type == MISSION_IS_DELETED
+            || type == MISSION_CHANGE_STAFF)
                 ? null
                 : navigaToMission,
             contentPadding: EdgeInsets.zero,
             dense: true,
             visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
             isThreeLine: true,
-            leading: (widget.notify.type == MISSION_IS_DELETED)
+            leading: (type == MISSION_IS_DELETED)
                 ? FloatingActionButton.small(
-                    heroTag: widget.notify.notifyId,
+                    heroTag: notify.notifyId,
                     backgroundColor: focusBlueColor,
                     onPressed: null,
                     child: const Icon(
@@ -201,11 +225,11 @@ class _NotificationCardState extends State<NotificationCard> {
                       color: notifyIconColor,
                     ),
                   )
-                : (widget.notify.type == STAFF_RECIEVE_MISSION_FROM_OTHER
-                || widget.notify.type == MISSION_CHANGE_STAFF
-                || widget.notify.type == MISSION_IS_CHANGED)
+                : (type == STAFF_RECIEVE_MISSION_FROM_OTHER
+                || type == MISSION_CHANGE_STAFF
+                || type == MISSION_IS_CHANGED)
                     ? FloatingActionButton.small(
-                        heroTag: widget.notify.notifyId,
+                        heroTag: notify.notifyId,
                         backgroundColor: focusBlueColor,
                         onPressed: null,
                         child: const Icon(
@@ -213,9 +237,9 @@ class _NotificationCardState extends State<NotificationCard> {
                           color: notifyIconColor,
                         ),
                       )
-                    : (widget.notify.type == STAFF_RECIEVE_MISSION )
+                    : (type == STAFF_RECIEVE_MISSION )
                         ? FloatingActionButton.small(
-                            heroTag: widget.notify.notifyId,
+                            heroTag: notify.notifyId,
                             backgroundColor: focusBlueColor,
                             onPressed: null,
                             child: AnimatedTextKit(
@@ -234,10 +258,10 @@ class _NotificationCardState extends State<NotificationCard> {
                                       ]),
                                 ]),
                           )
-                        : (widget.notify.type == MANAGER_APPROVE_PROGRESS ||
-                                widget.notify.type == MISSION_IS_OPEN || widget.notify.type == STAFF_COMPLETE_MISSION)
+                        : (type == MANAGER_APPROVE_PROGRESS ||
+                                type == MISSION_IS_OPEN || type == STAFF_COMPLETE_MISSION)
                             ? FloatingActionButton.small(
-                                heroTag: widget.notify.notifyId,
+                                heroTag: notify.notifyId,
                                 backgroundColor: focusBlueColor,
                                 onPressed: null,
                                 child: loudspeakerIcon,
@@ -246,98 +270,98 @@ class _NotificationCardState extends State<NotificationCard> {
             title: RichText(
               text: TextSpan(
                   style: const TextStyle(fontSize: 15),
-                  children: (widget.notify.type == MISSION_IS_DELETED) //mission is deleted
+                  children: (type == MISSION_IS_DELETED) //mission is deleted
                       ? [
                           const TextSpan(text: "Nhiệm vụ "),
                           TextSpan(
-                              text: widget.notify.nameMission,
+                              text: notify.nameMission,
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: notifyIconColor)),
                           const TextSpan(text: " trong dự án "),
                           TextSpan(
-                              text: widget.notify.nameProject,
+                              text: notify.nameProject,
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: notifyIconColor)),
                           const TextSpan(text: " mà bạn phụ trách đã bị xóa")
                         ]
-                      : (widget.notify.type == MISSION_IS_CHANGED) // misstion is changed
+                      : (type == MISSION_IS_CHANGED) // misstion is changed
                       ? [
                           const TextSpan(text: "Nhiệm vụ "),
                           TextSpan(
-                              text: widget.notify.nameMission,
+                              text: notify.nameMission,
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: notifyIconColor)),
                           const TextSpan(text: " trong dự án "),
                           TextSpan(
-                              text: widget.notify.nameProject,
+                              text: notify.nameProject,
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: notifyIconColor)),
                           const TextSpan(text: " mà bạn phụ trách bị chỉnh sửa nội dung")
                         ]
-                      :(widget.notify.type == STAFF_RECIEVE_MISSION_FROM_OTHER) //mission is deleted
+                      :(type == STAFF_RECIEVE_MISSION_FROM_OTHER) //mission is deleted
                       ? [
                           const TextSpan(text: "Nhiệm vụ "),
                           TextSpan(
-                              text: widget.notify.nameMission,
+                              text: notify.nameMission,
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: notifyIconColor)),
                           const TextSpan(text: " trong dự án "),
                           TextSpan(
-                              text: widget.notify.nameProject,
+                              text: notify.nameProject,
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: notifyIconColor)),
                           const TextSpan(text: " đã chuyển sang cho bạn!")
                         ]
-                      :  (widget.notify.type == MISSION_CHANGE_STAFF) // mission is change staff
+                      :  (type == MISSION_CHANGE_STAFF) // mission is change staff
                           ? [
                               const TextSpan(text: "Nhiệm vụ "),
                               TextSpan(
-                                  text: widget.notify.nameMission,
+                                  text: notify.nameMission,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: notifyIconColor)),
                               const TextSpan(text: " trong dự án "),
                               TextSpan(
-                                  text: widget.notify.nameProject,
+                                  text: notify.nameProject,
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: notifyIconColor)),
                               const TextSpan(
                                   text: " mà bạn phụ trách đã được chuyển cho nhân viên khác")
                             ]
-                          : (widget.notify.type == STAFF_RECIEVE_MISSION) // new mission for you
+                          : (type == STAFF_RECIEVE_MISSION) // new mission for you
                               ? [
                                   const TextSpan(
                                       text:
                                           "Bạn nhận được một nhiệm vụ mới: \n"),
                                   TextSpan(
-                                      text: widget.notify.nameMission,
+                                      text: notify.nameMission,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: notifyIconColor)),
                                   const TextSpan(text: " - dự án "),
                                   TextSpan(
-                                      text: widget.notify.nameProject,
+                                      text: notify.nameProject,
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           color: notifyIconColor)),
                                 ]
-                              : (widget.notify.type == MANAGER_APPROVE_PROGRESS) // manager approve progress
+                              : (type == MANAGER_APPROVE_PROGRESS) // manager approve progress
                                   ? [
                                       TextSpan(
-                                          text: widget.notify.nameMission,
+                                          text: notify.nameMission,
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: notifyIconColor)),
                                       const TextSpan(text: " - dự án "),
                                       TextSpan(
-                                          text: widget.notify.nameProject,
+                                          text: notify.nameProject,
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: notifyIconColor)),
@@ -345,16 +369,16 @@ class _NotificationCardState extends State<NotificationCard> {
                                           text:
                                               " :\nBài nộp tiến độ hôm nay đã được phê duyệt!"),
                                     ]
-                                  : (widget.notify.type == MISSION_IS_OPEN) // mission is open
+                                  : (type == MISSION_IS_OPEN) // mission is open
                                       ? [
                                           TextSpan(
-                                              text: widget.notify.nameMission,
+                                              text: notify.nameMission,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: notifyIconColor)),
                                           const TextSpan(text: " - dự án "),
                                           TextSpan(
-                                              text: widget.notify.nameProject,
+                                              text: notify.nameProject,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: notifyIconColor)),
@@ -362,12 +386,12 @@ class _NotificationCardState extends State<NotificationCard> {
                                               text:
                                                   " :\nNhiệm vụ đã được mở lại!"),
                                         ]
-                                      : (widget.notify.type ==
+                                      : (type ==
                                               STAFF_COMPLETE_MISSION) // you complete mission
                                           ? [
                                               TextSpan(
                                                   text:
-                                                      widget.notify.nameProject,
+                                                      notify.nameProject,
                                                   style: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
@@ -375,14 +399,14 @@ class _NotificationCardState extends State<NotificationCard> {
                                               const TextSpan(text: " - "),
                                               TextSpan(
                                                   text:
-                                                      widget.notify.nameMission,
+                                                      notify.nameMission,
                                                   style: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       color: notifyIconColor)),
                                               const TextSpan(text: " :\n"),
                                               TextSpan(
-                                                  text: widget.notify.username,
+                                                  text: notify.nameDetails,
                                                   style: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
@@ -392,14 +416,14 @@ class _NotificationCardState extends State<NotificationCard> {
                                                       " đã hoàn thành "),
                                               TextSpan(
                                                   text:
-                                                      '${(widget.notify.percent * 100)}%',
+                                                      '${(notify.percent * 100)}%',
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    color: (widget.notify.percent <=0.2)
+                                                    color: (notify.percent <=0.2)
                                                         ? Colors.red
-                                                        : (widget.notify.percent <=0.4)
+                                                        : (notify.percent <=0.4)
                                                             ? Colors.orange
-                                                            : (widget.notify.percent <=0.7)
+                                                            : (notify.percent <=0.7)
                                                                 ? Colors.yellow
                                                                 : Colors.green,
                                                   )),
@@ -408,11 +432,11 @@ class _NotificationCardState extends State<NotificationCard> {
                                                       " nhiệm vụ: \"${description()}...\""),
                                             ]
                                           : [
-                                            TextSpan(text: '${widget.notify.type}'),
+                                            TextSpan(text: '${type}'),
                                           ]),
               maxLines: 4,
             ),
-            subtitle: Text(timeDateWithNow(date: widget.notify.createDate)),
+            subtitle: Text(timeDateWithNow(date: notify.createDate)),
             trailing: IconButton(
                 onPressed: deleteNotification,
                 icon: const Icon(Icons.more_horiz)),

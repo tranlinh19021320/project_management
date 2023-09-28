@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/home/notifications/notification_card.dart';
-import 'package:project_management/model/notification.dart';
 import 'package:project_management/utils/colors.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -39,7 +38,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           return ListView.builder(
               itemCount: snapshot.data!.docs.length,
               itemBuilder: (context, index) => NotificationCard(
-                    notify: Notify.fromSnap(doc: snapshot.data!.docs[index]),
+                    doc: snapshot.data!.docs[index],
                   ));
         });
   }
