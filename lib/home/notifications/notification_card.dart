@@ -59,6 +59,9 @@ class _NotificationCardState extends State<NotificationCard> {
   }
 
   navigaToMission() async {
+    setState(() {
+      
+    });
     showDialog(
         barrierDismissible: false,
         context: context,
@@ -208,7 +211,7 @@ class _NotificationCardState extends State<NotificationCard> {
               isFocus = value;
             }),
             onTap: (type == MISSION_IS_DELETED
-            || type == MISSION_CHANGE_STAFF)
+            || type == MISSION_CHANGE_STAFF || type == TIME_KEEPING)
                 ? null
                 : navigaToMission,
             contentPadding: EdgeInsets.zero,
@@ -259,7 +262,7 @@ class _NotificationCardState extends State<NotificationCard> {
                                 ]),
                           )
                         : (type == MANAGER_APPROVE_PROGRESS ||
-                                type == MISSION_IS_OPEN || type == STAFF_COMPLETE_MISSION)
+                                type == MISSION_IS_OPEN || type == STAFF_COMPLETE_MISSION || type == TIME_KEEPING)
                             ? FloatingActionButton.small(
                                 heroTag: notify.notifyId,
                                 backgroundColor: focusBlueColor,
@@ -431,8 +434,22 @@ class _NotificationCardState extends State<NotificationCard> {
                                                   text:
                                                       " nhiệm vụ: \"${description()}...\""),
                                             ]
-                                          : [
-                                            TextSpan(text: '${type}'),
+                                          : (type == TIME_KEEPING) // mission is open
+                                      ? [
+                                          const TextSpan(text: "Bạn được chấm công ngày "),
+                                          TextSpan(
+                                              text: (notify.date == dayToString(time : DateTime.now())) ? "hôm nay" : notify.date,
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: notifyIconColor)),
+                                          const TextSpan(text: "\nTrạng thái: "),
+                                          TextSpan(
+                                              text: (notify.state == IS_COMPLETE) ? "Hoàn thành tốt" : "Chậm tiến độ",
+                                              style: TextStyle(
+                                                  color: (notify.state == IS_COMPLETE) ? correctGreenColor : textErrorRedColor),
+                                                  ),
+                                        ] : [
+                                            TextSpan(text: '$type'),
                                           ]),
               maxLines: 4,
             ),

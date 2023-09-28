@@ -471,19 +471,24 @@ class FirebaseMethods {
     }
     return res;
   }
-  Future<Mission?> getMissionInDay({required String userId, required DateTime date}) async {
+
+  Future<Mission?> getMissionInDay(
+      {required String userId, required DateTime date}) async {
     try {
-      var snap = await _firestore.collection('missions').where('staffId', isEqualTo: userId).get();
+      var snap = await _firestore
+          .collection('missions')
+          .where('staffId', isEqualTo: userId)
+          .get();
       var docs = snap.docs;
-      docs.removeWhere((element) { 
+      docs.removeWhere((element) {
         DateTime startDate = element['startDate'].toDate();
         startDate = DateTime(startDate.year, startDate.month, startDate.day);
         DateTime endDate = element['endDate'].toDate();
         endDate = DateTime(endDate.year, endDate.month, endDate.day);
 
         return (date.isBefore(startDate) || date.isAfter(endDate));
-        });
- 
+      });
+
       if (docs.isNotEmpty) {
         return Mission.fromSnap(mission: docs.first);
       }
@@ -491,7 +496,8 @@ class FirebaseMethods {
       print(e.toString());
     }
     return null;
-  } 
+  }
+
   Future<String> updateMission(
       {required Mission mission,
       required String nameMission,
@@ -641,16 +647,15 @@ class FirebaseMethods {
       if (state == IS_DOING) {
         createNotification(
             uid: mission.staffId, mission: mission, type: MISSION_IS_OPEN);
+        res = 'success';
       } else {
-        await _firestore.collection('users').doc(mission.staffId).update({
-          'timekeeping.${progress.date}': state,
-        });
         createNotification(
             uid: mission.staffId,
             mission: mission,
             type: MANAGER_APPROVE_PROGRESS);
+        res = await updateTimeKeeping(
+            userId: mission.staffId, date: progress.date, state: state);
       }
-      res = 'success';
     } catch (e) {
       res = e.toString();
     }
@@ -666,6 +671,10 @@ class FirebaseMethods {
       await _firestore.collection('users').doc(userId).update({
         'timekeeping.$date': state,
       });
+      if (state != IS_CLOSING) {
+        createNotification(
+          type: TIME_KEEPING, date: date, uid: userId, state: state);
+      }
       res = "success";
     } catch (e) {
       res = e.toString();
@@ -703,8 +712,10 @@ class FirebaseMethods {
   }
 
   Future<void> createNotification(
-      {String? uid,
-      required Mission mission,
+      {int state = 0,
+      String date = "",
+      String? uid,
+      Mission? mission,
       required int type,
       String? group,
       String username = "",
@@ -718,55 +729,55 @@ class FirebaseMethods {
       snapshot.docs.forEach((element) async {
         String userId = (element as dynamic)['userId'];
         String notifyId = const Uuid().v1();
-        
+
         Notify? notification = Notify.getNotify(
             percent: percent,
             nameDetails: username,
             description: description,
             notifyId: notifyId,
-            isRead: (type == MISSION_IS_DELETED),
-            missionId: mission.missionId,
-            nameMission: mission.nameMission,
-            nameProject: mission.nameProject,
+            isRead: (type == MISSION_IS_DELETED || type == TIME_KEEPING),
+            missionId: (mission == null) ? "" : mission.missionId,
+            nameMission: (mission == null) ? "" : mission.nameMission,
+            nameProject: (mission == null) ? "" : mission.nameProject,
             userId: userId,
             createDate: DateTime.now(),
             type: type);
         if (notification != null) {
           await _firestore
-            .collection('users')
-            .doc(userId)
-            .collection('notifications')
-            .doc(notifyId)
-            .set(notification.toJson());
-        imclementNotifyNumber(uid: userId);
+              .collection('users')
+              .doc(userId)
+              .collection('notifications')
+              .doc(notifyId)
+              .set(notification.toJson());
+          imclementNotifyNumber(uid: userId);
         }
-        
       });
     } else {
       String notifyId = const Uuid().v1();
       Notify? notification = Notify.getNotify(
+        state: state,
+        date: date,
           percent: percent,
           nameDetails: username,
           description: description,
           notifyId: notifyId,
-          isRead: (type == MISSION_IS_DELETED),
-          missionId: mission.missionId,
-          nameMission: mission.nameMission,
-          nameProject: mission.nameProject,
+          isRead: (type == MISSION_IS_DELETED || type == TIME_KEEPING),
+          missionId: (mission == null) ? "" : mission.missionId,
+          nameMission: (mission == null) ? "" : mission.nameMission,
+          nameProject: (mission == null) ? "" : mission.nameProject,
           userId: uid!,
           createDate: DateTime.now(),
           type: type);
       if (notification != null) {
         await _firestore
-          .collection('users')
-          .doc(uid)
-          .collection('notifications')
-          .doc(notifyId)
-          .set(notification.toJson());
+            .collection('users')
+            .doc(uid)
+            .collection('notifications')
+            .doc(notifyId)
+            .set(notification.toJson());
 
-      imclementNotifyNumber(uid: uid);
+        imclementNotifyNumber(uid: uid);
       }
-      
     }
   }
 
