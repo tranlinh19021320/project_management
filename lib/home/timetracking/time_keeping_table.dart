@@ -275,7 +275,7 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                               width: width,
                               decoration: BoxDecoration(
                                   color: backgroundWhiteColor,
-                                  border: Border.all(color: defaultColor)),
+                                  border:  Border.all(color: defaultColor)),
                               child: Text("${dayList[index - 6]}",style: const TextStyle(color: defaultColor),),
                             )
                           : InkWell(
@@ -389,7 +389,8 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                                   padding: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
                                       color: backgroundWhiteColor,
-                                      border: Border.all(color: defaultColor,)),
+                                      border:(isToDay(year: year, month: month, day: dayList[index - 6])) ? Border.all(color: focusBlueColor, width: 3) : Border.all(color: defaultColor,),
+                                      borderRadius: BorderRadius.circular(isToDay(year: year, month: month, day: dayList[index - 6]) ? 12 : 0)),
                                   child: Center(
                                       child: Column(
                                     children: [

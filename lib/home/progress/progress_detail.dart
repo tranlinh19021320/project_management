@@ -157,7 +157,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
           centerTitle: true,
           title: (widget.progress == null)
               ? const Text('Tạo submit')
-              : Text((isToDay(day: widget.progress!.date))
+              : Text((isToDay(dateString: widget.progress!.date))
                   ? "Hôm nay"
                   : widget.progress!.date),
         ),

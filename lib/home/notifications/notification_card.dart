@@ -438,7 +438,7 @@ class _NotificationCardState extends State<NotificationCard> {
                                       ? [
                                           const TextSpan(text: "Bạn được chấm công ngày "),
                                           TextSpan(
-                                              text: (notify.date == dayToString(time : DateTime.now())) ? "hôm nay" : notify.date,
+                                              text: (isToDay(dateString: notify.date)) ? "hôm nay" : notify.date,
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: notifyIconColor)),

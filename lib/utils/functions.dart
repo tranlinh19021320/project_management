@@ -261,8 +261,16 @@ String timeDateWithNow({required DateTime date}) {
   return "lúc ${DateFormat('HH:mm, dd').format(date)} tháng ${DateFormat('MM, yyyy').format(date)}";
 }
 
-bool isToDay({required String day}) {
-  return dayToString(time: DateTime.now()) == day;
+bool isToDay(
+    {String? dateString, DateTime? date, int? day, int? month, int? year}) {
+  return (dateString != null)
+      ? dayToString(time: DateTime.now()) == dateString
+      : (date != null)
+          ? dayToString(time: DateTime.now()) == dayToString(time: date)
+          : (day != null && month != null && year != null)
+              ? dayToString(time: DateTime.now()) ==
+                  dayToString(time: DateTime(year, month, day))
+              : false;
 }
 
 // evalute for time keeping
@@ -322,4 +330,3 @@ Widget evaluate(
               ),
   );
 }
-

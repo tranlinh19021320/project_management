@@ -29,7 +29,7 @@ class _ProgressCardState extends State<ProgressCard> {
     GroupProvider groupProvider =
         Provider.of<GroupProvider>(context, listen: false);
     isManager = groupProvider.getIsManager;
-    isToday = isToDay(day: widget.progress.date);
+    isToday = isToDay(dateString: widget.progress.date);
   }
 
   @override
