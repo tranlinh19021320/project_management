@@ -21,17 +21,6 @@ class ProjectHomeScreen extends StatefulWidget {
 class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
   int page = 0;
   PageController pageController = PageController();
-  late bool isManager;
-  @override
-  void initState() {
-    super.initState();
-    init();
-  }
-
-  init() async {
-    isManager =await currentUserIsManager();
-  }
-
   @override
   void dispose() {
     super.dispose();

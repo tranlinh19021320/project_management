@@ -1,8 +1,5 @@
-//funtions
-
-//funtion to show snack bar for events
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +12,7 @@ import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/paths.dart';
 
+// show snack bar
 showSnackBar(
     {required BuildContext context,
     required String content,
@@ -63,7 +61,6 @@ pickImage(BuildContext context, ImageSource source) async {
   final ImagePicker imagePicker = ImagePicker();
 
   XFile? file = await imagePicker.pickImage(source: source);
-
   if (file != null) {
     return await file.readAsBytes();
   }
@@ -75,6 +72,53 @@ pickImage(BuildContext context, ImageSource source) async {
   }
 }
 
+selectAnImage({required BuildContext context}) {
+  showDialog(
+      context: context,
+      builder: (_) => SimpleDialog(
+            backgroundColor: darkblueAppbarColor,
+            title: const Text("Chọn ảnh"),
+            surfaceTintColor: correctGreenColor,
+            children: [
+              SimpleDialogOption(
+                padding: const EdgeInsets.all(18),
+                child: const Text("Camera"),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  Uint8List imageFile =
+                      await pickImage(context, ImageSource.camera);
+                  await FirebaseMethods().changeProfileImage(
+                    image: imageFile,
+                  );
+                },
+              ),
+              SimpleDialogOption(
+                padding: const EdgeInsets.all(18),
+                child: const Text("Thư viện ảnh"),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  Uint8List imageFile =
+                      await pickImage(context, ImageSource.gallery);
+                  await FirebaseMethods().changeProfileImage(
+                    image: imageFile,
+                  );
+                },
+              ),
+              SimpleDialogOption(
+                padding: const EdgeInsets.all(18),
+                child: const Text(
+                  "Hủy",
+                  style: TextStyle(color: errorRedColor),
+                ),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ));
+}
+
+// get image from url
 Image getImageFromUrl({
   required String url,
   double size = 64,
@@ -102,6 +146,7 @@ Image getImageFromUrl({
   );
 }
 
+// circle percent
 CircularPercentIndicator circularPercentIndicator(
     {required double percent,
     required double radius,
@@ -126,6 +171,7 @@ CircularPercentIndicator circularPercentIndicator(
   );
 }
 
+// user card
 Widget user1Card(
     {required CurrentUser user, double size = 40, double fontsize = 16}) {
   return ListTile(
@@ -171,6 +217,7 @@ Widget userCard(
       });
 }
 
+// color
 Color notifyColor({required int state}) {
   return (state == IS_CORRECT_STATE)
       ? correctGreenColor
@@ -179,6 +226,7 @@ Color notifyColor({required int state}) {
           : errorRedColor;
 }
 
+// icon
 Icon? notifyIcon({required int state}) {
   return (state == IS_DEFAULT_STATE)
       ? null
@@ -187,10 +235,14 @@ Icon? notifyIcon({required int state}) {
           : errorIcon;
 }
 
+// day into string
 String dayToString({required DateTime time, int type = 0}) {
-  return (type == 0) ? DateFormat("dd-MM-yyyy").format(time) : DateFormat("MM-yyyy").format(time);
+  return (type == 0)
+      ? DateFormat("dd-MM-yyyy").format(time)
+      : DateFormat("MM-yyyy").format(time);
 }
 
+// deffirence with date and now
 String timeDateWithNow({required DateTime date}) {
   DateTime now = DateTime.now();
 
@@ -213,13 +265,7 @@ bool isToDay({required String day}) {
   return dayToString(time: DateTime.now()) == day;
 }
 
-Future<bool> currentUserIsManager() async {
-  CurrentUser user = await FirebaseMethods()
-      .getCurrentUserByUserId(userId: FirebaseAuth.instance.currentUser!.uid);
-
-  return (user.group == manager);
-}
-
+// evalute for time keeping
 Icon evaluateIcon({required int state, double size = 20}) {
   return (state == IS_COMPLETE)
       ? Icon(
@@ -240,27 +286,40 @@ Icon evaluateIcon({required int state, double size = 20}) {
             );
 }
 
-Widget evaluate({required int state, double size = 20, Color color = backgroundWhiteColor}) {
+Widget evaluate(
+    {required int state,
+    double size = 20,
+    Color color = backgroundWhiteColor}) {
   return Container(
     child: state == IS_CLOSING
         ? Row(
             children: [
               evaluateIcon(state: state, size: size),
-              Text(" Chưa được đánh giá.", style: TextStyle(color: color),),
+              Text(
+                " Chưa được đánh giá.",
+                style: TextStyle(color: color),
+              ),
             ],
           )
         : state == IS_COMPLETE
             ? Row(
                 children: [
                   evaluateIcon(state: state, size: size),
-                  Text(" Hoàn thành tốt.", style: TextStyle(color: color),),
+                  Text(
+                    " Hoàn thành tốt.",
+                    style: TextStyle(color: color),
+                  ),
                 ],
               )
             : Row(
                 children: [
                   evaluateIcon(state: state, size: size),
-                  Text(" Chậm tiến độ.", style: TextStyle(color: color),),
+                  Text(
+                    " Chậm tiến độ.",
+                    style: TextStyle(color: color),
+                  ),
                 ],
               ),
   );
 }
+

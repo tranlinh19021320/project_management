@@ -43,7 +43,7 @@ class _ProgressCardState extends State<ProgressCard> {
           decoration: BoxDecoration(
             border: Border.all(color: focusBlueColor),
             borderRadius: BorderRadius.circular(12),
-            color: (isToday) ? darkblueAppbarColor : defaultblueColor,
+            color: (isToday) ? darkblueAppbarColor : Colors.transparent,
           ),
           padding: const EdgeInsets.all(4),
           width: MediaQuery.of(context).size.width * 0.95,

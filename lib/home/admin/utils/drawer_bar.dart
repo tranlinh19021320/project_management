@@ -1,9 +1,6 @@
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/home/admin/screens/event_screen.dart';
 import 'package:project_management/home/admin/screens/personal_screen.dart';
@@ -40,71 +37,14 @@ class _DrawerMenuState extends State<DrawerMenu> {
         .pushReplacement(MaterialPageRoute(builder: (_) => const Login()));
   }
 
-  selectImage() async {
+  selectImage() {
     setState(() {
       isLoadingImage = true;
     });
-    showDialog(
-        context: context,
-        builder: (_) => SimpleDialog(
-              backgroundColor: darkblueAppbarColor,
-              title: const Text("Chọn ảnh"),
-              surfaceTintColor: correctGreenColor,
-              children: [
-                SimpleDialogOption(
-                  padding: const EdgeInsets.all(18),
-                  child: const Text("Camera"),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    setState(() {
-                      isLoadingImage = true;
-                    });
-                    Uint8List imageFile =
-                        await pickImage(context, ImageSource.camera);
-
-                    changeProfileImage(imageFile);
-                    setState(() {
-                      isLoadingImage = false;
-                    });
-                  },
-                ),
-                SimpleDialogOption(
-                  padding: const EdgeInsets.all(18),
-                  child: const Text("Thư viện ảnh"),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    setState(() {
-                      isLoadingImage = true;
-                    });
-                    Uint8List imageFile =
-                        await pickImage(context, ImageSource.gallery);
-                    changeProfileImage(imageFile);
-                    setState(() {
-                      isLoadingImage = false;
-                    });
-                  },
-                ),
-                SimpleDialogOption(
-                  padding: const EdgeInsets.all(18),
-                  child: const Text(
-                    "Hủy",
-                    style: TextStyle(color: errorRedColor),
-                  ),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ));
+    selectAnImage(context: context);
     setState(() {
       isLoadingImage = false;
     });
-  }
-
-  changeProfileImage(Uint8List image) async {
-    await FirebaseMethods().changeProfileImage(
-      image: image,
-    );
   }
 
   @override
