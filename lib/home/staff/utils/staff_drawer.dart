@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:project_management/home/staff/screens/staff_reports.dart';
 import 'package:project_management/home/staff/screens/staff_time_keeping.dart';
 import 'package:project_management/home/staff/screens/staff_home.dart';
 import 'package:project_management/home/staff/screens/staff_notify_screen.dart';
@@ -229,7 +230,7 @@ class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
                               }
                             },
                           ),
-                          //event select
+                          //time keeping select
                           ListTile(
                             tileColor: (widget.selectedPage == IS_EVENT_PAGE)
                                 ? focusBlueColor
@@ -250,6 +251,29 @@ class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
                                   MaterialPageRoute(
                                       builder: (_) =>
                                           const StaffTimeKeepingScreen()));
+                            },
+                          ),
+                          //reports select
+                          ListTile(
+                            tileColor: (widget.selectedPage == IS_REPORT_PAGE)
+                                ? focusBlueColor
+                                : Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                                side: const BorderSide(color: focusBlueColor),
+                                borderRadius: BorderRadius.circular(12)),
+                            leading: loudspeakerIcon,
+                            trailing: (widget.selectedPage == IS_REPORT_PAGE)
+                                ? rightArrowPageIcon
+                                : null,
+                            title: const Text(
+                              "Báo cáo",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (_) =>
+                                          const StaffReportsScreen()));
                             },
                           )
                         ],

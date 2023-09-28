@@ -10,6 +10,7 @@ const int IS_PERSONAL_PAGE = 1;
 const int IS_NOTIFY_PAGE = 2;
 const int IS_EVENT_PAGE = 3;
 const int IS_QUEST_PAGE = 4;
+const int IS_REPORT_PAGE = 5;
 
 const int IS_SUBMIT = 0;
 const int IS_DOING = 1;
@@ -27,6 +28,10 @@ const int MISSION_CHANGE_STAFF = 6;
 const int MISSION_IS_OPEN = 5;
 const int MISSION_IS_CHANGED = 7;
 const int TIME_KEEPING = 8;
+// report type
+const int UPDATE_REPORT = 9;
+const int BUG_REPORT = 10;
+const int PRIVATE_REPORT = 11;
 
 String manager = "Manager";
 

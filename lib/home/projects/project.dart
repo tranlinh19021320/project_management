@@ -142,16 +142,18 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
           controller: pageController,
           onPageChanged: onPageChanged,
           children: [
-            ProjectDetailScreen(project: widget.project,),
             MissionsScreen(project: widget.project),
+            ProjectDetailScreen(project: widget.project,),
+            
           ],
         ),
        bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.transparent,
         currentIndex: page,
         items: [
-          BottomNavigationBarItem(icon: projectIcon, label: "Chi tiết", ),
           BottomNavigationBarItem(icon: missionIcon, label: "Nhiệm vụ",),
+          BottomNavigationBarItem(icon: projectIcon, label: "Chi tiết", ),
+          
         ],
         
         onTap: (page) => pageController.jumpToPage(page),

@@ -9,11 +9,9 @@ class Project {
   final DateTime startDate;
   final DateTime endDate;
   final int missions;
-  final int completedMissions;
 
   const Project({
     this.missions = 0,
-    this.completedMissions = 0,
     required this.companyId,
     required this.projectId,
     required this.nameProject,
@@ -31,14 +29,12 @@ class Project {
         'createDate': createDate,
         'startDate': startDate,
         'endDate': endDate,
-        'completedMissions': completedMissions,
         'missions': missions,
       };
 
   static Project fromSnap(DocumentSnapshot project) {
     return Project(
       missions: project['missions'],
-      completedMissions: project['completedMissions'],
       companyId: project['companyId'],
       projectId: project['projectId'],
       nameProject: project['nameProject'],

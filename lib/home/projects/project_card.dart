@@ -15,15 +15,6 @@ class ProjectCard extends StatefulWidget {
 
 class _ProjectCardState extends State<ProjectCard> {
 
-  String percent() {
-    return (widget.project.missions == 0 ||
-            widget.project.completedMissions == 0)
-        ? '0%'
-        : NumberFormat('##.00%').format(
-            (widget.project.completedMissions.toDouble() /
-                widget.project.missions.toDouble()));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -87,7 +78,7 @@ class _ProjectCardState extends State<ProjectCard> {
                   height: 4,
                 ),
                 Text(
-                  "Nhiệm vụ: ${widget.project.completedMissions}/${widget.project.missions}  (${percent()})",
+                  "Nhiệm vụ: ${widget.project.missions}",
                   style: const TextStyle(
                       fontSize: 15, color: backgroundWhiteColor),
                 ),

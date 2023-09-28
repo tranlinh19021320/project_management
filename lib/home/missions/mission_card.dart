@@ -100,10 +100,7 @@ class _MissionCardState extends State<MissionCard> {
               )}",
               style: const TextStyle(fontSize: 11),
             ),
-            trailing: const Icon(
-              Icons.arrow_forward_sharp,
-              size: 30,
-            ),
+            trailing: const SizedBox(width: 20,)
           ),
         ),
       ],
