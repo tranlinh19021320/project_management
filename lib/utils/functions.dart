@@ -72,6 +72,24 @@ pickImage(BuildContext context, ImageSource source) async {
   }
 }
 
+pickImages(BuildContext context) async {
+  final ImagePicker imagePicker = ImagePicker();
+  List<XFile> list = await imagePicker.pickMultiImage();
+  List<Uint8List> imageList = [];
+  for (int i=0; i<list.length; i++) {
+    imageList.add(await list[i].readAsBytes());
+  }
+  if (imageList.isNotEmpty) {
+    return imageList;
+  }
+   if (context.mounted) {
+    showDialog(
+        context: context,
+        builder: (_) =>
+            const NotifyDialog(content: "Không chọn ảnh", isError: true));
+  }
+}
+
 selectAnImage({required BuildContext context}) {
   showDialog(
       context: context,
@@ -85,11 +103,14 @@ selectAnImage({required BuildContext context}) {
                 child: const Text("Camera"),
                 onPressed: () async {
                   Navigator.pop(context);
-                  Uint8List imageFile =
+                  Uint8List? imageFile =
                       await pickImage(context, ImageSource.camera);
-                  await FirebaseMethods().changeProfileImage(
+                  if (imageFile != null) {
+                     await FirebaseMethods().changeProfileImage(
                     image: imageFile,
                   );
+                  }
+                 
                 },
               ),
               SimpleDialogOption(
@@ -97,11 +118,13 @@ selectAnImage({required BuildContext context}) {
                 child: const Text("Thư viện ảnh"),
                 onPressed: () async {
                   Navigator.pop(context);
-                  Uint8List imageFile =
+                  Uint8List? imageFile =
                       await pickImage(context, ImageSource.gallery);
-                  await FirebaseMethods().changeProfileImage(
+                 if (imageFile != null) {
+                     await FirebaseMethods().changeProfileImage(
                     image: imageFile,
                   );
+                  }
                 },
               ),
               SimpleDialogOption(
@@ -328,5 +351,28 @@ Widget evaluate(
                   ),
                 ],
               ),
+  );
+}
+
+Widget typeReport({required int type}) {
+  return Container(
+    padding: const EdgeInsets.only(left: 2, right: 5, top: 1, bottom: 1),
+    decoration: BoxDecoration(
+      color: (type == UPDATE_REPORT) ? focusBlueColor : (type == BUG_REPORT) ? textErrorRedColor : yellowColor,
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Row(children: (type == UPDATE_REPORT) ? const [
+      Icon(Icons.update, color: darkblueColor,),
+      SizedBox(width: 4,),
+      Text("Cập nhật", style: TextStyle(fontSize: 14, color: blackColor),)
+    ] : (type == BUG_REPORT) ? const [
+      Icon(Icons.error, color: errorRedColor,),
+      SizedBox(width: 4,),
+      Text("Bug", style: TextStyle(fontSize: 14, color: blackColor),)
+    ] : const [
+      Icon(Icons.more, color: notifyIconColor,),
+      SizedBox(width: 4,),
+      Text("Ý kiến đóng góp", style: TextStyle(fontSize: 14, color: blackColor),)
+    ]),
   );
 }

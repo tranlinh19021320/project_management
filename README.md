@@ -50,6 +50,11 @@
 <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/change_state_day.png" alt="Change State Day">
 </p>
 
+- Page Report
+<p align = "center">
+<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/create_report.png" alt="Create Report">
+
+</p>
 ## Technology
 - frontend: Flutter, 
 - backend: Google Firebase, firebase_auth, cloud_firestore, firebase_core, firebase_storage, v.v.

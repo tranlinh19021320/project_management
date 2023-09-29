@@ -11,6 +11,7 @@ class CurrentUser {
   final String companyId;
   final String companyName;
   final int notifyNumber;
+  final int reportNumber;
   final Map<String, dynamic> timekeeping;
 
   const CurrentUser({
@@ -25,6 +26,7 @@ class CurrentUser {
     required this.userId,
     required this.companyId,
     required this.companyName,
+    required this.reportNumber,
   });
 
   Map<String, dynamic> toJson() => {
@@ -38,7 +40,8 @@ class CurrentUser {
         'userId': userId,
         'companyId': companyId,
         'companyName': companyName,
-        'notifyNumber': notifyNumber
+        'notifyNumber': notifyNumber,
+        'reportNumber':reportNumber
       };
 
   static CurrentUser fromSnap({required DocumentSnapshot user}) => CurrentUser(
@@ -52,5 +55,6 @@ class CurrentUser {
       group: user['group'],
       userId: user['userId'],
       companyId: user['companyId'],
-      companyName: user['companyName']);
+      companyName: user['companyName'],
+      reportNumber : user['reportNumber']);
 }

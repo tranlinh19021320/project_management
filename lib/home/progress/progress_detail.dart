@@ -36,6 +36,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
   String date = dayToString(time: DateTime.now());
   bool isAutoEvaluate = true;
   int pre_state = IS_COMPLETE;
+  
   @override
   void initState() {
     super.initState();
@@ -75,6 +76,8 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
       missionId = widget.mission!.missionId;
     }
   }
+
+  
 
   updateProgress() async {
     showDialog(

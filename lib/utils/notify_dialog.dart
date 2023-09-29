@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:project_management/home/widgets/text_button.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
 
@@ -15,46 +16,50 @@ class NotifyDialog extends StatefulWidget {
 class _NotifyDialogState extends State<NotifyDialog> {
   @override
   Widget build(BuildContext context) {
-    return (widget.content == 'loading') ? AlertDialog(
-      backgroundColor: Colors.transparent,
-      icon: LoadingAnimationWidget.inkDrop(color: darkblueAppbarColor, size: 32),
-      title: const Center(child: Text("Loading...", style: TextStyle(fontSize: 18, color: blueDrawerColor,), ), ),
-    ) : AlertDialog(
-      scrollable: true,
-      backgroundColor: darkblueAppbarColor,
-      iconPadding:const  EdgeInsets.only(bottom: 0),
-      icon:  loudspeakerIcon,
-      // backgroundColor: backgroundWhiteColor,
-      actionsAlignment: MainAxisAlignment.center,
-      actionsPadding: const EdgeInsets.only(bottom: 12),
-      title: Center(
-        child: Text(
+    return (widget.content == 'loading')
+        ? AlertDialog(
+            backgroundColor: Colors.transparent,
+            icon: LoadingAnimationWidget.inkDrop(
+                color: darkblueAppbarColor, size: 32),
+            title: const Center(
+              child: Text(
+                "Loading...",
+                style: TextStyle(
+                  fontSize: 18,
+                  color: blueDrawerColor,
+                ),
+              ),
+            ),
+          )
+        : AlertDialog(
+            scrollable: true,
+            backgroundColor: darkblueAppbarColor,
+            iconPadding: const EdgeInsets.only(top: 6),
+            icon: SizedBox(height: 24, width: 24, child: loudspeakerIcon),
+            // backgroundColor: backgroundWhiteColor,
+  
+            actionsAlignment: MainAxisAlignment.center,
+            actionsPadding: const EdgeInsets.only(bottom: 12),
+            titlePadding: const EdgeInsets.only(top: 8, bottom: 8),
+            title: Center(
+              child: Text(
                 widget.content,
                 style: TextStyle(
-                    fontStyle: FontStyle.italic,
-                    fontWeight: FontWeight.bold,
-                    color: widget.isError ? errorRedColor : correctGreenColor),
+                    color:
+                        widget.isError ? notifyIconColor : correctGreenColor, fontSize: 18),
               ),
-      ),
-      actions: [
-        InkWell(
-          onTap: () => Navigator.of(context).pop(),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              color: focusBlueColor,
             ),
-            width: 64,
-            height: 36,
-            child: const Center(
-                child: Text(
-              "Ok",
-            )),
-          ),
-        ),
-      ],
-    );
+            actions: [
+              TextBoxButton(
+                  color: notifyIconColor,
+                  text: 'OK',
+                  fontSize: 16,
+                  width: 50,
+                  height: 34,
+                  funtion: () {
+                    Navigator.of(context).pop();
+                  })
+            ],
+          );
   }
 }

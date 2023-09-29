@@ -181,7 +181,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             trailing: (widget.selectedPage == IS_NOTIFY_PAGE)
                                 ? rightArrowPageIcon
                                 : getNumberNotifications(
-                                    isBottom: false, size: 28, fontSize: 13),
+                                    isBottom: false, size: 28, fontSize: 13, type: 0,),
                             title: const Text(
                               "Thông báo",
                               style: TextStyle(fontSize: 16),

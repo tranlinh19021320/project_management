@@ -6,6 +6,7 @@ import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/notification.dart';
 import 'package:project_management/model/progress.dart';
 import 'package:project_management/model/project.dart';
+import 'package:project_management/model/report.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/paths.dart';
@@ -81,6 +82,7 @@ class FirebaseMethods {
           companyId: companyId,
           companyName: companyName,
           notifyNumber: 0,
+          reportNumber: 0,
           timekeeping: {});
 
       await _firestore.collection('users').doc(userId).set(user.toJson());
@@ -127,7 +129,8 @@ class FirebaseMethods {
         userId: (snap.data()!)['userId'],
         companyId: (snap.data()!)['companyId'],
         companyName: (snap.data()!)['companyName'],
-        notifyNumber: (snap.data()!)['notifyNumber']);
+        notifyNumber: (snap.data()!)['notifyNumber'],
+        reportNumber: (snap.data()!)['reportNumber']);
   }
 
   //update user profile
@@ -673,7 +676,7 @@ class FirebaseMethods {
       });
       if (state != IS_CLOSING) {
         createNotification(
-          type: TIME_KEEPING, date: date, uid: userId, state: state);
+            type: TIME_KEEPING, date: date, uid: userId, state: state);
       }
       res = "success";
     } catch (e) {
@@ -700,15 +703,11 @@ class FirebaseMethods {
 
   Future<void> imclementNotifyNumber({required String uid}) async {
     var snap = await _firestore.collection('users').doc(uid).get();
-    final number = snap.data()!['notifyNumber'];
-    int notifyNumber = 0;
-    if (number != null) {
-      notifyNumber = number + 1;
-    }
+    int number = snap.data()!['notifyNumber'];
     await _firestore
         .collection('users')
         .doc(uid)
-        .update({'notifyNumber': notifyNumber});
+        .update({'notifyNumber': number + 1});
   }
 
   Future<void> createNotification(
@@ -755,8 +754,8 @@ class FirebaseMethods {
     } else {
       String notifyId = const Uuid().v1();
       Notify? notification = Notify.getNotify(
-        state: state,
-        date: date,
+          state: state,
+          date: date,
           percent: percent,
           nameDetails: username,
           description: description,
@@ -793,6 +792,75 @@ class FirebaseMethods {
       res = 'success';
     } catch (er) {
       res = er.toString();
+    }
+    return res;
+  }
+
+  Future<String> refreshReportNumber() async {
+    String res = "error";
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_auth.currentUser!.uid)
+          .update({'reportNumber': 0});
+      res = "success";
+    } catch (e) {
+      res = e.toString();
+    }
+
+    return res;
+  }
+
+  Future<void> imclementReportNumber({required String uid}) async {
+    var snap = await _firestore.collection('users').doc(uid).get();
+    int number = snap.data()!['reportNumber'];
+
+    await _firestore
+        .collection('users')
+        .doc(uid)
+        .update({'reportNumber': number + 1});
+  }
+
+  Future<String> createReport({
+    required String nameReport,
+    required int type,
+    required String description,
+    required List<Uint8List> imageList,
+  }) async {
+    String res = 'error';
+    try {
+      String reportId = const Uuid().v1();
+      CurrentUser user =
+          await getCurrentUserByUserId(userId: _auth.currentUser!.uid);
+      List photoURL = [];
+      if (imageList.isNotEmpty) {
+        for (int i = 0; i < imageList.length; i++) {
+          String url = await StorageMethods()
+              .uploadImageToStorage('reports', user.username, imageList[i]);
+          photoURL.add(url);
+        }
+      }
+      Report report = Report(
+          type: type,
+          companyId: user.companyId,
+          ownId: user.userId,
+          createDate: DateTime.now(),
+          nameReport: nameReport,
+          description: description,
+          photoURL: photoURL,
+          reportId: reportId,
+          ownRead: true,
+          managerRead: false);
+      _firestore
+          .collection('companies')
+          .doc(user.companyId)
+          .collection('reports')
+          .doc(reportId)
+          .set(report.toJson());
+
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
     }
     return res;
   }

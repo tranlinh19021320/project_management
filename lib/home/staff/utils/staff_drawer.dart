@@ -157,7 +157,7 @@ class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
                             trailing: (widget.selectedPage == IS_NOTIFY_PAGE)
                                 ? rightArrowPageIcon
                                 : getNumberNotifications(
-                                    isBottom: false, size: 28, fontSize: 13),
+                                    isBottom: false, size: 28, fontSize: 13, type: 0),
                             title: const Text(
                               "Thông báo",
                               style: TextStyle(fontSize: 16),
@@ -185,7 +185,7 @@ class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
                                 side: const BorderSide(color: focusBlueColor),
                                 borderRadius: BorderRadius.circular(12)),
                             leading: eventIcon,
-                            trailing: (widget.selectedPage == IS_EVENT_PAGE)
+                            trailing: (widget.selectedPage == IS_NOTIFY_PAGE)
                                 ? rightArrowPageIcon
                                 : null,
                             title: const Text(
@@ -210,16 +210,24 @@ class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
                             leading: loudspeakerIcon,
                             trailing: (widget.selectedPage == IS_REPORT_PAGE)
                                 ? rightArrowPageIcon
-                                : null,
+                                : getNumberNotifications(
+                                    isBottom: false, size: 28, fontSize: 13, type: 1),
                             title: const Text(
                               "Báo cáo",
                               style: TextStyle(fontSize: 16),
                             ),
-                            onTap: () {
+                            onTap: () async {
                               Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (_) =>
-                                          const StaffReportsScreen()));
+                                      MaterialPageRoute(
+                                          builder: (_) =>
+                                              const StaffReportsScreen()));
+                              String res =
+                                  await FirebaseMethods().refreshReportNumber();
+                              if (res != 'success') {
+                                if (context.mounted) {
+                                  showSnackBar(context: context, content: res, isError: true);
+                                }
+                              }
                             },
                           )
                         ],
