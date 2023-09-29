@@ -91,10 +91,7 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
 
   changeStateOfDay({required int day, required int state}) async {
     Navigator.pop(context);
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (_) => const NotifyDialog(content: 'loading'));
+    showNotify(context: context, isLoading: true);
     String key = dayToString(time: DateTime(year, month, day));
     String res = await FirebaseMethods()
         .updateTimeKeeping(userId: widget.userId, date: key, state: state);

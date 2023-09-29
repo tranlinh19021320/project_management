@@ -68,10 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   updateProfile() async {
     if (nameDetails != detailNameController.text) {
-      showDialog(
-          context: context,
-          builder: (_) =>
-              const NotifyDialog(content: 'loading', isError: false));
+      showNotify(context: context, isLoading: true);
 
       // only change name details
       String res = await FirebaseMethods().updateNameDetail(
@@ -84,9 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       } else {
         if (context.mounted) {
           Navigator.of(context).pop();
-          showDialog(
-              context: context,
-              builder: (_) => NotifyDialog(content: res, isError: false));
+          showNotify(context: context, content: res, isError: true);
         }
       }
     }

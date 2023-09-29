@@ -44,7 +44,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                   .where('staffId',
                       isEqualTo: FirebaseAuth.instance.currentUser!.uid)
                   
-                  // .orderBy('createDate', descending: true)
+                  .orderBy('createDate', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {

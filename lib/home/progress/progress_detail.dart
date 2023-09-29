@@ -80,9 +80,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
   
 
   updateProgress() async {
-    showDialog(
-        context: context,
-        builder: (_) => const NotifyDialog(content: 'loading'));
+    showNotify(context: context, isLoading: true);
     final num = double.tryParse(percent.text);
     double number = 0;
     if (num != null) {
@@ -116,9 +114,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
   }
 
   changeStateProgress() async {
-    showDialog(
-        context: context,
-        builder: (_) => const NotifyDialog(content: 'loading'));
+    showNotify(context: context, isLoading: true);
     if (state != IS_DOING) {
       state = IS_DOING;
     } else if (isAutoEvaluate) {

@@ -70,11 +70,7 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
 
     if (comfirm != null && comfirm) {
       if (context.mounted) {
-        showDialog(
-            context: context,
-            builder: (_) => const NotifyDialog(
-                  content: "loading",
-                ));
+        showNotify(context: context, isLoading: true);
       }
       String res = await FirebaseMethods().deleteProject(
           companyId: widget.project.companyId,
@@ -84,11 +80,8 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
         if (context.mounted) {
           Navigator.pop(context);
           Navigator.pop(context);
-          showDialog(
-              context: context,
-              builder: (_) => const NotifyDialog(
-                    content: "Đã xóa dự án thành công!",
-                  ));
+          showNotify(context: context,content: "Đã xóa dự án thành công!",);
+         
         }
       } else {
         if (context.mounted) {

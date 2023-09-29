@@ -165,9 +165,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
 
   createmission() async {
     if (nameMission.text != "" && missionState == IS_CORRECT_STATE) {
-      showDialog(
-          context: context,
-          builder: (_) => const NotifyDialog(content: "loading"));
+      showNotify(context: context, isLoading: true);
       String missionId = const Uuid().v1();
       String res = await FirebaseMethods().createMission(
           project: widget.project!,
@@ -185,9 +183,8 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
       if (res == 'success') {
         if (context.mounted) {
           Navigator.pop(context);
-          showDialog(
-              context: context,
-              builder: (_) => const NotifyDialog(content: "Tạo thành công"));
+          showNotify(context: context, content: "Tạo thành công");
+          
         }
       } else {
         if (context.mounted) {
@@ -207,9 +204,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
 
   updateMission() async {
     if (ischanged()) {
-      showDialog(
-          context: context,
-          builder: (_) => const NotifyDialog(content: 'loading'));
+      showNotify(context: context, isLoading: true);
       String res = await FirebaseMethods().updateMission(
           mission: widget.mission!,
           nameMission: nameMission.text,
@@ -222,10 +217,8 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
       }
       if (res == 'success') {
         if (context.mounted) {
-          showDialog(
-              context: context,
-              builder: (_) =>
-                  const NotifyDialog(content: 'Cập nhật thành công!'));
+          showNotify(context: context, content: 'Cập nhật thành công!');
+          
         }
       } else {
         if (context.mounted) {

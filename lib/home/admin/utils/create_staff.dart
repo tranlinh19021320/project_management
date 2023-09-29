@@ -128,9 +128,7 @@ class _CreateStaffState extends State<CreateStaff> {
   }
 
   createStaff() async {
-    showDialog(
-        context: context,
-        builder: (_) => const NotifyDialog(content: 'loading', isError: false));
+    showNotify(context: context, isLoading: true);
     if (isAccountState == IS_CORRECT_STATE &&
         isEmailState == IS_CORRECT_STATE) {
       if (passwordController.text == "") {
@@ -152,10 +150,7 @@ class _CreateStaffState extends State<CreateStaff> {
           if (context.mounted) {
             Navigator.of(context).pop();
             Navigator.of(context).pop();
-            showDialog(
-                context: context,
-                builder: (_) => const NotifyDialog(
-                    content: "Tạo thành công! ",));
+            showNotify(context: context, content: "Tạo thành công! ", isError: true);
           }
         } else {
           if (context.mounted) {

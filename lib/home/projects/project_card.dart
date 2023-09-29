@@ -1,9 +1,9 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project_management/home/projects/project.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/functions.dart';
 
 class ProjectCard extends StatefulWidget {
   final Project project;
@@ -45,23 +45,8 @@ class _ProjectCardState extends State<ProjectCard> {
                   children: [
                     (widget.project.missions != 0)
                         ? Container()
-                        : AnimatedTextKit(repeatForever: true,
-                        
-                        pause: const Duration(milliseconds: 0),
-                         animatedTexts: [
-                            ColorizeAnimatedText('New    ',
-                                textStyle: const TextStyle(fontSize: 14),
-                                colors: [
-                                  Colors.yellow,
-                                  Colors.red,
-                                  Colors.green,
-                                  Colors.black,
-                                  Colors.blue,
-                                  Colors.purple,
-                                  Colors.white,
-                                ]),
-                                
-                          ]),
+                        : newTextAnimation(),
+                    const SizedBox(width: 4,),
                     Center(
                         child: Text(
                       widget.project.nameProject,

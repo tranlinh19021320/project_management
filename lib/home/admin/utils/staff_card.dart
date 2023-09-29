@@ -83,10 +83,7 @@ class _StaffCardState extends State<StaffCard> {
     if (comfirm) {
       FirebaseMethods().deleteUser(deleteUserId: widget.staff.userId);
       if (context.mounted) {
-        showDialog(
-            context: context,
-            builder: (_) =>
-                const NotifyDialog(content: "Xóa thành công!", isError: false));
+        showNotify(context: context, content: "Xóa thành công!",);
       }
     }
   }

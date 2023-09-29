@@ -80,11 +80,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
 
     if (comfirm != null && comfirm) {
       if (context.mounted) {
-        showDialog(
-            context: context,
-            builder: (_) => const NotifyDialog(
-                  content: "loading",
-                ));
+        showNotify(context: context, isLoading: true);
       }
       String res = await FirebaseMethods().deleteMission(
           mission: widget.mission);
@@ -93,11 +89,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
         if (context.mounted) {
           Navigator.pop(context);
           Navigator.pop(context);
-          showDialog(
-              context: context,
-              builder: (_) => const NotifyDialog(
-                    content: "Đã xóa nhiem vu thành công!",
-                  ));
+          showNotify(context: context, content: "Đã xóa nhiem vu thành công!",);
         }
       } else {
         if (context.mounted) {

@@ -85,9 +85,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
 
   updateProject() async {
     if (ischanged()) {
-      showDialog(
-          context: context,
-          builder: (_) => const NotifyDialog(content: 'loading'));
+      showNotify(context: context, isLoading: true);
       String res = await FirebaseMethods().updateProject(
           project: widget.project!,
           nameProject: nameProject.text,
@@ -99,10 +97,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
       }
       if (res == 'success') {
         if (context.mounted) {
-          
-          showDialog(
-          context: context,
-          builder: (_) => const NotifyDialog(content: 'Cập nhật thành công!'));
+          showNotify(context: context, content: 'Cập nhật thành công!');
         }
       } else {
         if (context.mounted) {

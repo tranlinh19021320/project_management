@@ -82,9 +82,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   updatePassword() async {
     if (isPasswordState == IS_CORRECT_STATE) {
-    showDialog(
-        context: context,
-        builder: (_) => const NotifyDialog(content: 'loading', isError: false));
+    showNotify(context: context, isLoading: true);
     String res = await FirebaseMethods().changePassword(
         userId: widget.userId,
         oldpassword: oldPasswordController.text,
@@ -94,16 +92,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       if (context.mounted) {
         Navigator.pop(context);
         Navigator.pop(context);
-        showDialog(
-            context: context,
-            builder: (_) => const NotifyDialog(
-                content: "Đổi mật khẩu thành công!", isError: false));
+        showNotify(context: context, content: "Đổi mật khẩu thành công!",);
+        
       }
     } else {
       if (context.mounted) {
-        showDialog(
-            context: context,
-            builder: (_) => NotifyDialog(content: res, isError: true));
+        showNotify(context: context, content: res, isError: true);
       }
     }
     }

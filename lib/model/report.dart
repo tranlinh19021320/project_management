@@ -5,6 +5,7 @@ class Report {
   final int type;
   final String companyId;
   final String ownId;
+  final String ownPhotoURL;
   final DateTime createDate;
   final String nameReport;
   final String description;
@@ -13,6 +14,7 @@ class Report {
   final bool managerRead;
   const Report({
     required this.type,
+    required this.ownPhotoURL,
     required this.companyId,
     required this.ownId,
     required this.createDate,
@@ -25,6 +27,7 @@ class Report {
   });
 
   Map<String, dynamic> toJson() => {
+    'ownPhotoURL' : ownPhotoURL,
         'type': type,
         'companyId': companyId,
         'ownId': ownId,
@@ -38,6 +41,7 @@ class Report {
       };
 
   static Report fromSnap({required DocumentSnapshot doc}) => Report(
+    ownPhotoURL : doc['ownPhotoURL'],
         type: doc['type'],
         ownId: doc['ownId'],
         nameReport: doc['nameReport'],

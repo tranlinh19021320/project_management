@@ -43,9 +43,9 @@ class _AddCompanyState extends State<AddCompany> {
               companyName: controller.text,
             )));
     } else if (isAlreadyCompany == IS_DEFAULT_STATE) {
-      const NotifyDialog(content: ("Vui lòng nhập tên tổ chức!"), isError: true);
+      showNotify(context: context, content: ("Vui lòng nhập tên tổ chức!"), isError: true);
     } else {
-      const NotifyDialog(content: ("Tên tổ chức đã đăng ký!!"), isError: true);
+      showNotify(context: context, content: ("Tên tổ chức đã đăng ký!!"), isError: true);
     }
   }
 

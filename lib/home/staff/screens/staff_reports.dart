@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_management/home/reports/report_detail.dart';
 import 'package:project_management/home/reports/reports_screen.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
@@ -35,6 +36,12 @@ class _StaffReportsScreenState extends State<StaffReportsScreen> {
         ),
         drawer:const StaffDrawerMenu(selectedPage: IS_REPORT_PAGE,),
         body: const ReportsScreen(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReportDetail())),
+        tooltip: "Tạo báo cáo mới",
+        child: const Icon(Icons.add),
+      ),
       ),
     );
   }

@@ -31,6 +31,7 @@ class _ReportDetailState extends State<ReportDetail> {
 
   List<Uint8List> imageList = [];
   int type = 0;
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -44,6 +45,25 @@ class _ReportDetailState extends State<ReportDetail> {
           nameReportState = IS_ERROR_STATE;
         });
       }
+    });
+    if (!isNew) {
+      nameReport.text = widget.report!.nameReport;
+      type = widget.report!.type;
+      description.text = widget.report!.description;
+      init();
+    }
+    
+  }
+
+  init() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    imageList = await getImageList(photoURL: widget.report!.photoURL);
+
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -66,14 +86,11 @@ class _ReportDetailState extends State<ReportDetail> {
   createReport() async {
     if (nameReport.text != "") {
       if (type == 0) {
-        showDialog(
-            context: context,
-            builder: (_) => const NotifyDialog(
-                  content: 'Hãy phân loại báo cáo',
-                  isError: true,
-                ));
+        showNotify(context: context, content: 'Hãy phân loại báo cáo',
+                  isError: true,);
+        
       } else {
-        showDialog(context: context, builder: (_) => const NotifyDialog(content: 'loading'));
+        showNotify(context: context, isLoading: true);
         String res = await FirebaseMethods().createReport(
             nameReport: nameReport.text,
             type: type,
@@ -111,292 +128,312 @@ class _ReportDetailState extends State<ReportDetail> {
           centerTitle: true,
         ),
         body: Padding(
-          padding: const EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 20),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Divider(),
-                // text field for name report
-                TextField(
-                  controller: nameReport,
-                  focusNode: nameFocus,
-                  style: const TextStyle(color: blackColor),
-                  decoration: InputDecoration(
-                      label: const Text(
-                        "Tiêu đề",
-                        style: TextStyle(color: defaultColor),
+                padding: const EdgeInsets.only(
+                    top: 0, left: 8, right: 8, bottom: 20),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(),
+                      // text field for name report
+                      TextField(
+                        controller: nameReport,
+                        focusNode: nameFocus,
+                        style: const TextStyle(color: blackColor),
+                        decoration: InputDecoration(
+                            label: Text(
+                              "Tiêu đề",
+                              style: TextStyle(
+                                  color: (isNew)
+                                      ? defaultColor
+                                      : backgroundWhiteColor),
+                            ),
+                            contentPadding: const EdgeInsets.only(left: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            helperText: (nameReportState == IS_DEFAULT_STATE)
+                                ? null
+                                : "Chưa có tiêu đề",
+                            helperStyle: const TextStyle(color: errorRedColor),
+                            filled: true,
+                            fillColor:
+                                (isNew) ? backgroundWhiteColor : defaultColor),
+                        readOnly: (!isNew),
                       ),
-                      contentPadding: const EdgeInsets.only(left: 12),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
+                      const SizedBox(
+                        height: 14,
                       ),
-                      helperText: (nameReportState == IS_DEFAULT_STATE)
-                          ? null
-                          : "Chưa có tiêu đề",
-                      helperStyle: const TextStyle(color: errorRedColor),
-                      filled: true,
-                      fillColor: (isNew) ? backgroundWhiteColor : defaultColor),
-                  readOnly: (!isNew),
-                ),
-                const SizedBox(
-                  height: 14,
-                ),
 
-                // type report
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 5),
-                      child: Text(
-                        "Phân loại: ",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    (type == 0 && isNew)
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    height: 30,
-                                    width: 30,
-                                    child: Checkbox(
-                                        value: (type == UPDATE_REPORT),
-                                        shape: const CircleBorder(),
-                                        visualDensity:
-                                            VisualDensity.comfortable,
-                                        splashRadius: 0,
-                                        onChanged: (value) {
-                                          if (value == null || !value) {
-                                            type = 0;
-                                          } else {
-                                            type = UPDATE_REPORT;
-                                          }
-                                          setState(() {});
-                                        }),
-                                  ),
-                                  typeReport(type: UPDATE_REPORT),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    height: 30,
-                                    width: 30,
-                                    child: Checkbox(
-                                        value: (type == BUG_REPORT),
-                                        shape: const CircleBorder(),
-                                        onChanged: (value) {
-                                          if (value == null || !value) {
-                                            type = 0;
-                                          } else {
-                                            type = BUG_REPORT;
-                                          }
-                                          setState(() {});
-                                        }),
-                                  ),
-                                  typeReport(type: BUG_REPORT),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(
-                                    height: 30,
-                                    width: 30,
-                                    child: Checkbox(
-                                        value: (type == PRIVATE_REPORT),
-                                        shape: const CircleBorder(),
-                                        onChanged: (value) {
-                                          if (value == null || !value) {
-                                            type = 0;
-                                          } else {
-                                            type = PRIVATE_REPORT;
-                                          }
-                                          setState(() {});
-                                        }),
-                                  ),
-                                  typeReport(type: PRIVATE_REPORT),
-                                ],
-                              ),
-                            ],
-                          )
-                        : Row(
-                            children: [
-                              typeReport(type: type),
-                              InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      type = 0;
-                                    });
-                                  },
-                                  child: const Icon(Icons.cancel_rounded))
-                            ],
+                      // type report
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 5),
+                            child: Text(
+                              "Phân loại: ",
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                // report description
-                TextField(
-                  controller: description,
-                  focusNode: descriptionFocus,
-                  style: const TextStyle(color: blackColor),
-                  decoration: InputDecoration(
-                      labelText: "Mô tả",
-                      labelStyle: const TextStyle(color: defaultColor),
-                      contentPadding: const EdgeInsets.only(left: 8, top: 24),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      filled: true,
-                      fillColor: (isNew) ? backgroundWhiteColor : defaultColor),
-                  keyboardType: TextInputType.multiline,
-                  minLines: 3,
-                  maxLines: null,
-                  scrollController: descriptionScroll,
-                  readOnly: (!isNew),
-                ),
-                const SizedBox(
-                  height: 14,
-                ),
-                // add photo button
-                Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 4),
-                      child: Text(
-                        "Hình ảnh:   ",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                    (!isNew)
-                        ? const SizedBox()
-                        : InkWell(
-                            onTap: () async {
-                              List<Uint8List>? imageAddList =
-                                  await pickImages(context);
-                              if (imageAddList != null) {
-                                imageList.addAll(imageAddList);
-                              }
-                              setState(() {});
-                            },
-                            child: const Icon(
-                              Icons.add_photo_alternate,
-                              size: 28,
-                              color: correctGreenColor,
-                            )),
-                  ],
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                // image show
-                (imageList.isEmpty)
-                    ? Container()
-                    : Container(
-                        width: double.infinity,
-                        height: 240,
-                        decoration: BoxDecoration(
-                            border:
-                                Border.all(color: focusBlueColor, width: 2)),
-                        child: PageView.builder(
-                            itemCount: imageList.length,
-                            controller: pageController,
-                            itemBuilder: (context, index) {
-                              return Stack(children: [
-                                SizedBox(
-                                    width: double.infinity,
-                                    child: Image.memory(
-                                      imageList[index],
-                                      fit: BoxFit.cover,
-                                    )),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        "${index + 1}/${imageList.length}",
-                                        style: const TextStyle(fontSize: 15),
-                                      ),
-                                      const SizedBox(
-                                        width: 8,
-                                      ),
-                                      (!isNew)
-                                          ? const SizedBox(
-                                              width: 2,
-                                            )
-                                          : InkWell(
-                                              onTap: () {
-                                                imageList.removeAt(index);
-                                                jumpToFirstPage();
-                                              },
-                                              child: const Icon(
-                                                Icons.cancel,
-                                                size: 24,
-                                              ))
-                                    ],
-                                  ),
+                          (type == 0 && isNew)
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          height: 30,
+                                          width: 30,
+                                          child: Checkbox(
+                                              value: (type == UPDATE_REPORT),
+                                              shape: const CircleBorder(),
+                                              visualDensity:
+                                                  VisualDensity.comfortable,
+                                              splashRadius: 0,
+                                              onChanged: (value) {
+                                                if (value == null || !value) {
+                                                  type = 0;
+                                                } else {
+                                                  type = UPDATE_REPORT;
+                                                }
+                                                setState(() {});
+                                              }),
+                                        ),
+                                        typeReport(type: UPDATE_REPORT),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          height: 30,
+                                          width: 30,
+                                          child: Checkbox(
+                                              value: (type == BUG_REPORT),
+                                              shape: const CircleBorder(),
+                                              onChanged: (value) {
+                                                if (value == null || !value) {
+                                                  type = 0;
+                                                } else {
+                                                  type = BUG_REPORT;
+                                                }
+                                                setState(() {});
+                                              }),
+                                        ),
+                                        typeReport(type: BUG_REPORT),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          height: 30,
+                                          width: 30,
+                                          child: Checkbox(
+                                              value: (type == PRIVATE_REPORT),
+                                              shape: const CircleBorder(),
+                                              onChanged: (value) {
+                                                if (value == null || !value) {
+                                                  type = 0;
+                                                } else {
+                                                  type = PRIVATE_REPORT;
+                                                }
+                                                setState(() {});
+                                              }),
+                                        ),
+                                        typeReport(type: PRIVATE_REPORT),
+                                      ],
+                                    ),
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    typeReport(type: type),
+                                    (!isNew)
+                                        ? const SizedBox()
+                                        : InkWell(
+                                            onTap: () {
+                                              setState(() {
+                                                type = 0;
+                                              });
+                                            },
+                                            child: const Icon(
+                                                Icons.cancel_rounded))
+                                  ],
                                 ),
-                                (index == 0)
-                                    ? Container()
-                                    : const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.all(4.0),
-                                            child: Center(
-                                                child: Icon(
-                                              Icons.arrow_back_ios,
-                                              size: 30,
-                                              color: defaultColor,
-                                            )),
-                                          )
-                                        ],
-                                      ),
-                                (index == imageList.length - 1)
-                                    ? Container()
-                                    : const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.all(4.0),
-                                            child: Center(
-                                                child: Icon(
-                                              Icons.arrow_forward_ios,
-                                              size: 30,
-                                              color: defaultColor,
-                                            )),
-                                          )
-                                        ],
-                                      )
-                              ]);
-                            }),
+                        ],
                       ),
-                const SizedBox(
-                  height: 20,
-                ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      // report description
+                      TextField(
+                        controller: description,
+                        focusNode: descriptionFocus,
+                        style: const TextStyle(color: blackColor),
+                        decoration: InputDecoration(
+                            labelText: "Mô tả",
+                            labelStyle: TextStyle(
+                                color: (isNew)
+                                    ? defaultColor
+                                    : backgroundWhiteColor),
+                            contentPadding:
+                                const EdgeInsets.only(left: 8, top: 24),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            filled: true,
+                            fillColor:
+                                (isNew) ? backgroundWhiteColor : defaultColor),
+                        keyboardType: TextInputType.multiline,
+                        minLines: 3,
+                        maxLines: null,
+                        scrollController: descriptionScroll,
+                        readOnly: (!isNew),
+                      ),
+                      const SizedBox(
+                        height: 14,
+                      ),
+                      // add photo button
+                      Row(
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(top: 4),
+                            child: Text(
+                              "Hình ảnh:   ",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          (!isNew)
+                              ? const SizedBox()
+                              : InkWell(
+                                  onTap: () async {
+                                    List<Uint8List>? imageAddList =
+                                        await pickImages(context);
+                                    if (imageAddList != null) {
+                                      imageList.addAll(imageAddList);
+                                    }
+                                    setState(() {});
+                                  },
+                                  child: const Icon(
+                                    Icons.add_photo_alternate,
+                                    size: 28,
+                                    color: correctGreenColor,
+                                  )),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      // image show
+                      (isLoading)
+            ? const LinearProgressIndicator()
+            : 
+                      (imageList.isEmpty)
+                          ? const Center(
+                            child: Text('Không có hình ảnh minh họa'),
+                          )
+                          : Container(
+                              width: double.infinity,
+                              height: 240,
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: focusBlueColor, width: 2)),
+                              child: PageView.builder(
+                                  itemCount: imageList.length,
+                                  controller: pageController,
+                                  itemBuilder: (context, index) {
+                                    return Stack(children: [
+                                      SizedBox(
+                                          width: double.infinity,
+                                          child: Image.memory(
+                                            imageList[index],
+                                            fit: BoxFit.cover,
+                                          )),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              "${index + 1}/${imageList.length}",
+                                              style:
+                                                  const TextStyle(fontSize: 15),
+                                            ),
+                                            const SizedBox(
+                                              width: 8,
+                                            ),
+                                            (!isNew)
+                                                ? const SizedBox(
+                                                    width: 2,
+                                                  )
+                                                : InkWell(
+                                                    onTap: () {
+                                                      imageList.removeAt(index);
+                                                      jumpToFirstPage();
+                                                    },
+                                                    child: const Icon(
+                                                      Icons.cancel,
+                                                      size: 24,
+                                                    ))
+                                          ],
+                                        ),
+                                      ),
+                                      (index == 0)
+                                          ? Container()
+                                          : const Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.all(4.0),
+                                                  child: Center(
+                                                      child: Icon(
+                                                    Icons.arrow_back_ios,
+                                                    size: 30,
+                                                    color: defaultColor,
+                                                  )),
+                                                )
+                                              ],
+                                            ),
+                                      (index == imageList.length - 1)
+                                          ? Container()
+                                          : const Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.all(4.0),
+                                                  child: Center(
+                                                      child: Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    size: 30,
+                                                    color: defaultColor,
+                                                  )),
+                                                )
+                                              ],
+                                            )
+                                    ]);
+                                  }),
+                            ),
+                      const SizedBox(
+                        height: 20,
+                      ),
 
-                // create button
-                Center(
-                  child: TextBoxButton(
-                      color: notifyIconColor,
-                      text: "Tạo mới",
-                      fontSize: 16,
-                      width: 100,
-                      height: 40,
-                      funtion: createReport),
-                )
-              ],
-            ),
-          ),
-        ),
+                      // create button
+                      Center(
+                        child: TextBoxButton(
+                            color: notifyIconColor,
+                            text: "Tạo mới",
+                            fontSize: 16,
+                            width: 100,
+                            height: 40,
+                            funtion: createReport),
+                      )
+                    ],
+                  ),
+                ),
+              ),
       ),
     );
   }

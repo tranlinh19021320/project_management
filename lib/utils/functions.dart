@@ -1,6 +1,8 @@
 import 'dart:typed_data';
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -65,10 +67,7 @@ pickImage(BuildContext context, ImageSource source) async {
     return await file.readAsBytes();
   }
   if (context.mounted) {
-    showDialog(
-        context: context,
-        builder: (_) =>
-            const NotifyDialog(content: "Không chọn ảnh", isError: true));
+    showNotify(context: context, content: "Không chọn ảnh", isError: true);
   }
 }
 
@@ -83,10 +82,7 @@ pickImages(BuildContext context) async {
     return imageList;
   }
    if (context.mounted) {
-    showDialog(
-        context: context,
-        builder: (_) =>
-            const NotifyDialog(content: "Không chọn ảnh", isError: true));
+    showNotify(context: context, content: "Không chọn ảnh", isError: true);
   }
 }
 
@@ -354,25 +350,54 @@ Widget evaluate(
   );
 }
 
-Widget typeReport({required int type}) {
+Widget newTextAnimation() {
+  return AnimatedTextKit(repeatForever: true,
+                        pause: const Duration(milliseconds: 0),
+                         animatedTexts: [
+                            ColorizeAnimatedText('Mới',
+                                textStyle: const TextStyle(fontSize: 14),
+                                colors: [
+                                  Colors.white,
+                                  Colors.yellow,
+                                  Colors.red,
+                                  Colors.green,
+                                  Colors.black,
+                                  Colors.blue,
+                                  Colors.purple,
+                                ]),
+                                
+                          ]);
+}
+
+Widget typeReport({required int type, double size = 24,double fontSize = 14,}) {
   return Container(
     padding: const EdgeInsets.only(left: 2, right: 5, top: 1, bottom: 1),
     decoration: BoxDecoration(
       color: (type == UPDATE_REPORT) ? focusBlueColor : (type == BUG_REPORT) ? textErrorRedColor : yellowColor,
       borderRadius: BorderRadius.circular(8),
     ),
-    child: Row(children: (type == UPDATE_REPORT) ? const [
-      Icon(Icons.update, color: darkblueColor,),
-      SizedBox(width: 4,),
-      Text("Cập nhật", style: TextStyle(fontSize: 14, color: blackColor),)
-    ] : (type == BUG_REPORT) ? const [
-      Icon(Icons.error, color: errorRedColor,),
-      SizedBox(width: 4,),
-      Text("Bug", style: TextStyle(fontSize: 14, color: blackColor),)
-    ] : const [
-      Icon(Icons.more, color: notifyIconColor,),
-      SizedBox(width: 4,),
-      Text("Ý kiến đóng góp", style: TextStyle(fontSize: 14, color: blackColor),)
+    child: Row(children: (type == UPDATE_REPORT) ?  [
+      Icon(Icons.update, color: darkblueColor,size: size,),
+      const SizedBox(width: 4,),
+      Text("Cập nhật", style: TextStyle(fontSize: fontSize, color: blackColor),)
+    ] : (type == BUG_REPORT) ? [
+      Icon(Icons.error, color: errorRedColor,size: size,),
+      const SizedBox(width: 4,),
+      Text("Bug", style: TextStyle(fontSize: fontSize, color: blackColor),)
+    ] :  [
+      Icon(Icons.more, color: notifyIconColor, size: size,),
+      const SizedBox(width: 4,),
+      Text("Ý kiến đóng góp", style: TextStyle(fontSize: fontSize, color: blackColor),)
     ]),
   );
+}
+
+Future<List<Uint8List>> getImageList({required List photoURL}) async {
+  List<Uint8List> imageList = [];
+  for (int i=0; i<photoURL.length; i++) {
+    String url = photoURL[i];
+    Uint8List image = (await NetworkAssetBundle(Uri.parse(url)).load(url)).buffer.asUint8List();
+    imageList.add(image);
+  }
+  return imageList;
 }

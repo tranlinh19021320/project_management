@@ -62,10 +62,7 @@ class _NotificationCardState extends State<NotificationCard> {
     setState(() {
       
     });
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (_) => const NotifyDialog(content: 'loading'));
+    showNotify(context: context, isLoading: true);
     String res = 'error';
     DocumentSnapshot<Map<String, dynamic>> snap;
     Mission? mission;
@@ -98,18 +95,12 @@ class _NotificationCardState extends State<NotificationCard> {
       if (context.mounted) {
         
         (mission == null)
-            ? showDialog(
-                context: context,
-                builder: (_) => const NotifyDialog(
-                      content: 'Nhiệm vụ đã bị xóa !',
-                      isError: true,
-                    ))
-            :(mission.staffId != FirebaseAuth.instance.currentUser!.uid && !isManager) ?showDialog(
-                context: context,
-                builder: (_) => const NotifyDialog(
-                      content: 'Bạn không còn phụ trách nhiệm vụ này!',
-                      isError: true,
-                    )) : Navigator.of(context).push(MaterialPageRoute(
+            ?
+             showNotify(context: context,  content: 'Nhiệm vụ đã bị xóa !',
+                      isError: true,) 
+            :(mission.staffId != FirebaseAuth.instance.currentUser!.uid && !isManager) ?
+            showNotify(context: context,  content: 'Bạn không còn phụ trách nhiệm vụ này!',
+                      isError: true,) : Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => MissionHomeScreen(
                   mission: mission!,
                 ),
@@ -159,10 +150,7 @@ class _NotificationCardState extends State<NotificationCard> {
 
     if (isdeleted != null && isdeleted) {
       if (context.mounted) {
-        showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (_) => const NotifyDialog(content: 'loading'));
+        showNotify(context: context, isLoading: true);
       }
       String res =
           await FirebaseMethods().deleteNotification(notify: notify);

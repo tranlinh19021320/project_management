@@ -66,7 +66,7 @@ class FirebaseMethods {
         ByteData dataImage = await rootBundle.load(defaultProfileImage);
         Uint8List image = dataImage.buffer.asUint8List();
         url = await StorageMethods()
-            .uploadImageToStorage('profile', username, image);
+            .uploadImageToStorage(folderName: 'profile', username : username,image: image);
       } else {
         url = photoURL;
       }
@@ -290,7 +290,7 @@ class FirebaseMethods {
         await getCurrentUserByUserId(userId: _auth.currentUser!.uid);
     try {
       String photoURL = await StorageMethods()
-          .uploadImageToStorage('profile', user.username, image);
+          .uploadImageToStorage(folderName: 'profile', username: user.username, image: image);
       await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
         'photoURL': photoURL,
       });
@@ -835,12 +835,16 @@ class FirebaseMethods {
       List photoURL = [];
       if (imageList.isNotEmpty) {
         for (int i = 0; i < imageList.length; i++) {
-          String url = await StorageMethods()
-              .uploadImageToStorage('reports', user.username, imageList[i]);
+          String url = await StorageMethods().uploadImageToStorage(
+              folderName: 'reports',
+              username: user.username,
+              imageReport: const Uuid().v1(),
+              image: imageList[i]);
           photoURL.add(url);
         }
       }
       Report report = Report(
+          ownPhotoURL: user.photoURL,
           type: type,
           companyId: user.companyId,
           ownId: user.userId,
