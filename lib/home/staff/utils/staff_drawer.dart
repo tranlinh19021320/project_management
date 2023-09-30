@@ -40,7 +40,8 @@ class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
     setState(() {
       isLoadingImage = true;
     });
-    selectAnImage(context: context);
+    selectAImage(context: context);
+    
     setState(() {
       isLoadingImage = false;
     });

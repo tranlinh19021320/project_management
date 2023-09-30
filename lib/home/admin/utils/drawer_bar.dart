@@ -41,7 +41,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
     setState(() {
       isLoadingImage = true;
     });
-    selectAnImage(context: context);
+    selectAImage(context: context);
+    
     setState(() {
       isLoadingImage = false;
     });
@@ -211,15 +212,23 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             leading: eventIcon,
                             trailing: (widget.selectedPage == IS_EVENT_PAGE)
                                 ? rightArrowPageIcon
-                                : null,
+                                : getNumberNotifications(
+                                    isBottom: false, size: 28, fontSize: 13, type: 1,),
                             title: const Text(
                               "Sự kiện",
                               style: TextStyle(fontSize: 16),
                             ),
-                            onTap: () {
+                            onTap: () async {
                               Navigator.of(context).pushReplacement(
                                   MaterialPageRoute(
                                       builder: (_) => const EventScreen()));
+                              String res =
+                                  await FirebaseMethods().refreshReportNumber();
+                              if (res != 'success') {
+                                if (context.mounted) {
+                                  showSnackBar(context: context, content: res, isError: true);
+                                }
+                              }
                             },
                           )
                         ],

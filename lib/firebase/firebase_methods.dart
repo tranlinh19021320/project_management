@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:project_management/firebase/storage_method.dart';
+import 'package:project_management/model/comment.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/notification.dart';
 import 'package:project_management/model/progress.dart';
@@ -65,8 +66,8 @@ class FirebaseMethods {
       if (photoURL == "") {
         ByteData dataImage = await rootBundle.load(defaultProfileImage);
         Uint8List image = dataImage.buffer.asUint8List();
-        url = await StorageMethods()
-            .uploadImageToStorage(folderName: 'profile', username : username,image: image);
+        url = await StorageMethods().uploadImageToStorage(
+            folderNamev1: 'profile', folderNamev2: username, image: image);
       } else {
         url = photoURL;
       }
@@ -289,8 +290,8 @@ class FirebaseMethods {
     CurrentUser user =
         await getCurrentUserByUserId(userId: _auth.currentUser!.uid);
     try {
-      String photoURL = await StorageMethods()
-          .uploadImageToStorage(folderName: 'profile', username: user.username, image: image);
+      String photoURL = await StorageMethods().uploadImageToStorage(
+          folderNamev1: 'profile', folderNamev2: user.username, image: image);
       await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
         'photoURL': photoURL,
       });
@@ -811,14 +812,29 @@ class FirebaseMethods {
     return res;
   }
 
-  Future<void> imclementReportNumber({required String uid}) async {
-    var snap = await _firestore.collection('users').doc(uid).get();
-    int number = snap.data()!['reportNumber'];
+  Future<void> imclementReportNumber({String? uid, String? group}) async {
+    if (uid != null) {
+      var snap = await _firestore.collection('users').doc(uid).get();
+      int number = snap.data()!['reportNumber'];
 
-    await _firestore
-        .collection('users')
-        .doc(uid)
-        .update({'reportNumber': number + 1});
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .update({'reportNumber': number + 1});
+    } else if (group != null) {
+      var snapshot = await _firestore
+          .collection('users')
+          .where('group', isEqualTo: group)
+          .get();
+      snapshot.docs.forEach((element) async {
+        String userId = (element as dynamic)['userId'];
+        int number = (element as dynamic)['reportNumber'];
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .update({'reportNumber': number + 1});
+      });
+    }
   }
 
   Future<String> createReport({
@@ -836,14 +852,15 @@ class FirebaseMethods {
       if (imageList.isNotEmpty) {
         for (int i = 0; i < imageList.length; i++) {
           String url = await StorageMethods().uploadImageToStorage(
-              folderName: 'reports',
-              username: user.username,
-              imageReport: const Uuid().v1(),
+              folderNamev1: 'reports',
+              folderNamev2: user.username,
+              folderNamev3: const Uuid().v1(),
               image: imageList[i]);
           photoURL.add(url);
         }
       }
       Report report = Report(
+          ownName: user.nameDetails,
           ownPhotoURL: user.photoURL,
           type: type,
           companyId: user.companyId,
@@ -861,7 +878,75 @@ class FirebaseMethods {
           .collection('reports')
           .doc(reportId)
           .set(report.toJson());
+      imclementReportNumber(group: manager);
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+    return res;
+  }
 
+  Future<String> changeIsReadReportState(
+      {required Report report,
+      required bool isOwner,
+      required bool isRead}) async {
+    String res = 'error';
+    try {
+      _firestore
+          .collection('companies')
+          .doc(report.companyId)
+          .collection('reports')
+          .doc(report.reportId)
+          .update((!isOwner) ? {"managerRead": isRead} : {'ownRead': isRead});
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+
+    return res;
+  }
+
+  Future<String> postComment(
+      {required Report report,
+      String comment = '',
+      Uint8List? imageFile}) async {
+    String res = 'error';
+    try {
+      CurrentUser user =
+          await getCurrentUserByUserId(userId: _auth.currentUser!.uid);
+      String commentId = const Uuid().v1();
+      String photoComment = '';
+      if (imageFile != null) {
+        photoComment = await StorageMethods().uploadImageToStorage(
+            folderNamev1: 'comments',
+            folderNamev2: report.reportId,
+            folderNamev3: const Uuid().v1(),
+            image: imageFile);
+      }
+      CommentReport commentReport = CommentReport(
+          commentId: commentId,
+          companyId: report.companyId,
+          reportId: report.reportId,
+          createDate: DateTime.now(),
+          ownId: user.userId,
+          isManager: (user.group == manager),
+          ownName: user.nameDetails,
+          photoURL: user.photoURL,
+          photoComment: photoComment,
+          comment: comment);
+      _firestore
+          .collection('companies')
+          .doc(report.companyId)
+          .collection('reports')
+          .doc(report.reportId)
+          .collection('comments')
+          .doc(commentId)
+          .set(commentReport.toJson());
+
+      (user.group == manager)
+          ? imclementReportNumber(uid: report.ownId)
+          : imclementReportNumber(group: manager);
+      changeIsReadReportState(report: report, isOwner: (user.group != manager), isRead: false);
       res = 'success';
     } catch (e) {
       res = e.toString();

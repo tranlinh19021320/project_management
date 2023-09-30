@@ -5,11 +5,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 class StorageMethods {
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  Future<String> uploadImageToStorage({required String folderName,required String username,
-      String? imageReport,required Uint8List image}) async {
-    Reference ref = (imageReport == null)
-        ? _storage.ref().child(folderName).child(username)
-        : _storage.ref().child(folderName).child(username).child(imageReport);
+  Future<String> uploadImageToStorage({required String folderNamev1,required String folderNamev2,
+      String? folderNamev3,required Uint8List image}) async {
+    Reference ref = (folderNamev3 == null)
+        ? _storage.ref().child(folderNamev1).child(folderNamev2)
+        : _storage.ref().child(folderNamev1).child(folderNamev2).child(folderNamev3);
     UploadTask uploadTask = ref.putData(image);
 
     TaskSnapshot snap = await uploadTask;

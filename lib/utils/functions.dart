@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -75,19 +74,21 @@ pickImages(BuildContext context) async {
   final ImagePicker imagePicker = ImagePicker();
   List<XFile> list = await imagePicker.pickMultiImage();
   List<Uint8List> imageList = [];
-  for (int i=0; i<list.length; i++) {
+  for (int i = 0; i < list.length; i++) {
     imageList.add(await list[i].readAsBytes());
   }
   if (imageList.isNotEmpty) {
     return imageList;
   }
-   if (context.mounted) {
+  if (context.mounted) {
     showNotify(context: context, content: "Không chọn ảnh", isError: true);
   }
 }
 
-selectAnImage({required BuildContext context}) {
-  showDialog(
+Future<Uint8List?> selectAImage(
+    {required BuildContext context, bool isSave = true}) async {
+  Uint8List? imageFile;
+  return await showDialog(
       context: context,
       builder: (_) => SimpleDialog(
             backgroundColor: darkblueAppbarColor,
@@ -98,28 +99,42 @@ selectAnImage({required BuildContext context}) {
                 padding: const EdgeInsets.all(18),
                 child: const Text("Camera"),
                 onPressed: () async {
-                  Navigator.pop(context);
-                  Uint8List? imageFile =
-                      await pickImage(context, ImageSource.camera);
-                  if (imageFile != null) {
-                     await FirebaseMethods().changeProfileImage(
-                    image: imageFile,
-                  );
+                  imageFile = await pickImage(context, ImageSource.camera);
+                  if (imageFile != null && isSave) {
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      showNotify(context: context, isLoading: true);
+                    }
+                    await FirebaseMethods().changeProfileImage(
+                      image: imageFile!,
+                    );
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  } else if (context.mounted) {
+                    Navigator.of(context).pop(imageFile);
                   }
-                 
                 },
               ),
               SimpleDialogOption(
                 padding: const EdgeInsets.all(18),
                 child: const Text("Thư viện ảnh"),
                 onPressed: () async {
-                  Navigator.pop(context);
-                  Uint8List? imageFile =
-                      await pickImage(context, ImageSource.gallery);
-                 if (imageFile != null) {
-                     await FirebaseMethods().changeProfileImage(
-                    image: imageFile,
-                  );
+                  
+                  imageFile = await pickImage(context, ImageSource.gallery);
+                  if (imageFile != null && isSave) {
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      showNotify(context: context, isLoading: true);
+                    }
+                    await FirebaseMethods().changeProfileImage(
+                      image: imageFile!,
+                    );
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  } else if (context.mounted) {
+                    Navigator.of(context).pop(imageFile);
                   }
                 },
               ),
@@ -351,52 +366,94 @@ Widget evaluate(
 }
 
 Widget newTextAnimation() {
-  return AnimatedTextKit(repeatForever: true,
-                        pause: const Duration(milliseconds: 0),
-                         animatedTexts: [
-                            ColorizeAnimatedText('Mới',
-                                textStyle: const TextStyle(fontSize: 14),
-                                colors: [
-                                  Colors.white,
-                                  Colors.yellow,
-                                  Colors.red,
-                                  Colors.green,
-                                  Colors.black,
-                                  Colors.blue,
-                                  Colors.purple,
-                                ]),
-                                
-                          ]);
+  return AnimatedTextKit(
+      repeatForever: true,
+      pause: const Duration(milliseconds: 0),
+      animatedTexts: [
+        ColorizeAnimatedText('Mới',
+            textStyle: const TextStyle(fontSize: 14),
+            colors: [
+              Colors.white,
+              Colors.yellow,
+              Colors.red,
+              Colors.green,
+              Colors.black,
+              Colors.blue,
+              Colors.purple,
+            ]),
+      ]);
 }
 
-Widget typeReport({required int type, double size = 24,double fontSize = 14,}) {
+Widget typeReport({
+  required int type,
+  double size = 24,
+  double fontSize = 14,
+}) {
   return Container(
     padding: const EdgeInsets.only(left: 2, right: 5, top: 1, bottom: 1),
     decoration: BoxDecoration(
-      color: (type == UPDATE_REPORT) ? focusBlueColor : (type == BUG_REPORT) ? textErrorRedColor : yellowColor,
+      color: (type == UPDATE_REPORT)
+          ? focusBlueColor
+          : (type == BUG_REPORT)
+              ? textErrorRedColor
+              : yellowColor,
       borderRadius: BorderRadius.circular(8),
     ),
-    child: Row(children: (type == UPDATE_REPORT) ?  [
-      Icon(Icons.update, color: darkblueColor,size: size,),
-      const SizedBox(width: 4,),
-      Text("Cập nhật", style: TextStyle(fontSize: fontSize, color: blackColor),)
-    ] : (type == BUG_REPORT) ? [
-      Icon(Icons.error, color: errorRedColor,size: size,),
-      const SizedBox(width: 4,),
-      Text("Bug", style: TextStyle(fontSize: fontSize, color: blackColor),)
-    ] :  [
-      Icon(Icons.more, color: notifyIconColor, size: size,),
-      const SizedBox(width: 4,),
-      Text("Ý kiến đóng góp", style: TextStyle(fontSize: fontSize, color: blackColor),)
-    ]),
+    child: Row(
+        children: (type == UPDATE_REPORT)
+            ? [
+                Icon(
+                  Icons.update,
+                  color: darkblueColor,
+                  size: size,
+                ),
+                const SizedBox(
+                  width: 4,
+                ),
+                Text(
+                  "Cập nhật",
+                  style: TextStyle(fontSize: fontSize, color: blackColor),
+                )
+              ]
+            : (type == BUG_REPORT)
+                ? [
+                    Icon(
+                      Icons.error,
+                      color: errorRedColor,
+                      size: size,
+                    ),
+                    const SizedBox(
+                      width: 4,
+                    ),
+                    Text(
+                      "Bug",
+                      style: TextStyle(fontSize: fontSize, color: blackColor),
+                    )
+                  ]
+                : [
+                    Icon(
+                      Icons.more,
+                      color: notifyIconColor,
+                      size: size,
+                    ),
+                    const SizedBox(
+                      width: 4,
+                    ),
+                    Text(
+                      "Ý kiến đóng góp",
+                      style: TextStyle(fontSize: fontSize, color: blackColor),
+                    )
+                  ]),
   );
 }
 
 Future<List<Uint8List>> getImageList({required List photoURL}) async {
   List<Uint8List> imageList = [];
-  for (int i=0; i<photoURL.length; i++) {
+  for (int i = 0; i < photoURL.length; i++) {
     String url = photoURL[i];
-    Uint8List image = (await NetworkAssetBundle(Uri.parse(url)).load(url)).buffer.asUint8List();
+    Uint8List image = (await NetworkAssetBundle(Uri.parse(url)).load(url))
+        .buffer
+        .asUint8List();
     imageList.add(image);
   }
   return imageList;
