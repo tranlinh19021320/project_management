@@ -34,10 +34,11 @@ class _ReportCardState extends State<ReportCard> {
     String res = '';
     if (isOwner && !widget.report.ownRead) {
       res = await FirebaseMethods().changeIsReadReportState(
-          report: widget.report, isOwner: !isOwner, isRead: true);
+          report: widget.report, isManager: !isOwner, isRead: true);
     } else if (!isOwner && !widget.report.managerRead) {
       res = await FirebaseMethods().changeIsReadReportState(
-          report: widget.report, isOwner: isOwner, isRead: true);
+          report: widget.report, isManager: !isOwner, isRead: true);
+      print(res);
     }
 
     if (res != 'success' && res != '') {

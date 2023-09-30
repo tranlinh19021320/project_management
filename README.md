@@ -54,6 +54,7 @@
 <p align = "center">
 <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/create_report.png" alt="Create Report">
 <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/comment.png" alt="comment">
+<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/all_comment.png" alt="comment">
 </p>
 ## Technology
 - frontend: Flutter, 

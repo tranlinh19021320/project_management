@@ -14,52 +14,77 @@ class CommentCard extends StatefulWidget {
   State<CommentCard> createState() => _CommentCardState();
 }
 
+
 class _CommentCardState extends State<CommentCard> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(
-          height: 6,
-        ),
-        ListTile(
-          contentPadding: EdgeInsets.zero,
-          dense: true,
-          visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-          // isThreeLine: true,
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage(widget.comment.photoURL),
-            radius: 16,
-          ),
-          title: Container(
-            padding: const EdgeInsets.all(4),
-            decoration: BoxDecoration(
-                color: darkblueAppbarColor,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: focusBlueColor)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              Text(
-                widget.comment.ownName,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+    return 
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(widget.comment.photoURL),
+                  radius: 16,
+                ),
               ),
-              (widget.comment.comment == '')
-                  ? Container()
-                  : Text(widget.comment.comment),
-              (widget.comment.photoComment == '')
-                  ? Container()
-                  : Image.network(
-                      widget.comment.photoComment,
-                      height: 120,
-                      width: 120,
-                      fit: BoxFit.cover,
-                    )
-            ]),
+              const SizedBox(
+                width: 8,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: (widget.comment.comment.length > 20) ? 200 : null,
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                        color: darkblueAppbarColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: focusBlueColor)),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.comment.ownName,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          (widget.comment.comment == '')
+                              ? Container()
+                              : Padding(
+                                  padding: const EdgeInsets.all(5),
+                                  child: Text(
+                                    widget.comment.comment,
+                                    maxLines: null,
+                                  ),
+                                ),
+                        ]),
+                  ),
+                  (widget.comment.photoComment == '')
+                      ? Container()
+                      : Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Image.network(
+                            widget.comment.photoComment,
+                            height: 120,
+                            width: 120,
+                            fit: BoxFit.cover,
+                          ),
+                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Text(timeDateWithNow(date: widget.comment.createDate)),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                width: 8,
+              ),
+            ],
           ),
-          subtitle: Text(timeDateWithNow(date: widget.comment.createDate)),
-        ),
-      ],
-    );
+        );
+      
   }
 }

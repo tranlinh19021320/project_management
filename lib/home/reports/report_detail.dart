@@ -1,10 +1,13 @@
 import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/comments/comments_list.dart';
 import 'package:project_management/home/widgets/text_button.dart';
 import 'package:project_management/model/report.dart';
+import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/notify_dialog.dart';
@@ -38,6 +41,7 @@ class _ReportDetailState extends State<ReportDetail> {
 
   Uint8List? imageComment;
   bool isLoading = false;
+  String photoURL = '';
   @override
   void initState() {
     super.initState();
@@ -65,7 +69,8 @@ class _ReportDetailState extends State<ReportDetail> {
     setState(() {
       isLoading = true;
     });
-
+    CurrentUser user = await FirebaseMethods().getCurrentUserByUserId(userId: FirebaseAuth.instance.currentUser!.uid);
+    photoURL = user.photoURL;
     imageList = await getImageList(photoURL: widget.report!.photoURL);
 
     setState(() {
@@ -138,23 +143,22 @@ class _ReportDetailState extends State<ReportDetail> {
         imageComment = null;
         comment.text = '';
 
-        setState(() {
-          
-        });
+        setState(() {});
         if (context.mounted) {
           showSnackBar(context: context, content: "Đã đăng thành công");
         }
-        
       } else {
         if (context.mounted) {
           showSnackBar(context: context, content: res, isError: true);
         }
       }
       if (commentFocus.hasFocus) {
-          commentFocus.unfocus();
-        }
+        commentFocus.unfocus();
+      }
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -470,9 +474,43 @@ class _ReportDetailState extends State<ReportDetail> {
                         children: [
                           Center(
                             child: InkWell(
-                              onTap: () => setState(() {
-                                isOpenComment = !isOpenComment;
-                              }),
+                              onTap: () async {
+                                setState(() {
+                                  isOpenComment = !isOpenComment;
+                                });
+                                await showCupertinoModalPopup(
+                                    context: context,
+                                    builder: (_) => Container(
+                                          height: MediaQuery.of(context).size.height *0.8,
+                                          
+                                          decoration: BoxDecoration(
+                                              color: darkblueAppbarColor,
+                                              borderRadius: const BorderRadius.only(
+                                                  topLeft: Radius.circular(30),
+                                                  topRight:Radius.circular(30)),
+                                              border: Border.all(color: focusBlueColor)),
+                                          child: Scaffold(
+                                            backgroundColor: Colors.transparent,
+                                            body: Column(
+                                              children: [
+                                                const Center(
+                                                  child: Text("Comment", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: backgroundWhiteColor),),
+                                                ),
+                                          
+                                                const Divider(thickness: 1.2, color: backgroundWhiteColor,),
+                                                CommentList(report: widget.report!, isLast: false,)
+                                              ],
+                                            ),
+
+                                            bottomNavigationBar: bottomCommentPost(),
+                                          ),
+                                        ),
+                                        
+                                        );
+                                setState(() {
+                                  isOpenComment = !isOpenComment;
+                                });
+                              },
                               child: Container(
                                 width: 110,
                                 decoration: BoxDecoration(
@@ -514,7 +552,9 @@ class _ReportDetailState extends State<ReportDetail> {
                           const Divider(
                             color: correctGreenColor,
                           ),
-                          CommentList(report: widget.report!)
+                          CommentList(
+                            report: widget.report!,
+                          )
                         ],
                       )
               ],
@@ -524,7 +564,13 @@ class _ReportDetailState extends State<ReportDetail> {
         // comment
         bottomNavigationBar: isNew
             ? null
-            : SafeArea(
+            : bottomCommentPost(),
+      ),
+    );
+  }
+
+  Widget bottomCommentPost() {
+    return SafeArea(
                 child: Container(
                   height: (imageComment == null)
                       ? kToolbarHeight + 5
@@ -552,8 +598,8 @@ class _ReportDetailState extends State<ReportDetail> {
                             : Column(
                                 children: [
                                   Padding(
-                                    padding:
-                                        const EdgeInsets.only(left: 0, right: 65),
+                                    padding: const EdgeInsets.only(
+                                        left: 0, right: 65),
                                     child: Stack(
                                       children: [
                                         SizedBox(
@@ -590,12 +636,13 @@ class _ReportDetailState extends State<ReportDetail> {
                           children: [
                             CircleAvatar(
                               backgroundImage:
-                                  NetworkImage(widget.report!.ownPhotoURL),
+                                  NetworkImage(photoURL),
                               radius: 20,
                             ),
                             Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.only(left: 8, right: 8),
+                                padding:
+                                    const EdgeInsets.only(left: 8, right: 8),
                                 child: TextField(
                                   controller: comment,
                                   focusNode: commentFocus,
@@ -646,8 +693,6 @@ class _ReportDetailState extends State<ReportDetail> {
                     ),
                   ),
                 ),
-              ),
-      ),
-    );
+              );
   }
 }

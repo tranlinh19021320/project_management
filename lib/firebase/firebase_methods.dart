@@ -888,7 +888,7 @@ class FirebaseMethods {
 
   Future<String> changeIsReadReportState(
       {required Report report,
-      required bool isOwner,
+      required bool isManager,
       required bool isRead}) async {
     String res = 'error';
     try {
@@ -897,7 +897,7 @@ class FirebaseMethods {
           .doc(report.companyId)
           .collection('reports')
           .doc(report.reportId)
-          .update((!isOwner) ? {"managerRead": isRead} : {'ownRead': isRead});
+          .update((isManager) ? {"managerRead": isRead} : {'ownRead': isRead});
       res = 'success';
     } catch (e) {
       res = e.toString();
@@ -934,7 +934,7 @@ class FirebaseMethods {
           photoURL: user.photoURL,
           photoComment: photoComment,
           comment: comment);
-      _firestore
+      await _firestore
           .collection('companies')
           .doc(report.companyId)
           .collection('reports')
@@ -942,11 +942,19 @@ class FirebaseMethods {
           .collection('comments')
           .doc(commentId)
           .set(commentReport.toJson());
-
+      await _firestore
+          .collection('companies')
+          .doc(report.companyId)
+          .collection('reports')
+          .doc(report.reportId)
+          .update({
+            'createDate' : DateTime.now(),
+          });
       (user.group == manager)
           ? imclementReportNumber(uid: report.ownId)
           : imclementReportNumber(group: manager);
-      changeIsReadReportState(report: report, isOwner: (user.group != manager), isRead: false);
+      changeIsReadReportState(
+          report: report, isManager: !(user.group == manager), isRead: false);
       res = 'success';
     } catch (e) {
       res = e.toString();

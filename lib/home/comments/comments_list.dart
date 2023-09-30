@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:project_management/home/comments/comment_card.dart';
 import 'package:project_management/model/comment.dart';
 import 'package:project_management/model/report.dart';
+import 'package:project_management/utils/colors.dart';
 
 class CommentList extends StatefulWidget {
   final Report report;
@@ -30,13 +31,13 @@ class _CommentListState extends State<CommentList> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const LinearProgressIndicator();
           }
-          if (!snapshot.hasData) {
+          if (snapshot.data!.docs.isEmpty) {
             return const Center(
               child: Text("Không có Comment"),
             );
           }
           int maxLength = snapshot.data!.docs.length;
-          print(maxLength);
+        
           if (widget.isLast) {
             String commentOwnId = snapshot.data!.docs.first['ownId'];
             maxLength = 1;
@@ -50,8 +51,14 @@ class _CommentListState extends State<CommentList> {
               }
             }
           }
-          return SizedBox(
-            height: MediaQuery.of(context).size.height*0.4,
+          return Container(
+            height:(widget.isLast) ? MediaQuery.of(context).size.height*0.4 : MediaQuery.of(context).size.height*0.68,
+            
+            width: double.infinity,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: darkblueAppbarColor
+            ),
             child: ListView.builder(
                 itemCount: maxLength,
                 
