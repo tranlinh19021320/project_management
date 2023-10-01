@@ -149,13 +149,7 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                   CircleAvatar(
                     backgroundColor: focusBlueColor,
                     radius: 36,
-                    child: CircleAvatar(
-                      backgroundColor: defaultColor,
-                      backgroundImage: NetworkImage(
-                        user.photoURL,
-                      ),
-                      radius: 34,
-                    ),
+                    child: getCircleImageFromUrl(url: user.photoURL, radius: 34)
                   ),
                   const SizedBox(
                     width: 12,

@@ -139,7 +139,7 @@ Widget menuIcon() {
         Icons.menu,
         size: 35,
       ),
-      getNumberNotifications(type: 2)
+      getNumberNotifications()
     ]),
   );
 }
@@ -148,7 +148,7 @@ getNumberNotifications(
     {double locate = 35,
     double size = 20,
     double fontSize = 10,
-    bool isBottom = true, int type = 0}) {
+    bool isBottom = true, bool? isNotify}) {
   return StreamBuilder(
     stream: FirebaseFirestore.instance
         .collection('users')
@@ -162,10 +162,10 @@ getNumberNotifications(
       int notifyNumber = snapshot.data!['notifyNumber'];
       int reportNumber = snapshot.data!['reportNumber'];
       
-      switch (type) {
-        case 0: notificationsNumber = notifyNumber;
-        case 1: notificationsNumber = reportNumber;
-        case 2: notificationsNumber = notifyNumber + reportNumber;
+      switch (isNotify) {
+        case true: notificationsNumber = notifyNumber;
+        case false: notificationsNumber = reportNumber;
+        case null: notificationsNumber = notifyNumber + reportNumber;
       }
       return (notificationsNumber == 0)
           ? SizedBox(

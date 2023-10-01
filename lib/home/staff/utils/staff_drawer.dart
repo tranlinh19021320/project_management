@@ -1,16 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:project_management/home/staff/screens/staff_reports.dart';
-import 'package:project_management/home/staff/screens/staff_time_keeping.dart';
-import 'package:project_management/home/staff/screens/staff_home.dart';
-import 'package:project_management/home/staff/screens/staff_notify_screen.dart';
-import 'package:project_management/home/widgets/text_button.dart';
+import 'package:project_management/home/widgets/button.dart';
+import 'package:project_management/home/widgets/page_list.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/parameters.dart';
 import '../../../firebase/firebase_methods.dart';
 import '../../../start_screen/login.dart';
 import '../../widgets/user_profile.dart';
@@ -53,69 +45,13 @@ class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
       backgroundColor: blueDrawerColor,
       child: Column(
         children: [
-          StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return UserAccountsDrawerHeader(
-                    currentAccountPicture: const CircleAvatar(
-                      foregroundColor: backgroundWhiteColor,
-                      backgroundColor: darkblueAppbarColor,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          backgroundColor: blueDrawerColor,
-                        ),
-                      ),
-                    ),
-                    accountName: LoadingAnimationWidget.staggeredDotsWave(
-                        color: backgroundWhiteColor, size: 18),
-                    accountEmail: LoadingAnimationWidget.staggeredDotsWave(
-                        color: backgroundWhiteColor, size: 18),
-                  );
-                }
-
-                return UserAccountsDrawerHeader(
-                  currentAccountPicture: Stack(
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          (isOpenProfile) ? selectImage() : null;
-                        },
-                        child: CircleAvatar(
-                          backgroundColor: backgroundWhiteColor,
-                          backgroundImage:
-                              NetworkImage(snapshot.data!['photoURL']),
-                          radius: 64,
-                        ),
-                      ),
-                      (isOpenProfile)
-                          ? Positioned(
-                              bottom: -15,
-                              left: 35,
-                              child: IconButton(
-                                onPressed: selectImage,
-                                icon: const Icon(
-                                  Icons.add_a_photo,
-                                  size: 18,
-                                ),
-                                color: backgroundWhiteColor,
-                              ),
-                            )
-                          : Container(),
-                    ],
-                  ),
-                  accountName: Text(snapshot.data!['nameDetails']),
-                  accountEmail: Text(snapshot.data!['email']),
-                  onDetailsPressed: () {
-                    setState(() {
-                      isOpenProfile = !isOpenProfile;
-                    });
-                  },
-                );
-              }),
+          userInfor(
+              selectImage: selectImage,
+              setState: () => setState(() {
+                    isOpenProfile = !isOpenProfile;
+                  }),
+              isLoadingImage: isLoadingImage,
+              isOpenProfile: isOpenProfile),
           Expanded(
               child: isOpenProfile
                   ? const ProfileScreen()
@@ -125,112 +61,13 @@ class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
                         padding: const EdgeInsets.only(top: 4),
                         children: [
                           // quest select
-                          ListTile(
-                            tileColor: (widget.selectedPage == IS_QUEST_PAGE)
-                                ? focusBlueColor
-                                : Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(color: focusBlueColor),
-                                borderRadius: BorderRadius.circular(12)),
-                            leading: projectIcon,
-                            trailing: (widget.selectedPage == IS_QUEST_PAGE)
-                                ? rightArrowPageIcon
-                                : null,
-                            title: const Text(
-                              "Nhiệm vụ",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            onTap: () {
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (_) => const StaffHomeScreen()));
-                            },
-                          ),
+                          menuListTile(context: context, selectPage: widget.selectedPage, pageValue: IS_QUEST_PAGE),
                           // notification select
-                          ListTile(
-                            tileColor: (widget.selectedPage == IS_NOTIFY_PAGE)
-                                ? focusBlueColor
-                                : Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(color: focusBlueColor),
-                                borderRadius: BorderRadius.circular(12)),
-                            leading: defaultnotifyIcon,
-                            trailing: (widget.selectedPage == IS_NOTIFY_PAGE)
-                                ? rightArrowPageIcon
-                                : getNumberNotifications(
-                                    isBottom: false, size: 28, fontSize: 13, type: 0),
-                            title: const Text(
-                              "Thông báo",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            onTap: () async {
-                              Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (_) =>
-                                              const StaffNotifyScreen()));
-                              String res =
-                                  await FirebaseMethods().refreshNotifyNumber();
-                              if (res != 'success') {
-                                if (context.mounted) {
-                                  showSnackBar(context: context, content: res, isError: true);
-                                }
-                              }
-                            },
-                          ),
+                          menuListTile(context: context, selectPage: widget.selectedPage, pageValue: IS_STAFF_NOTIFY_PAGE, isNotify: true),
                           //time keeping select
-                          ListTile(
-                            tileColor: (widget.selectedPage == IS_EVENT_PAGE)
-                                ? focusBlueColor
-                                : Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(color: focusBlueColor),
-                                borderRadius: BorderRadius.circular(12)),
-                            leading: eventIcon,
-                            trailing: (widget.selectedPage == IS_NOTIFY_PAGE)
-                                ? rightArrowPageIcon
-                                : null,
-                            title: const Text(
-                              "Bảng chấm công",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            onTap: () {
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (_) =>
-                                          const StaffTimeKeepingScreen()));
-                            },
-                          ),
+                          menuListTile(context: context, selectPage: widget.selectedPage, pageValue: IS_TIME_KEEPING_PAGE),
                           //reports select
-                          ListTile(
-                            tileColor: (widget.selectedPage == IS_REPORT_PAGE)
-                                ? focusBlueColor
-                                : Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(color: focusBlueColor),
-                                borderRadius: BorderRadius.circular(12)),
-                            leading: loudspeakerIcon,
-                            trailing: (widget.selectedPage == IS_REPORT_PAGE)
-                                ? rightArrowPageIcon
-                                : getNumberNotifications(
-                                    isBottom: false, size: 28, fontSize: 13, type: 1),
-                            title: const Text(
-                              "Báo cáo",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            onTap: () async {
-                              Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (_) =>
-                                              const StaffReportsScreen()));
-                              String res =
-                                  await FirebaseMethods().refreshReportNumber();
-                              if (res != 'success') {
-                                if (context.mounted) {
-                                  showSnackBar(context: context, content: res, isError: true);
-                                }
-                              }
-                            },
-                          )
+                          menuListTile(context: context, selectPage: widget.selectedPage, pageValue: IS_REPORT_PAGE, isNotify: false)
                         ],
                       ),
                       floatingActionButton: TextBoxButton(

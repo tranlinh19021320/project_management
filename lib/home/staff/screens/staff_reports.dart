@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/home/reports/report_detail.dart';
 import 'package:project_management/home/reports/reports_screen.dart';
+import 'package:project_management/home/widgets/page_list.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/paths.dart';
 
 import '../utils/staff_drawer.dart';

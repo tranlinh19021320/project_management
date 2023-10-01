@@ -5,11 +5,11 @@ import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/admin/utils/drawer_bar.dart';
 import 'package:project_management/home/projects/project_card.dart';
 import 'package:project_management/home/projects/project_detail.dart';
+import 'package:project_management/home/widgets/page_list.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/paths.dart';
 
 class ProjectsScreen extends StatefulWidget {

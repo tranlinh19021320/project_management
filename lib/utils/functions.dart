@@ -120,7 +120,6 @@ Future<Uint8List?> selectAImage(
                 padding: const EdgeInsets.all(18),
                 child: const Text("Thư viện ảnh"),
                 onPressed: () async {
-                  
                   imageFile = await pickImage(context, ImageSource.gallery);
                   if (imageFile != null && isSave) {
                     if (context.mounted) {
@@ -153,30 +152,32 @@ Future<Uint8List?> selectAImage(
 }
 
 // get image from url
-Image getImageFromUrl({
+Widget getCircleImageFromUrl({
   required String url,
-  double size = 64,
+  double radius = 32,
 }) {
-  return Image.network(
-    url,
-    width: size,
-    height: size,
-    fit: BoxFit.cover,
-    loadingBuilder: (context, child, loadingProgress) {
-      int? totalSize;
-      int? downloadSize;
-
-      totalSize = loadingProgress?.expectedTotalBytes;
-      downloadSize = loadingProgress?.cumulativeBytesLoaded;
-
-      if (totalSize != null && downloadSize != null) {
-        var loadPercent = (downloadSize / totalSize).toDouble();
-
-        return circularPercentIndicator(percent: loadPercent, radius: size / 2);
-      }
-
-      return child;
-    },
+  return ClipOval(
+    child: Image.network(
+      url,
+      width: radius * 2,
+      height: radius * 2,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, loadingProgress) {
+        int? totalSize;
+        int? downloadSize;
+  
+        totalSize = loadingProgress?.expectedTotalBytes;
+        downloadSize = loadingProgress?.cumulativeBytesLoaded;
+  
+        if (totalSize != null && downloadSize != null) {
+          var loadPercent = (downloadSize / totalSize).toDouble();
+  
+          return circularPercentIndicator(percent: loadPercent, radius: radius, lineWidth: radius/2, );
+        }
+  
+        return child;
+      },
+    ),
   );
 }
 
@@ -212,10 +213,7 @@ Widget user1Card(
     contentPadding: const EdgeInsets.symmetric(horizontal: 12),
     dense: true,
     visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-    leading: ClipRRect(
-      borderRadius: BorderRadius.circular(size / 2),
-      child: getImageFromUrl(url: user.photoURL, size: size),
-    ),
+    leading: getCircleImageFromUrl(url: user.photoURL, radius: size/2),
     title: Text(
       user.nameDetails,
       style: TextStyle(fontSize: fontsize),

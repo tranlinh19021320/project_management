@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/comments/comments_list.dart';
-import 'package:project_management/home/widgets/text_button.dart';
+import 'package:project_management/home/widgets/button.dart';
 import 'package:project_management/model/report.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/colors.dart';
@@ -57,6 +57,7 @@ class _ReportDetailState extends State<ReportDetail> {
         });
       }
     });
+
     if (!isNew) {
       nameReport.text = widget.report!.nameReport;
       type = widget.report!.type;
@@ -69,8 +70,11 @@ class _ReportDetailState extends State<ReportDetail> {
     setState(() {
       isLoading = true;
     });
-    CurrentUser user = await FirebaseMethods().getCurrentUserByUserId(userId: FirebaseAuth.instance.currentUser!.uid);
-    photoURL = user.photoURL;
+
+    CurrentUser currentUser = await FirebaseMethods()
+        .getCurrentUserByUserId(userId: FirebaseAuth.instance.currentUser!.uid);
+    photoURL = currentUser.photoURL;
+
     imageList = await getImageList(photoURL: widget.report!.photoURL);
 
     setState(() {
@@ -152,13 +156,9 @@ class _ReportDetailState extends State<ReportDetail> {
           showSnackBar(context: context, content: res, isError: true);
         }
       }
-      if (commentFocus.hasFocus) {
-        commentFocus.unfocus();
-      }
+      commentFocus.unfocus();
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -180,6 +180,30 @@ class _ReportDetailState extends State<ReportDetail> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                isNew
+                    ? Container()
+                    : Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Row(
+                          children: [
+                            getCircleImageFromUrl(url: widget.report!.ownPhotoURL, radius: 24),
+                            const SizedBox(
+                              width: 12,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.report!.ownName,
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                 const Divider(),
                 // text field for name report
                 TextField(
@@ -365,7 +389,9 @@ class _ReportDetailState extends State<ReportDetail> {
                 ),
                 // image show
                 (isLoading)
-                    ? const LinearProgressIndicator()
+                    ? const LinearProgressIndicator(
+                        color: correctGreenColor,
+                      )
                     : (imageList.isEmpty)
                         ? const Center(
                             child: Text('Không có hình ảnh minh họa'),
@@ -393,11 +419,44 @@ class _ReportDetailState extends State<ReportDetail> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.end,
                                         children: [
-                                          Text(
-                                            "${index + 1}/${imageList.length}",
-                                            style:
-                                                const TextStyle(fontSize: 15),
-                                          ),
+                                          (imageList.length == 1)
+                                              ? const Text('')
+                                              : FutureBuilder(
+                                                  future: Future.delayed(
+                                                      const Duration(
+                                                          seconds: 2)),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState.done) {
+                                                      return Container();
+                                                    } else {
+                                                      return Container(
+                                                        decoration: BoxDecoration(
+                                                            color:
+                                                                darkblueAppbarColor,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        50)),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  vertical: 4,
+                                                                  horizontal:
+                                                                      6),
+                                                          child: Text(
+                                                            "${index + 1}/${imageList.length}",
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        15),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  }),
                                           const SizedBox(
                                             width: 8,
                                           ),
@@ -479,34 +538,43 @@ class _ReportDetailState extends State<ReportDetail> {
                                   isOpenComment = !isOpenComment;
                                 });
                                 await showCupertinoModalPopup(
-                                    context: context,
-                                    builder: (_) => Container(
-                                          height: MediaQuery.of(context).size.height *0.8,
-                                          
-                                          decoration: BoxDecoration(
-                                              color: darkblueAppbarColor,
-                                              borderRadius: const BorderRadius.only(
-                                                  topLeft: Radius.circular(30),
-                                                  topRight:Radius.circular(30)),
-                                              border: Border.all(color: focusBlueColor)),
-                                          child: Scaffold(
-                                            backgroundColor: Colors.transparent,
-                                            body: Column(
-                                              children: [
-                                                const Center(
-                                                  child: Text("Comment", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: backgroundWhiteColor),),
-                                                ),
-                                          
-                                                const Divider(thickness: 1.2, color: backgroundWhiteColor,),
-                                                CommentList(report: widget.report!, isLast: false,)
-                                              ],
+                                  context: context,
+                                  builder: (_) => Container(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.8,
+                                    decoration: BoxDecoration(
+                                        color: darkblueAppbarColor,
+                                        borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(30),
+                                            topRight: Radius.circular(30)),
+                                        border:
+                                            Border.all(color: focusBlueColor)),
+                                    child: Scaffold(
+                                      backgroundColor: Colors.transparent,
+                                      body: Column(
+                                        children: [
+                                          const Center(
+                                            child: Text(
+                                              "Tất cả bình luận",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20,
+                                                  color: backgroundWhiteColor),
                                             ),
-
-                                            bottomNavigationBar: bottomCommentPost(),
                                           ),
-                                        ),
-                                        
-                                        );
+                                          const Divider(
+                                            thickness: 1.2,
+                                            color: backgroundWhiteColor,
+                                          ),
+                                          CommentList(
+                                            report: widget.report!,
+                                            isLast: false,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
                                 setState(() {
                                   isOpenComment = !isOpenComment;
                                 });
@@ -521,7 +589,7 @@ class _ReportDetailState extends State<ReportDetail> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     const Text(
-                                      "Comments",
+                                      "Bình luận",
                                       style: TextStyle(fontSize: 15),
                                     ),
                                     AnimatedSwitcher(
@@ -562,137 +630,131 @@ class _ReportDetailState extends State<ReportDetail> {
           ),
         ),
         // comment
-        bottomNavigationBar: isNew
-            ? null
-            : bottomCommentPost(),
+        bottomNavigationBar: isNew ? null : bottomCommentPost(),
       ),
     );
   }
 
   Widget bottomCommentPost() {
     return SafeArea(
-                child: Container(
-                  height: (imageComment == null)
-                      ? kToolbarHeight + 5
-                      : kToolbarHeight + 200,
-                  decoration: BoxDecoration(
-                    color: darkblueAppbarColor,
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12)),
-                    border: Border.all(color: focusBlueColor),
-                  ),
-                  margin: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).viewInsets.bottom),
-                  padding: const EdgeInsets.only(
-                    left: 4,
-                    right: 4,
-                    bottom: 5,
-                    top: 5,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
+      child: Container(
+        height:
+            (imageComment == null) ? kToolbarHeight + 5 : kToolbarHeight + 200,
+        decoration: BoxDecoration(
+          color: darkblueAppbarColor,
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+          border: Border.all(color: focusBlueColor),
+        ),
+        margin:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        padding: const EdgeInsets.only(
+          left: 4,
+          right: 4,
+          bottom: 5,
+          top: 5,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              (imageComment == null)
+                  ? Container()
+                  : Column(
                       children: [
-                        (imageComment == null)
-                            ? Container()
-                            : Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 0, right: 65),
-                                    child: Stack(
-                                      children: [
-                                        SizedBox(
-                                            height: 180,
-                                            width: 240,
-                                            child: Image.memory(
-                                              imageComment!,
-                                              fit: BoxFit.cover,
-                                            )),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 210, top: 4),
-                                          child: InkWell(
-                                            onTap: () {
-                                              imageComment = null;
-                                              setState(() {});
-                                            },
-                                            child: const Icon(
-                                              Icons.cancel,
-                                              color: errorRedColor,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const Divider(
-                                    thickness: 1.3,
-                                    color: focusBlueColor,
-                                  )
-                                ],
-                              ),
-                        Row(
-                          children: [
-                            CircleAvatar(
-                              backgroundImage:
-                                  NetworkImage(photoURL),
-                              radius: 20,
-                            ),
-                            Expanded(
-                              child: Padding(
+                        Padding(
+                          padding: const EdgeInsets.only(left: 0, right: 65),
+                          child: Stack(
+                            children: [
+                              SizedBox(
+                                  height: 180,
+                                  width: 240,
+                                  child: Image.memory(
+                                    imageComment!,
+                                    fit: BoxFit.cover,
+                                  )),
+                              Padding(
                                 padding:
-                                    const EdgeInsets.only(left: 8, right: 8),
-                                child: TextField(
-                                  controller: comment,
-                                  focusNode: commentFocus,
-                                  style: const TextStyle(color: blackColor),
-                                  decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.all(8),
-                                    filled: true,
-                                    fillColor: backgroundWhiteColor,
-                                    hintText: "Comment",
-                                    hintStyle:
-                                        const TextStyle(color: defaultColor),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                    const EdgeInsets.only(left: 210, top: 4),
+                                child: InkWell(
+                                  onTap: () {
+                                    imageComment = null;
+                                    setState(() {});
+                                  },
+                                  child: const Icon(
+                                    Icons.cancel,
+                                    color: errorRedColor,
                                   ),
-                                  maxLines: null,
                                 ),
                               ),
-                            ),
-                            InkWell(
-                                onTap: () async {
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-                                  imageComment = await selectAImage(
-                                      context: context, isSave: false);
-                                  setState(() {
-                                    isLoading = false;
-                                  });
-                                  setState(() {});
-                                },
-                                child: const Icon(
-                                  Icons.add_a_photo,
-                                  color: correctGreenColor,
-                                )),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 3, left: 8),
-                              child: InkWell(
-                                  onTap: postComment,
-                                  child: const Icon(
-                                    Icons.send,
-                                    color: focusBlueColor,
-                                  )),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                        const Divider(
+                          thickness: 1.3,
+                          color: focusBlueColor,
+                        )
                       ],
                     ),
+              Row(
+                children: [
+                   (isLoading)
+                    ? const CircularProgressIndicator(
+                        color: correctGreenColor,
+                      )
+                    : getCircleImageFromUrl(url: photoURL, radius: 20),
+                  
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8, right: 8),
+                      child: TextField(
+                        controller: comment,
+                        focusNode: commentFocus,
+                        style: const TextStyle(color: blackColor),
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.all(8),
+                          filled: true,
+                          fillColor: backgroundWhiteColor,
+                          hintText: "Comment",
+                          hintStyle: const TextStyle(color: defaultColor),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        maxLines: null,
+                      ),
+                    ),
                   ),
-                ),
-              );
+                  InkWell(
+                      onTap: () async {
+                        setState(() {
+                          isLoading = true;
+                        });
+                        imageComment =
+                            await selectAImage(context: context, isSave: false);
+                        setState(() {
+                          isLoading = false;
+                        });
+                        setState(() {});
+                      },
+                      child: const Icon(
+                        Icons.add_a_photo,
+                        color: correctGreenColor,
+                      )),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 3, left: 8),
+                    child: InkWell(
+                        onTap: postComment,
+                        child: const Icon(
+                          Icons.send,
+                          color: focusBlueColor,
+                        )),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

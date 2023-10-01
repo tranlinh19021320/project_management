@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/home/notifications/notifications_list.dart';
+import 'package:project_management/home/widgets/page_list.dart';
 
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/paths.dart';
 import '../utils/drawer_bar.dart';
 class NotifyScreen extends StatefulWidget {
@@ -34,7 +34,7 @@ class _NotifyScreenState extends State<NotifyScreen> {
                         icon: menuIcon()),
                   ),
         ),
-        drawer:const  DrawerMenu(selectedPage: IS_NOTIFY_PAGE,),
+        drawer:const DrawerMenu(selectedPage: IS_MANAGER_NOTIFY_PAGE,),
         body: const NotificationsScreen()
       ),
     );

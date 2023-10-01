@@ -52,9 +52,7 @@ class _CommentListState extends State<CommentList> {
             }
           }
           return Container(
-            height:(widget.isLast) ? MediaQuery.of(context).size.height*0.4 : MediaQuery.of(context).size.height*0.68,
-            
-            width: double.infinity,
+            constraints:BoxConstraints(maxHeight:(!widget.isLast) ? MediaQuery.of(context).size.height * 0.73 :  MediaQuery.of(context).size.height * 0.45,),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               color: darkblueAppbarColor

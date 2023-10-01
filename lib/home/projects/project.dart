@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/missions/missions_list.dart';
 import 'package:project_management/home/projects/project_detail.dart';
-import 'package:project_management/home/widgets/text_button.dart';
+import 'package:project_management/home/widgets/button.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/notify_dialog.dart';

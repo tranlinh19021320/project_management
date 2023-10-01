@@ -26,10 +26,7 @@ class _CommentCardState extends State<CommentCard> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(widget.comment.photoURL),
-                  radius: 16,
-                ),
+                child: getCircleImageFromUrl(url: widget.comment.photoURL, radius: 16)
               ),
               const SizedBox(
                 width: 8,
@@ -38,7 +35,7 @@ class _CommentCardState extends State<CommentCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: (widget.comment.comment.length > 20) ? 200 : null,
+                    constraints: const BoxConstraints(maxWidth: 200),
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                         color: darkblueAppbarColor,
@@ -47,9 +44,12 @@ class _CommentCardState extends State<CommentCard> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            widget.comment.ownName,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          Padding(
+                            padding: const EdgeInsets.all(2),
+                            child: Text(
+                              widget.comment.ownName,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
                           (widget.comment.comment == '')
                               ? Container()
@@ -57,7 +57,7 @@ class _CommentCardState extends State<CommentCard> {
                                   padding: const EdgeInsets.all(5),
                                   child: Text(
                                     widget.comment.comment,
-                                    maxLines: null,
+                                    
                                   ),
                                 ),
                         ]),

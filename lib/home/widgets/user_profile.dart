@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/home/widgets/reset_password.dart';
-import 'package:project_management/home/widgets/text_button.dart';
+import 'package:project_management/home/widgets/button.dart';
 import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/icons.dart';
 import 'package:project_management/utils/notify_dialog.dart';
 import '../../firebase/firebase_methods.dart';
@@ -262,4 +264,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
               );
             });
   }
+}
+
+Widget userInfor({required VoidCallback selectImage, required VoidCallback setState, required bool isLoadingImage, required bool isOpenProfile,}) {
+  return StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting ||
+                    isLoadingImage) {
+                  return UserAccountsDrawerHeader(
+                    currentAccountPicture: const CircleAvatar(
+                      
+                      backgroundColor: defaultColor,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: focusBlueColor,
+                        ),
+                      ),
+                    ),
+                    accountName: LoadingAnimationWidget.staggeredDotsWave(
+                        color: backgroundWhiteColor, size: 18),
+                    accountEmail: LoadingAnimationWidget.staggeredDotsWave(
+                        color: backgroundWhiteColor, size: 18),
+                  );
+                }
+
+                return UserAccountsDrawerHeader(
+                  currentAccountPicture: Stack(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          (isOpenProfile) ? selectImage : null;
+                        },
+                        child: CircleAvatar(
+                          radius: 35,
+                          backgroundColor: darkblueAppbarColor,
+                          child:
+                              getCircleImageFromUrl(url: snapshot.data!['photoURL']),
+                        ),
+                      ),
+                      (isOpenProfile)
+                          ? Positioned(
+                              bottom: -15,
+                              left: 35,
+                              child: IconButton(
+                                onPressed: selectImage,
+                                icon: const Icon(
+                                  Icons.add_a_photo,
+                                  size: 18,
+                                ),
+                                color: backgroundWhiteColor,
+                              ),
+                            )
+                          : Container(),
+                    ],
+                  ),
+                  accountName: Text(snapshot.data!['nameDetails']),
+                  accountEmail: Text(snapshot.data!['email']),
+                  onDetailsPressed:setState,
+                );
+              });
 }

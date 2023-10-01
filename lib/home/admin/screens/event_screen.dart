@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/home/reports/reports_screen.dart';
+import 'package:project_management/home/widgets/page_list.dart';
 
 import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/paths.dart';
 import '../utils/drawer_bar.dart';
 
@@ -33,7 +33,7 @@ class _EventScreenState extends State<EventScreen> {
                         icon: menuIcon()),
                   ),
         ),
-        drawer:const  DrawerMenu(selectedPage: IS_EVENT_PAGE,),
+        drawer:const DrawerMenu(selectedPage: IS_EVENT_PAGE,),
         body: const ReportsScreen(),
       ),
     );

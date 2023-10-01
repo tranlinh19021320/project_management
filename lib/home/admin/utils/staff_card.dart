@@ -5,7 +5,7 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/timetracking/time_keeping_table.dart';
 import 'package:project_management/home/widgets/group_dropdown_button.dart';
-import 'package:project_management/home/widgets/text_button.dart';
+import 'package:project_management/home/widgets/button.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/notify_dialog.dart';
@@ -177,13 +177,7 @@ Nhóm: $userGroup''';
                       children: [
                         Expanded(
                           child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: backgroundWhiteColor,
-                              backgroundImage: NetworkImage(
-                                widget.staff.photoURL,
-                              ),
-                              radius: 22,
-                            ),
+                            leading: getCircleImageFromUrl(url: widget.staff.photoURL, radius: 22),
                             title: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
