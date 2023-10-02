@@ -38,9 +38,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
         context: context,
         builder: (_) => AlertDialog(
               scrollable: true,
-              backgroundColor: darkblueAppbarColor,
-              iconPadding: const EdgeInsets.only(bottom: 8),
-              icon: loudspeakerIcon,
+              backgroundColor: darkblueColor,
               title: Column(
                 children: [
                   Text(
@@ -51,7 +49,7 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
                   ),
                   const Text(
                     "Dự án sẽ bị xóa vĩnh viễn!",
-                    style: TextStyle(color: errorRedColor, fontSize: 12),
+                    style: TextStyle(color: errorRedColor, fontSize: 14),
                   ),
                 ],
               ),
@@ -59,14 +57,15 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
               actionsPadding: const EdgeInsets.only(bottom: 14),
               actions: [
                 textBoxButton(
-                    color: darkblueColor,
+                    color: errorRedColor,
                     text: "Ok",
+                    width: 60,
                     fontSize: 14,
-                    
                     function: () => Navigator.of(context).pop(true)),
                 textBoxButton(
-                    color: errorRedColor,
+                    color: darkblueAppbarColor,
                     text: "Hủy",
+                    width: 60,
                     fontSize: 14,
                     
                     function: () => Navigator.of(context).pop(false)),

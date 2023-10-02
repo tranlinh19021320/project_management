@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:project_management/home/missions/mission.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/provider/group_provider.dart';
+import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/widgets.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +32,7 @@ class _MissionCardState extends State<MissionCard> {
   @override
   Widget build(BuildContext context) {
     return card(
+      color: dateInTime(startDate: widget.mission.startDate, endDate: widget.mission.endDate) ? darkblueAppbarColor : darkblueColor,
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => MissionHomeScreen(
                   mission: widget.mission,
@@ -61,7 +63,7 @@ class _MissionCardState extends State<MissionCard> {
                         const BoxConstraints(maxWidth: 200, maxHeight: 45),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      color: darkblueColor,
+                      color: Colors.transparent,
                       border: Border.all(),
                     ),
                     child: userCard(

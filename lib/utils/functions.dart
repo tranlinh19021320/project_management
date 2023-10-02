@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -5,17 +7,16 @@ import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/utils/parameters.dart';
-import 'package:project_management/utils/widgets.dart';
 
-
-Image resizedIcon(String imagePath,{double size = 20}) {
+Image resizedIcon(String imagePath, {double size = 20, bool isfill = true}) {
   return Image.asset(
     imagePath,
     width: size,
     height: size,
-    fit: BoxFit.fill,
+    fit: (isfill) ? BoxFit.fill : null,
   );
 }
+
 // show snack bar
 showSnackBar(
     {required BuildContext context,
@@ -53,59 +54,33 @@ showSnackBar(
   ));
 }
 
-showNotify(
-    {required BuildContext context,
-    String content = '',
-    bool isLoading = false,
-    bool isError = false}) {
-  return isLoading
-      ? showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (_) => AlertDialog(
-                backgroundColor: Colors.transparent,
-                icon: LoadingAnimationWidget.inkDrop(
-                    color: darkblueAppbarColor, size: 32),
-                title: const Center(
-                  child: Text(
-                    "Loading...",
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: blueDrawerColor,
-                    ),
+showNotify({
+  required BuildContext context,
+  String content = '',
+  bool isLoading = false,
+  bool isError = false,
+}) {
+  if (isLoading) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) => AlertDialog(
+              backgroundColor: Colors.transparent,
+              icon: LoadingAnimationWidget.inkDrop(
+                  color: darkblueAppbarColor, size: 32),
+              title: const Center(
+                child: Text(
+                  "Loading...",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: blueDrawerColor,
                   ),
                 ),
-              ))
-      : showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-                scrollable: true,
-                backgroundColor: darkblueAppbarColor,
-                iconPadding: const EdgeInsets.only(top: 6),
-                icon: SizedBox(height: 24, width: 24, child: loudspeakerIcon),
-                // backgroundColor: backgroundWhiteColor,
-
-                actionsAlignment: MainAxisAlignment.center,
-                actionsPadding: const EdgeInsets.only(bottom: 12),
-                titlePadding: const EdgeInsets.only(top: 8, bottom: 8),
-                title: Center(
-                  child: Text(
-                    content,
-                    style: TextStyle(
-                        color: isError ? notifyIconColor : correctGreenColor,
-                        fontSize: 18),
-                  ),
-                ),
-                actions: [
-                  textBoxButton(
-                      color: notifyIconColor,
-                      text: 'OK',
-                      fontSize: 16,
-                      function: () {
-                        Navigator.of(context).pop();
-                      })
-                ],
-              ));
+              ),
+            ));
+  } else {
+    showSnackBar(context: context, content: content, isError: isError);
+  }
 }
 
 // funtion to check email is valid or not
@@ -217,7 +192,9 @@ String dayToString({required DateTime time, int type = 0}) {
 }
 
 // deffirence with date and now
-String timeDateWithNow({required DateTime date}) {
+String timeDateWithNow({
+  required DateTime date,
+}) {
   DateTime now = DateTime.now();
 
   if (now.year == date.year && now.month == date.month && now.day == date.day) {
@@ -236,18 +213,23 @@ String timeDateWithNow({required DateTime date}) {
 }
 
 bool isToDay(
-    {String? dateString, DateTime? date, int? day, int? month, int? year}) {
+    {String? dateString,
+    DateTime? date,
+    int? day,
+    int? month,
+    int? year,
+    DateTime? date2}) {
+  DateTime now = DateTime.now();
+  if (date2 != null) now = date2;
   return (dateString != null)
-      ? dayToString(time: DateTime.now()) == dateString
+      ? dayToString(time: now) == dateString
       : (date != null)
-          ? dayToString(time: DateTime.now()) == dayToString(time: date)
+          ? dayToString(time: now) == dayToString(time: date)
           : (day != null && month != null && year != null)
-              ? dayToString(time: DateTime.now()) ==
+              ? dayToString(time: now) ==
                   dayToString(time: DateTime(year, month, day))
               : false;
 }
-
-
 
 Future<List<Uint8List>> getImageList({required List photoURL}) async {
   List<Uint8List> imageList = [];
@@ -261,8 +243,28 @@ Future<List<Uint8List>> getImageList({required List photoURL}) async {
   return imageList;
 }
 
-String staffRecieveMission({required String nameMission, required String description}) {
-  String notify = "Bạn đã nhận được nhiệm vụ \"$nameMission\" với mô tả:\"$description\"";
+String staffRecieveMission(
+    {required String nameMission, required String description}) {
+  String notify =
+      "Bạn đã nhận được nhiệm vụ \"$nameMission\" với mô tả:\"$description\"";
 
   return "${notify.substring(0, 50)}...";
+}
+
+bool dateInTime(
+    {required DateTime startDate, required DateTime endDate, DateTime? date}) {
+  DateTime time;
+  if (date == null) {
+    time = DateTime.now();
+  } else {
+    time = date;
+  }
+
+  DateTime start = DateTime(startDate.year, startDate.month, startDate.day);
+  DateTime end = DateTime(endDate.year, endDate.month, endDate.day);
+
+  return (isToDay(date: time, date2: startDate) ||
+          isToDay(date: time, date2: endDate))
+      ? true
+      : !(time.isBefore(start) || time.isAfter(end));
 }

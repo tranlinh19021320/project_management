@@ -455,7 +455,21 @@ class FirebaseMethods {
           .collection('missions')
           .doc(missionId)
           .set(mission.toJson());
-
+      var snap = await _firestore
+          .collection('companies')
+          .doc(mission.companyId)
+          .collection('projects')
+          .doc(mission.projectId)
+          .get();
+      int missions = snap.data()!['missions'];
+      await _firestore
+          .collection('companies')
+          .doc(mission.companyId)
+          .collection('projects')
+          .doc(mission.projectId)
+          .update({
+        'missions': missions + 1,
+      });
       await createNotification(
           uid: staffId, mission: mission, type: STAFF_RECIEVE_MISSION);
       res = 'success';
@@ -483,14 +497,10 @@ class FirebaseMethods {
           .where('staffId', isEqualTo: userId)
           .get();
       var docs = snap.docs;
-      docs.removeWhere((element) {
-        DateTime startDate = element['startDate'].toDate();
-        startDate = DateTime(startDate.year, startDate.month, startDate.day);
-        DateTime endDate = element['endDate'].toDate();
-        endDate = DateTime(endDate.year, endDate.month, endDate.day);
-
-        return (date.isBefore(startDate) || date.isAfter(endDate));
-      });
+      docs.removeWhere((element) => !dateInTime(
+          startDate: element['startDate'].toDate(),
+          endDate: element['endDate'].toDate(),
+          date: date));
 
       if (docs.isNotEmpty) {
         return Mission.fromSnap(mission: docs.first);
@@ -947,8 +957,8 @@ class FirebaseMethods {
           .collection('reports')
           .doc(report.reportId)
           .update({
-            'createDate' : DateTime.now(),
-          });
+        'createDate': DateTime.now(),
+      });
       (user.group == manager)
           ? imclementReportNumber(uid: report.ownId)
           : imclementReportNumber(group: manager);

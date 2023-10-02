@@ -42,7 +42,6 @@ class _MissionsScreenState extends State<MissionsScreen> {
                   .collection('missions')
                   .where('staffId',
                       isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                  
                   .orderBy('createDate', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
@@ -69,6 +68,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                   .collection('missions')
                   .where('companyId', isEqualTo: widget.project!.companyId)
                   .where('projectId', isEqualTo: widget.project!.projectId)
+                  .orderBy('createDate', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {

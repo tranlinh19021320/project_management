@@ -35,6 +35,7 @@ class _ProgressCardState extends State<ProgressCard> {
   @override
   Widget build(BuildContext context) {
     return card(
+      color: isToday ? darkblueAppbarColor : darkblueColor,
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => ProgressDetailScreen(
                   progress: widget.progress,

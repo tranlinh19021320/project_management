@@ -28,9 +28,8 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
         context: context,
         builder: (_) => AlertDialog(
               scrollable: true,
-              backgroundColor: darkblueAppbarColor,
-              iconPadding: const EdgeInsets.only(bottom: 8),
-              icon: loudspeakerIcon,
+              backgroundColor: darkblueColor,
+              
               title: Column(
                 children: [
                   Text(
@@ -41,7 +40,7 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
                   ),
                   const Text(
                     "Dự án sẽ bị xóa vĩnh viễn!",
-                    style: TextStyle(color: errorRedColor, fontSize: 12),
+                    style: TextStyle(color: errorRedColor, fontSize: 14),
                   ),
                 ],
               ),
@@ -49,16 +48,16 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
               actionsPadding: const EdgeInsets.only(bottom: 14),
               actions: [
                 textBoxButton(
-                    color: darkblueColor,
+                    color: errorRedColor,
                     text: "Ok",
                     fontSize: 14,
-                    
+                    width: 60,
                     function: () => Navigator.of(context).pop(true)),
                 textBoxButton(
-                    color: errorRedColor,
+                    color: darkblueAppbarColor,
                     text: "Hủy",
                     fontSize: 14,
-                    
+                    width: 60,
                     function: () => Navigator.of(context).pop(false)),
               ],
             ));

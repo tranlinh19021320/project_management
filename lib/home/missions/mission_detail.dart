@@ -181,7 +181,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
       if (res == 'success') {
         if (context.mounted) {
           Navigator.pop(context);
-          showNotify(context: context, content: "Tạo thành công");
+          showNotify(context: context, content: "Tạo thành công",);
           
         }
       } else {

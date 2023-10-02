@@ -3,59 +3,58 @@
 Ứng dụng di động quản lý dự án
 
 ## Feature - is doing
-- Đăng ký
-- Đăng nhập
+
+### Start Screen
+- Đăng ký, Đăng nhập
 <p align="center">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/login_screenshot.png" alt="Login">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/signup_screenshot.png" alt="Singup">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/general_screen_add_company.png" alt="Add company">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/general_screen_sign_up.png" alt="Singup">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/general_screen_login.png" alt="Login">
 </p>
 
-- Thanh menu
-- Profile
-- Update function
-
+### Admin
+- Drawer, Dự án, Nhân sự, 
 <p align="center">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/slide_bar.png" alt="Slide Bar">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/profile.png" alt="User Profile">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/reset_password.png" alt="Reset Password Dialog">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/admin_drawer.png" alt="Drawer">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/admin_project_page.png" alt="Project List">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/admin_personal_page.png" alt="Personal List">
 </p>
 
-- Page Nhân sự
-<p align = "center">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/personal.png" alt="Search Going">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/create_staff.png" alt="Create Staff">
+### Staff
+- Drawer, Nhiệm vụ, Tiến độ, Bảng chấm công
+<p align="center">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/staff_drawer.png" alt="Drawer">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/staff_mission_page.png" alt="Mission List">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/staff_mission_progress.png" alt="Mission Progress">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/staff_time_tracking.png" alt="Time Tracking">
 </p>
 
-- Page Project
-<p align = "center">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/projects.png" alt="Projects">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/create_project.png" alt="Create Project">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/project_detail.png" alt="Project Detail">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/create_mission.png" alt="Create Mission">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/mission_screen.png" alt="Mission Screen">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/mission_detail.png" alt="Mission Detail">
-  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/progress_screen.png" alt="Progress Screen">
-
+### Chung
+- Thông tin cá nhân
+<p align="center">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/user_profile.png" alt="User Profile">
 </p>
 
-- Page Notifications
-<p align = "center">
-<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/notification_admin.png" alt="Notification Screen">
-<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/notification_staff.png" alt="Notification Screen">
+- Chi tiết dự án, nhiệm vụ, tiến độ
+<p align="center">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/project.png" alt="Project">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/mission.png" alt="Mission">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/progress.png" alt="Progress">
 </p>
 
-- Page Time Tracking Table
-<p align = "center">
-<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/time_keeping.png" alt="Time Keeping">
-<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/change_state_day.png" alt="Change State Day">
+
+- Thông báo
+<p align="center">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/general_screen_notification.png" alt="Notification">
 </p>
 
-- Page Report
-<p align = "center">
-<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/create_report.png" alt="Create Report">
-<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/comment.png" alt="comment">
-<img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_screenshot/all_comment.png" alt="comment">
+- Báo cáo, comment
+<p align="center">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/general_report_list_page.png" alt="Report List">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/general_report_page.png" alt="Report">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/all_comment.png" alt="Comment">
 </p>
+
 ## Technology
 - frontend: Flutter, 
 - backend: Google Firebase, firebase_auth, cloud_firestore, firebase_core, firebase_storage, v.v.

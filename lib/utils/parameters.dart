@@ -41,7 +41,7 @@ const Color yellowColor = Color.fromARGB(255, 255, 246, 163);
 const Color darkblueAppbarColor = Color.fromARGB(255, 14, 92, 181);
 const Color blueDrawerColor = Color.fromARGB(255, 33, 108, 169);
 const Color notifyIconColor = Color.fromARGB(255, 223, 203, 24);
-Color darkblueColor =  Colors.lightBlue.shade900;
+Color darkblueColor =  Colors.blueGrey.shade700;
 const Color defaultblueColor = Color.fromARGB(255, 80, 72, 160);
 const Color darkgreenColor = Color.fromARGB(255, 60, 133, 60);
 
@@ -61,9 +61,9 @@ Image eventIcon = resizedIcon(eventImagePath, size: 30);
 Image rightArrowIcon = resizedIcon(rightArrowImagePath, size: 30);
 Image leftArrowIcon = resizedIcon(leftArrowImagePath, size: 30);
 Image rightArrowPageIcon = resizedIcon(rightArrowPageImagePath, size: 30);
-Image loudspeakerIcon = resizedIcon(louadspeakerImagePath, size: 36);
-Image addIcon = resizedIcon(addImagePath, size: 36);
-Image addImageIcon = resizedIcon(addImageImagePath, size: 28);
+Image loudspeakerIcon = resizedIcon(louadspeakerImagePath, size: 36, isfill: false);
+Image addIcon = resizedIcon(addImagePath, size: 36, isfill: false);
+Image addImageIcon = resizedIcon(addImageImagePath, size: 28, isfill: false);
 
 const Icon correctIcon = Icon(
   Icons.check,

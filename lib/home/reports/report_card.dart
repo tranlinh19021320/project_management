@@ -108,6 +108,7 @@ class _ReportCardState extends State<ReportCard> {
                 ),
               ],
             ),
+            const SizedBox(height: 4,),
             Text(
               'Cập nhật ${timeDateWithNow(date: widget.report.createDate)}',
               style: const TextStyle(fontSize: 10, color: notifyIconColor),

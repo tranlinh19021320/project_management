@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project_management/home/projects/project.dart';
 import 'package:project_management/model/project.dart';
+import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/widgets.dart';
 
@@ -17,6 +18,7 @@ class _ProjectCardState extends State<ProjectCard> {
   @override
   Widget build(BuildContext context) {
     return card(
+      color: dateInTime(startDate: widget.project.startDate, endDate: widget.project.endDate) ? darkblueAppbarColor : darkblueColor,
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => ProjectHomeScreen(project: widget.project))),
         title: Column(
