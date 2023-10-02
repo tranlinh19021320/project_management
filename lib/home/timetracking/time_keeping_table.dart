@@ -6,10 +6,9 @@ import 'package:project_management/home/missions/mission.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/provider/group_provider.dart';
-import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 import 'package:provider/provider.dart';
 
 class TimeKeepingTable extends StatefulWidget {
@@ -149,7 +148,7 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
                   CircleAvatar(
                     backgroundColor: focusBlueColor,
                     radius: 36,
-                    child: getCircleImageFromUrl(url: user.photoURL, radius: 34)
+                    child: getCircleImageFromUrl(user.photoURL, radius: 34)
                   ),
                   const SizedBox(
                     width: 12,

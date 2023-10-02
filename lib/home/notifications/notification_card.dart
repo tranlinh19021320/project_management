@@ -8,11 +8,9 @@ import 'package:project_management/home/missions/mission.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/notification.dart';
 import 'package:project_management/provider/group_provider.dart';
-import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 import 'package:provider/provider.dart';
 
 class NotificationCard extends StatefulWidget {
@@ -29,10 +27,12 @@ class _NotificationCardState extends State<NotificationCard> {
   
   var notify;
   late int type = widget.doc['type'];
+  bool isRead = false;
 
   @override
   void initState() {
     super.initState();
+    isRead = widget.doc['isRead'];
     GroupProvider groupProvider =
         Provider.of<GroupProvider>(context, listen: false);
     isManager = groupProvider.getIsManager;
@@ -69,11 +69,9 @@ class _NotificationCardState extends State<NotificationCard> {
     try {
       snap = await FirebaseFirestore.instance
           .collection('missions')
-          .doc((notify!).missionId)
+          .doc((notify).missionId)
           .get();
-      if (snap.exists) {
-        mission = Mission.fromSnap(mission: snap);
-        if (!notify!.isRead) {
+          if (!isRead) {
           await FirebaseFirestore.instance
               .collection('users')
               .doc(notify.userId)
@@ -82,7 +80,12 @@ class _NotificationCardState extends State<NotificationCard> {
               .update({
             'isRead': true,
           });
+          setState(() {
+            isRead = true;
+          });
         }
+      if (snap.exists) {
+        mission = Mission.fromSnap(mission: snap);
       }
       res = 'success';
     } catch (e) {
@@ -179,86 +182,11 @@ class _NotificationCardState extends State<NotificationCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(
-          height: 4,
-        ),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: focusBlueColor),
-            borderRadius: BorderRadius.circular(6),
-            color: (notify.isRead)
-                ? Colors.transparent
-                : darkblueAppbarColor,
-          ),
-          padding: const EdgeInsets.all(4),
-          width: MediaQuery.of(context).size.width * 0.98,
-          child: ListTile(
-            onFocusChange: (value) => setState(() {
-              isFocus = value;
-            }),
-            onTap: (type == MISSION_IS_DELETED
+    return card(color: isRead ? darkblueColor : darkblueAppbarColor,
+      onTap: (type == MISSION_IS_DELETED
             || type == MISSION_CHANGE_STAFF || type == TIME_KEEPING)
                 ? null
-                : navigaToMission,
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-            visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-            isThreeLine: true,
-            leading: (type == MISSION_IS_DELETED)
-                ? FloatingActionButton.small(
-                    heroTag: notify.notifyId,
-                    backgroundColor: focusBlueColor,
-                    onPressed: null,
-                    child: const Icon(
-                      Icons.delete_forever_rounded,
-                      color: notifyIconColor,
-                    ),
-                  )
-                : (type == STAFF_RECIEVE_MISSION_FROM_OTHER
-                || type == MISSION_CHANGE_STAFF
-                || type == MISSION_IS_CHANGED)
-                    ? FloatingActionButton.small(
-                        heroTag: notify.notifyId,
-                        backgroundColor: focusBlueColor,
-                        onPressed: null,
-                        child: const Icon(
-                          Icons.change_circle,
-                          color: notifyIconColor,
-                        ),
-                      )
-                    : (type == STAFF_RECIEVE_MISSION )
-                        ? FloatingActionButton.small(
-                            heroTag: notify.notifyId,
-                            backgroundColor: focusBlueColor,
-                            onPressed: null,
-                            child: AnimatedTextKit(
-                                repeatForever: true,
-                                pause: const Duration(milliseconds: 0),
-                                animatedTexts: [
-                                  ColorizeAnimatedText('Mới',
-                                      textStyle: const TextStyle(fontSize: 12),
-                                      colors: [
-                                        Colors.deepOrange,
-                                        Colors.white,
-                                        Colors.yellow,
-                                        Colors.green,
-                                        Colors.blue,
-                                        Colors.purple,
-                                      ]),
-                                ]),
-                          )
-                        : (type == MANAGER_APPROVE_PROGRESS ||
-                                type == MISSION_IS_OPEN || type == STAFF_COMPLETE_MISSION || type == TIME_KEEPING)
-                            ? FloatingActionButton.small(
-                                heroTag: notify.notifyId,
-                                backgroundColor: focusBlueColor,
-                                onPressed: null,
-                                child: loudspeakerIcon,
-                              )
-                            : null,
-            title: RichText(
+                : navigaToMission, title: RichText(
               text: TextSpan(
                   style: const TextStyle(fontSize: 15),
                   children: (type == MISSION_IS_DELETED) //mission is deleted
@@ -440,14 +368,60 @@ class _NotificationCardState extends State<NotificationCard> {
                                             TextSpan(text: '$type'),
                                           ]),
               maxLines: 4,
-            ),
-            subtitle: Text(timeDateWithNow(date: notify.createDate)),
-            trailing: IconButton(
+            ), subtitle: Text(timeDateWithNow(date: notify.createDate),), leading: (type == MISSION_IS_DELETED)
+                ? FloatingActionButton.small(
+                    heroTag: notify.notifyId,
+                    backgroundColor: focusBlueColor,
+                    onPressed: null,
+                    child: const Icon(
+                      Icons.delete_forever_rounded,
+                      color: notifyIconColor,
+                    ),
+                  )
+                : (type == STAFF_RECIEVE_MISSION_FROM_OTHER
+                || type == MISSION_CHANGE_STAFF
+                || type == MISSION_IS_CHANGED)
+                    ? FloatingActionButton.small(
+                        heroTag: notify.notifyId,
+                        backgroundColor: focusBlueColor,
+                        onPressed: null,
+                        child: const Icon(
+                          Icons.change_circle,
+                          color: notifyIconColor,
+                        ),
+                      )
+                    : (type == STAFF_RECIEVE_MISSION )
+                        ? FloatingActionButton.small(
+                            heroTag: notify.notifyId,
+                            backgroundColor: focusBlueColor,
+                            onPressed: null,
+                            child: AnimatedTextKit(
+                                repeatForever: true,
+                                pause: const Duration(milliseconds: 0),
+                                animatedTexts: [
+                                  ColorizeAnimatedText('Mới',
+                                      textStyle: const TextStyle(fontSize: 12),
+                                      colors: [
+                                        Colors.deepOrange,
+                                        Colors.white,
+                                        Colors.yellow,
+                                        Colors.green,
+                                        Colors.blue,
+                                        Colors.purple,
+                                      ]),
+                                ]),
+                          )
+                        : (type == MANAGER_APPROVE_PROGRESS ||
+                                type == MISSION_IS_OPEN || type == STAFF_COMPLETE_MISSION || type == TIME_KEEPING)
+                            ? FloatingActionButton.small(
+                                heroTag: notify.notifyId,
+                                backgroundColor: focusBlueColor,
+                                onPressed: null,
+                                child: loudspeakerIcon,
+                              )
+                            : null, trailing:  IconButton(
                 onPressed: deleteNotification,
-                icon: const Icon(Icons.more_horiz)),
-          ),
-        )
-      ],
-    );
+                icon: const Icon(Icons.more_horiz)) );
+    
   }
 }

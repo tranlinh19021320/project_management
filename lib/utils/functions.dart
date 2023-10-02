@@ -1,18 +1,21 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/model/user.dart';
-import 'package:project_management/utils/colors.dart';
-import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/parameters.dart';
-import 'package:project_management/utils/paths.dart';
+import 'package:project_management/utils/widgets.dart';
 
+
+Image resizedIcon(String imagePath,{double size = 20}) {
+  return Image.asset(
+    imagePath,
+    width: size,
+    height: size,
+    fit: BoxFit.fill,
+  );
+}
 // show snack bar
 showSnackBar(
     {required BuildContext context,
@@ -48,6 +51,61 @@ showSnackBar(
             ),
           ]),
   ));
+}
+
+showNotify(
+    {required BuildContext context,
+    String content = '',
+    bool isLoading = false,
+    bool isError = false}) {
+  return isLoading
+      ? showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (_) => AlertDialog(
+                backgroundColor: Colors.transparent,
+                icon: LoadingAnimationWidget.inkDrop(
+                    color: darkblueAppbarColor, size: 32),
+                title: const Center(
+                  child: Text(
+                    "Loading...",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: blueDrawerColor,
+                    ),
+                  ),
+                ),
+              ))
+      : showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+                scrollable: true,
+                backgroundColor: darkblueAppbarColor,
+                iconPadding: const EdgeInsets.only(top: 6),
+                icon: SizedBox(height: 24, width: 24, child: loudspeakerIcon),
+                // backgroundColor: backgroundWhiteColor,
+
+                actionsAlignment: MainAxisAlignment.center,
+                actionsPadding: const EdgeInsets.only(bottom: 12),
+                titlePadding: const EdgeInsets.only(top: 8, bottom: 8),
+                title: Center(
+                  child: Text(
+                    content,
+                    style: TextStyle(
+                        color: isError ? notifyIconColor : correctGreenColor,
+                        fontSize: 18),
+                  ),
+                ),
+                actions: [
+                  textBoxButton(
+                      color: notifyIconColor,
+                      text: 'OK',
+                      fontSize: 16,
+                      function: () {
+                        Navigator.of(context).pop();
+                      })
+                ],
+              ));
 }
 
 // funtion to check email is valid or not
@@ -151,122 +209,6 @@ Future<Uint8List?> selectAImage(
           ));
 }
 
-// get image from url
-Widget getCircleImageFromUrl({
-  required String url,
-  double radius = 32,
-}) {
-  return ClipOval(
-    child: Image.network(
-      url,
-      width: radius * 2,
-      height: radius * 2,
-      fit: BoxFit.cover,
-      loadingBuilder: (context, child, loadingProgress) {
-        int? totalSize;
-        int? downloadSize;
-  
-        totalSize = loadingProgress?.expectedTotalBytes;
-        downloadSize = loadingProgress?.cumulativeBytesLoaded;
-  
-        if (totalSize != null && downloadSize != null) {
-          var loadPercent = (downloadSize / totalSize).toDouble();
-  
-          return circularPercentIndicator(percent: loadPercent, radius: radius, lineWidth: radius/2, );
-        }
-  
-        return child;
-      },
-    ),
-  );
-}
-
-// circle percent
-CircularPercentIndicator circularPercentIndicator(
-    {required double percent,
-    required double radius,
-    double lineWidth = 5,
-    double? fontSize,
-    bool textCenter = true}) {
-  return CircularPercentIndicator(
-    radius: radius,
-    lineWidth: lineWidth,
-    percent: percent,
-    center: (!textCenter)
-        ? null
-        : Text("${(percent * 100).toStringAsFixed(0)}%",
-            style: (fontSize == null) ? null : TextStyle(fontSize: fontSize)),
-    progressColor: (percent <= 0.2)
-        ? Colors.red
-        : (percent <= 0.4)
-            ? Colors.orange
-            : (percent <= 0.7)
-                ? Colors.yellow
-                : Colors.green,
-  );
-}
-
-// user card
-Widget user1Card(
-    {required CurrentUser user, double size = 40, double fontsize = 16}) {
-  return ListTile(
-    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-    dense: true,
-    visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-    leading: getCircleImageFromUrl(url: user.photoURL, radius: size/2),
-    title: Text(
-      user.nameDetails,
-      style: TextStyle(fontSize: fontsize),
-    ),
-    subtitle: Text(
-      user.group,
-      style: TextStyle(fontSize: fontsize - 2),
-    ),
-    trailing: (user.group == manager)
-        ? resizedIcon(keyImage, 18)
-        : resizedIcon(staffImage, 18),
-  );
-}
-
-Widget userCard(
-    {required String userId, double size = 40, double fontsize = 16}) {
-  return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (!snapshot.hasData) {
-          return const Text("Not User");
-        }
-
-        CurrentUser user = CurrentUser.fromSnap(user: snapshot.data!);
-
-        return user1Card(user: user, size: size, fontsize: fontsize);
-      });
-}
-
-// color
-Color notifyColor({required int state}) {
-  return (state == IS_CORRECT_STATE)
-      ? correctGreenColor
-      : (state == IS_DEFAULT_STATE)
-          ? defaultColor
-          : errorRedColor;
-}
-
-// icon
-Icon? notifyIcon({required int state}) {
-  return (state == IS_DEFAULT_STATE)
-      ? null
-      : (state == IS_CORRECT_STATE)
-          ? correctIcon
-          : errorIcon;
-}
-
 // day into string
 String dayToString({required DateTime time, int type = 0}) {
   return (type == 0)
@@ -305,145 +247,7 @@ bool isToDay(
               : false;
 }
 
-// evalute for time keeping
-Icon evaluateIcon({required int state, double size = 20}) {
-  return (state == IS_COMPLETE)
-      ? Icon(
-          Icons.check,
-          size: size,
-          color: correctGreenColor,
-        )
-      : (state == IS_LATE)
-          ? Icon(
-              Icons.assignment_late_rounded,
-              size: size,
-              color: errorRedColor,
-            )
-          : Icon(
-              Icons.circle,
-              size: size,
-              color: defaultColor,
-            );
-}
 
-Widget evaluate(
-    {required int state,
-    double size = 20,
-    Color color = backgroundWhiteColor}) {
-  return Container(
-    child: state == IS_CLOSING
-        ? Row(
-            children: [
-              evaluateIcon(state: state, size: size),
-              Text(
-                " Chưa được đánh giá.",
-                style: TextStyle(color: color),
-              ),
-            ],
-          )
-        : state == IS_COMPLETE
-            ? Row(
-                children: [
-                  evaluateIcon(state: state, size: size),
-                  Text(
-                    " Hoàn thành tốt.",
-                    style: TextStyle(color: color),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  evaluateIcon(state: state, size: size),
-                  Text(
-                    " Chậm tiến độ.",
-                    style: TextStyle(color: color),
-                  ),
-                ],
-              ),
-  );
-}
-
-Widget newTextAnimation() {
-  return AnimatedTextKit(
-      repeatForever: true,
-      pause: const Duration(milliseconds: 0),
-      animatedTexts: [
-        ColorizeAnimatedText('Mới',
-            textStyle: const TextStyle(fontSize: 14),
-            colors: [
-              Colors.white,
-              Colors.yellow,
-              Colors.red,
-              Colors.green,
-              Colors.black,
-              Colors.blue,
-              Colors.purple,
-            ]),
-      ]);
-}
-
-Widget typeReport({
-  required int type,
-  double size = 24,
-  double fontSize = 14,
-}) {
-  return Container(
-    padding: const EdgeInsets.only(left: 2, right: 5, top: 1, bottom: 1),
-    decoration: BoxDecoration(
-      color: (type == UPDATE_REPORT)
-          ? focusBlueColor
-          : (type == BUG_REPORT)
-              ? textErrorRedColor
-              : yellowColor,
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Row(
-        children: (type == UPDATE_REPORT)
-            ? [
-                Icon(
-                  Icons.update,
-                  color: darkblueColor,
-                  size: size,
-                ),
-                const SizedBox(
-                  width: 4,
-                ),
-                Text(
-                  "Cập nhật",
-                  style: TextStyle(fontSize: fontSize, color: blackColor),
-                )
-              ]
-            : (type == BUG_REPORT)
-                ? [
-                    Icon(
-                      Icons.error,
-                      color: errorRedColor,
-                      size: size,
-                    ),
-                    const SizedBox(
-                      width: 4,
-                    ),
-                    Text(
-                      "Bug",
-                      style: TextStyle(fontSize: fontSize, color: blackColor),
-                    )
-                  ]
-                : [
-                    Icon(
-                      Icons.more,
-                      color: notifyIconColor,
-                      size: size,
-                    ),
-                    const SizedBox(
-                      width: 4,
-                    ),
-                    Text(
-                      "Ý kiến đóng góp",
-                      style: TextStyle(fontSize: fontSize, color: blackColor),
-                    )
-                  ]),
-  );
-}
 
 Future<List<Uint8List>> getImageList({required List photoURL}) async {
   List<Uint8List> imageList = [];
@@ -455,4 +259,10 @@ Future<List<Uint8List>> getImageList({required List photoURL}) async {
     imageList.add(image);
   }
   return imageList;
+}
+
+String staffRecieveMission({required String nameMission, required String description}) {
+  String notify = "Bạn đã nhận được nhiệm vụ \"$nameMission\" với mô tả:\"$description\"";
+
+  return "${notify.substring(0, 50)}...";
 }

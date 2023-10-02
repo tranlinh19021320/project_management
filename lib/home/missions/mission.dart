@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/missions/mission_detail.dart';
 import 'package:project_management/home/progress/progress_screen.dart';
-import 'package:project_management/home/widgets/button.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/notify_dialog.dart';
-import 'package:project_management/utils/colors.dart';
-import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/paths.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 import 'package:provider/provider.dart';
 
 class MissionHomeScreen extends StatefulWidget {
@@ -61,20 +58,18 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
               actionsAlignment: MainAxisAlignment.spaceAround,
               actionsPadding: const EdgeInsets.only(bottom: 14),
               actions: [
-                TextBoxButton(
+                textBoxButton(
                     color: darkblueColor,
                     text: "Ok",
                     fontSize: 14,
-                    width: 64,
-                    height: 36,
-                    funtion: () => Navigator.of(context).pop(true)),
-                TextBoxButton(
+                    
+                    function: () => Navigator.of(context).pop(true)),
+                textBoxButton(
                     color: errorRedColor,
                     text: "Hủy",
                     fontSize: 14,
-                    width: 64,
-                    height: 36,
-                    funtion: () => Navigator.of(context).pop(false)),
+                    
+                    function: () => Navigator.of(context).pop(false)),
               ],
             ));
 

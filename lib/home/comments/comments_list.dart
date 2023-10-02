@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:project_management/home/comments/comment_card.dart';
 import 'package:project_management/model/comment.dart';
 import 'package:project_management/model/report.dart';
-import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/parameters.dart';
 
 class CommentList extends StatefulWidget {
   final Report report;
@@ -55,7 +55,8 @@ class _CommentListState extends State<CommentList> {
             constraints:BoxConstraints(maxHeight:(!widget.isLast) ? MediaQuery.of(context).size.height * 0.73 :  MediaQuery.of(context).size.height * 0.45,),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: darkblueAppbarColor
+              border: Border.all(),
+              color: darkblueColor
             ),
             child: ListView.builder(
                 itemCount: maxLength,

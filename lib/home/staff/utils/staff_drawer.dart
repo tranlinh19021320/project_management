@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project_management/home/widgets/button.dart';
-import 'package:project_management/home/widgets/page_list.dart';
-import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 import '../../../firebase/firebase_methods.dart';
 import '../../../start_screen/login.dart';
 import '../../widgets/user_profile.dart';
@@ -70,13 +69,13 @@ class _StaffDrawerMenuState extends State<StaffDrawerMenu> {
                           menuListTile(context: context, selectPage: widget.selectedPage, pageValue: IS_REPORT_PAGE, isNotify: false)
                         ],
                       ),
-                      floatingActionButton: TextBoxButton(
+                      floatingActionButton: textBoxButton(
                           color: errorRedColor,
                           text: "Đăng xuất",
                           fontSize: 14,
-                          width: 80,
-                          height: 36,
-                          funtion: signOut),
+                          width: 100,
+                          height: 38,
+                          function: signOut),
                       floatingActionButtonLocation:
                           FloatingActionButtonLocation.endFloat,
                     )),

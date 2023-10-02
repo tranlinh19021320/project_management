@@ -7,7 +7,7 @@ import 'package:project_management/home/reports/report_card.dart';
 import 'package:project_management/model/report.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/provider/group_provider.dart';
-import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/parameters.dart';
 import 'package:provider/provider.dart';
 
 class ReportsScreen extends StatefulWidget {

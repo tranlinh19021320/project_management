@@ -5,14 +5,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/comments/comments_list.dart';
-import 'package:project_management/home/widgets/button.dart';
 import 'package:project_management/model/report.dart';
 import 'package:project_management/model/user.dart';
-import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/parameters.dart';
-import 'package:project_management/utils/paths.dart';
+import 'package:project_management/utils/widgets.dart';
 
 class ReportDetail extends StatefulWidget {
   final Report? report;
@@ -186,7 +183,7 @@ class _ReportDetailState extends State<ReportDetail> {
                         padding: const EdgeInsets.all(10.0),
                         child: Row(
                           children: [
-                            getCircleImageFromUrl(url: widget.report!.ownPhotoURL, radius: 24),
+                            getCircleImageFromUrl(widget.report!.ownPhotoURL, radius: 24),
                             const SizedBox(
                               width: 12,
                             ),
@@ -400,8 +397,8 @@ class _ReportDetailState extends State<ReportDetail> {
                             width: double.infinity,
                             height: 240,
                             decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: focusBlueColor, width: 2)),
+                                border: Border.all(color: focusBlueColor, width: 2),
+                                borderRadius: BorderRadius.circular(12)),
                             child: PageView.builder(
                                 itemCount: imageList.length,
                                 controller: pageController,
@@ -409,9 +406,12 @@ class _ReportDetailState extends State<ReportDetail> {
                                   return Stack(children: [
                                     SizedBox(
                                         width: double.infinity,
-                                        child: Image.memory(
-                                          imageList[index],
-                                          fit: BoxFit.cover,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(12),
+                                          child: Image.memory(
+                                            imageList[index],
+                                            fit: BoxFit.cover,
+                                          ),
                                         )),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
@@ -426,32 +426,20 @@ class _ReportDetailState extends State<ReportDetail> {
                                                       const Duration(
                                                           seconds: 2)),
                                                   builder: (context, snapshot) {
-                                                    if (snapshot
-                                                            .connectionState ==
-                                                        ConnectionState.done) {
+                                                    if (snapshot.connectionState == ConnectionState.done) {
                                                       return Container();
                                                     } else {
                                                       return Container(
                                                         decoration: BoxDecoration(
-                                                            color:
-                                                                darkblueAppbarColor,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        50)),
+                                                            color: darkblueAppbarColor,
+                                                            borderRadius:BorderRadius.circular(50)),
                                                         child: Padding(
                                                           padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  vertical: 4,
-                                                                  horizontal:
-                                                                      6),
+                                                              const EdgeInsets.symmetric(vertical: 4, horizontal:6),
                                                           child: Text(
                                                             "${index + 1}/${imageList.length}",
                                                             style:
-                                                                const TextStyle(
-                                                                    fontSize:
-                                                                        15),
+                                                                const TextStyle( fontSize: 15),
                                                           ),
                                                         ),
                                                       );
@@ -520,13 +508,11 @@ class _ReportDetailState extends State<ReportDetail> {
                 // create button
                 isNew
                     ? Center(
-                        child: TextBoxButton(
+                        child: textBoxButton(
                             color: notifyIconColor,
                             text: "Tạo mới",
                             fontSize: 16,
-                            width: 100,
-                            height: 40,
-                            funtion: createReport),
+                            function: createReport),
                       )
                     // comments
                     : Column(
@@ -701,7 +687,7 @@ class _ReportDetailState extends State<ReportDetail> {
                     ? const CircularProgressIndicator(
                         color: correctGreenColor,
                       )
-                    : getCircleImageFromUrl(url: photoURL, radius: 20),
+                    : getCircleImageFromUrl(photoURL, radius: 20),
                   
                   Expanded(
                     child: Padding(

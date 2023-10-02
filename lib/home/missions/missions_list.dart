@@ -7,8 +7,7 @@ import 'package:project_management/home/missions/mission_card.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/provider/group_provider.dart';
-import 'package:project_management/utils/colors.dart';
-import 'package:project_management/utils/paths.dart';
+import 'package:project_management/utils/parameters.dart';
 import 'package:provider/provider.dart';
 
 class MissionsScreen extends StatefulWidget {

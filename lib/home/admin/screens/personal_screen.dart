@@ -6,13 +6,9 @@ import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/admin/utils/create_staff.dart';
 import 'package:project_management/home/widgets/group_dropdown_button.dart';
 import 'package:project_management/home/admin/utils/staff_card.dart';
-import 'package:project_management/home/widgets/page_list.dart';
 import 'package:project_management/model/user.dart';
-import 'package:project_management/utils/colors.dart';
-import 'package:project_management/utils/icons.dart';
 import 'package:project_management/utils/parameters.dart';
-import 'package:project_management/utils/paths.dart';
-import '../utils/drawer_bar.dart';
+import 'package:project_management/utils/widgets.dart';
 
 class PersonalScreen extends StatefulWidget {
   const PersonalScreen({
@@ -97,7 +93,6 @@ class _PersonalScreenState extends State<PersonalScreen> {
       username = username.toLowerCase();
       if (!nameDetails.startsWith(searchController.text.toLowerCase()) &&
           !username.startsWith(searchController.text.toLowerCase())) {
-        print('loại $username');
       }
       return (!nameDetails.startsWith(searchController.text.toLowerCase()) &&
           !username.startsWith(searchController.text.toLowerCase()));
@@ -114,108 +109,86 @@ class _PersonalScreenState extends State<PersonalScreen> {
               backgroundColor: Colors.transparent,
             ),
           )
-        : Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(backgroundImage), fit: BoxFit.fill),
-            ),
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              appBar: AppBar(
-                backgroundColor: darkblueAppbarColor,
-                title: const Text("Nhân viên"),
-                leading: Builder(
-                  builder: (context) => IconButton(
-                      onPressed: () => Scaffold.of(context).openDrawer(),
-                      icon: menuIcon()),
-                ),
-              ),
-              drawer: const DrawerMenu(
-                selectedPage: IS_PERSONAL_PAGE,
-              ),
-              body: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: SizedBox(
-                            height: 48,
-                            child: TextField(
-                              controller: searchController,
-                              focusNode: searchFocus,
-                              decoration: InputDecoration(
-                                prefixIcon: const Padding(
-                                  padding: EdgeInsets.all(10.0),
-                                  child: Icon(Icons.search),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(6)),
-                                enabledBorder: const OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: defaultColor)),
+        : mainScreen(IS_PERSONAL_PAGE,
+            
+            body: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 48,
+                          child: TextField(
+                            controller: searchController,
+                            focusNode: searchFocus,
+                            decoration: InputDecoration(
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Icon(Icons.search),
                               ),
-                              onChanged: (value) {
-                                setState(() {});
-                              },
-                              onSubmitted: (value) {
-                                searchFocus.unfocus;
-                                setState(() {});
-                              },
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6)),
+                              enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(color: defaultColor)),
                             ),
+                            onChanged: (value) {
+                              setState(() {});
+                            },
+                            onSubmitted: (value) {
+                              searchFocus.unfocus;
+                              setState(() {});
+                            },
                           ),
                         ),
-                        const SizedBox(
-                          width: 12,
-                        ),
-                        groupDropdownButton,
-                        // button to create user
-                      ],
-                    ),
-                    const Divider(),
-                    StreamBuilder(
-                      stream: FirebaseMethods()
-                          .searchSnapshot(groupSelect: groupSelect),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: LoadingAnimationWidget.hexagonDots(
-                                color: backgroundWhiteColor, size: 40),
-                          );
-                        }
+                      ),
+                      const SizedBox(
+                        width: 12,
+                      ),
+                      groupDropdownButton,
+                      // button to create user
+                    ],
+                  ),
+                  const Divider(),
+                  StreamBuilder(
+                    stream: FirebaseMethods()
+                        .searchSnapshot(groupSelect: groupSelect),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: LoadingAnimationWidget.hexagonDots(
+                              color: backgroundWhiteColor, size: 40),
+                        );
+                      }
 
-                        List<DocumentSnapshot> documents =
-                            getDocuments(snapshot);
-                        if (documents.isEmpty) {
-                          return const Text("Không tìm thấy nhân viên");
-                        }
-                        return Expanded(
-                            child: ListView.builder(
-                                itemCount: documents.length,
-                                itemBuilder: (context, index) => StaffCard(
-                                      staff: CurrentUser.fromSnap(user: documents[index]) ,
-                                    )));
-                      },
-                    )
-                  ],
-                ),
+                      List<DocumentSnapshot> documents = getDocuments(snapshot);
+                      if (documents.isEmpty) {
+                        return const Text("Không tìm thấy nhân viên");
+                      }
+                      return Expanded(
+                          child: ListView.builder(
+                              itemCount: documents.length,
+                              itemBuilder: (context, index) => StaffCard(
+                                    staff: CurrentUser.fromSnap(
+                                        user: documents[index]),
+                                  )));
+                    },
+                  )
+                ],
               ),
-              floatingActionButton: FloatingActionButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (_) => CreateStaff(
-                            companyId: companyId,
-                            companyName: companyName,
-                          ));
-                },
-                child: const Icon(Icons.add),
-              ),
-              floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
             ),
-          );
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (_) => CreateStaff(
+                          companyId: companyId,
+                          companyName: companyName,
+                        ));
+              },
+              child: const Icon(Icons.add),
+            ));
   }
 }

@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/reports/report_detail.dart';
 import 'package:project_management/model/report.dart';
-import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 
 class ReportCard extends StatefulWidget {
   final Report report;
@@ -50,98 +49,78 @@ class _ReportCardState extends State<ReportCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(
-          height: 5,
-        ),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: focusBlueColor),
-            borderRadius: BorderRadius.circular(12),
-            color: darkblueAppbarColor,
-          ),
-          padding: const EdgeInsets.only(left: 8, right: 14),
-          width: MediaQuery.of(context).size.width * 0.98,
-          child: ListTile(
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => ReportDetail(
-                        report: widget.report,
-                      )));
-              changeIsReadState();
-            },
-            contentPadding: EdgeInsets.zero,
-            dense: true,
-            visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
-            // isThreeLine: true,
-            title: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return card(
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => ReportDetail(
+                    report: widget.report,
+                  )));
+          changeIsReadState();
+        },
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            (isOwner)
+                ? Container()
+                : Text(
+                    widget.report.ownName,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+            Row(
               children: [
-                (isOwner) ? Container() : Text(widget.report.ownName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),),
-                Row(
-                  children: [
-                    (widget.report.type == UPDATE_REPORT)
+                (widget.report.type == UPDATE_REPORT)
+                    ? const Icon(
+                        Icons.update,
+                        color: focusBlueColor,
+                        size: 18,
+                      )
+                    : (widget.report.type == BUG_REPORT)
                         ? const Icon(
-                            Icons.update,
-                            color: focusBlueColor,
+                            Icons.error,
+                            color: errorRedColor,
                             size: 18,
                           )
-                        : (widget.report.type == BUG_REPORT)
-                            ? const Icon(
-                                Icons.error,
-                                color: errorRedColor,
-                                size: 18,
-                              )
-                            : const Icon(
-                                Icons.more,
-                                color: notifyIconColor,
-                                size: 18,
-                              ),
-                    const SizedBox(
-                      width: 4,
-                    ),
-                    Text(widget.report.nameReport),
-                  ],
-                ),
-              ],
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+                        : const Icon(
+                            Icons.more,
+                            color: notifyIconColor,
+                            size: 18,
+                          ),
                 const SizedBox(
-                  height: 4,
+                  width: 4,
                 ),
-                Row(
-                  children: [
-                    Text(
-                      "Mô tả: ${description()}",
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                  ],
-                ),
-                Text(
-                  'Cập nhật ${timeDateWithNow(date: widget.report.createDate)}',
-                  style: const TextStyle(fontSize: 10, color: notifyIconColor),
-                )
+                Text(widget.report.nameReport),
               ],
             ),
-            leading: isOwner
-                ? null
-                : CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(
-                      widget.report.ownPhotoURL,
-                    ),
-                  ),
-            trailing: (isOwner && !widget.report.ownRead)
-                ? newTextAnimation()
-                : (!isOwner && !widget.report.managerRead)
-                    ? newTextAnimation()
-                    : null,
-          ),
+          ],
         ),
-      ],
-    );
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(
+              height: 4,
+            ),
+            Row(
+              children: [
+                Text(
+                  "Mô tả: ${description()}",
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ],
+            ),
+            Text(
+              'Cập nhật ${timeDateWithNow(date: widget.report.createDate)}',
+              style: const TextStyle(fontSize: 10, color: notifyIconColor),
+            )
+          ],
+        ),
+        leading: isOwner
+            ? null
+            : getCircleImageFromUrl(widget.report.ownPhotoURL, radius: 17),
+        trailing: (isOwner && !widget.report.ownRead)
+            ? newTextAnimation()
+            : (!isOwner && !widget.report.managerRead)
+                ? newTextAnimation()
+                : null);
   }
 }

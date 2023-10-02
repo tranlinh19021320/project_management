@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:project_management/home/home_screen.dart';
 import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/start_screen/login.dart';
-import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/parameters.dart';
 import 'firebase_options.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';

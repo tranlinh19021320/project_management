@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/home/widgets/group_dropdown_button.dart';
-import 'package:project_management/home/widgets/button.dart';
-import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/colors.dart';
-import 'package:project_management/utils/icons.dart';
 import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 import '../../../firebase/firebase_methods.dart';
 
 class CreateStaff extends StatefulWidget {
@@ -110,7 +107,7 @@ class _CreateStaffState extends State<CreateStaff> {
         .addGroup(companyId: widget.companyId, groupName: groupController.text);
     if (res != 'success') {
       if (context.mounted) {
-        showSnackBar(context:context,content: res,isError: true);
+        showSnackBar(context: context, content: res, isError: true);
       }
     } else {
       groupSelect = groupController.text;
@@ -150,11 +147,12 @@ class _CreateStaffState extends State<CreateStaff> {
           if (context.mounted) {
             Navigator.of(context).pop();
             Navigator.of(context).pop();
-            showNotify(context: context, content: "Tạo thành công! ", isError: true);
+            showNotify(
+                context: context, content: "Tạo thành công! ", isError: true);
           }
         } else {
           if (context.mounted) {
-            showSnackBar(context:context,content: res,isError: true);
+            showSnackBar(context: context, content: res, isError: true);
           }
         }
       }
@@ -314,13 +312,11 @@ class _CreateStaffState extends State<CreateStaff> {
                           width: 8,
                         ),
                         // createGroupButton,
-                        TextBoxButton(
+                        textBoxButton(
                             color: focusBlueColor,
                             text: "Tạo",
                             fontSize: 14,
-                            width: 48,
-                            height: 32,
-                            funtion: updateGroup),
+                            function: updateGroup),
                         IconButton(
                             onPressed: () {
                               setState(() {
@@ -360,21 +356,21 @@ class _CreateStaffState extends State<CreateStaff> {
         ]),
       ),
       actions: [
-        TextBoxButton(
-        color: buttonGreenColor,
-        text: "Tạo",
-        fontSize: 14,
-        width: 80,
-        height: 36,
-        funtion: createStaff),
+        textBoxButton(
+            color: buttonGreenColor,
+            text: "Tạo",
+            width: 50,
+            height: 36,
+            fontSize: 14,
+            function: createStaff),
         //  cancelButton,
-        TextBoxButton(
+        textBoxButton(
             color: textErrorRedColor,
             text: "Hủy",
-            fontSize: 14,
-            width: 64,
+            width: 50,
             height: 36,
-            funtion: () => Navigator.of(context).pop()),
+            fontSize: 14,
+            function: () => Navigator.of(context).pop()),
       ],
     );
   }

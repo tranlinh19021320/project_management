@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/start_screen/login.dart';
 import 'package:project_management/start_screen/signup.dart';
-import 'package:project_management/utils/colors.dart';
-import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/notify_dialog.dart';
+import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';
-import 'package:project_management/utils/paths.dart';
 
 class AddCompany extends StatefulWidget {
   const AddCompany({super.key});

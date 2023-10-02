@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/model/user.dart';
-import 'package:project_management/utils/colors.dart';
-import 'package:project_management/utils/functions.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 
 class SearchUser extends StatefulWidget {
   final String companyId;

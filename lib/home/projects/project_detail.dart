@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/provider/group_provider.dart';
-import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/colors.dart';
 import 'package:intl/intl.dart';
+import 'package:project_management/utils/parameters.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 

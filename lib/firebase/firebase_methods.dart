@@ -10,7 +10,6 @@ import 'package:project_management/model/project.dart';
 import 'package:project_management/model/report.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';
-import 'package:project_management/utils/paths.dart';
 import 'package:project_management/model/user.dart';
 import 'package:uuid/uuid.dart';
 
@@ -64,7 +63,7 @@ class FirebaseMethods {
         await loginWithUserId(userId: uid);
       }
       if (photoURL == "") {
-        ByteData dataImage = await rootBundle.load(defaultProfileImage);
+        ByteData dataImage = await rootBundle.load(defaultProfileImagePath);
         Uint8List image = dataImage.buffer.asUint8List();
         url = await StorageMethods().uploadImageToStorage(
             folderNamev1: 'profile', folderNamev2: username, image: image);

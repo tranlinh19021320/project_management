@@ -5,7 +5,7 @@ import 'package:project_management/home/progress/progress_card.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/progress.dart';
 import 'package:project_management/provider/group_provider.dart';
-import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/parameters.dart';
 import 'package:provider/provider.dart';
 
 class ProgressScreen extends StatefulWidget {

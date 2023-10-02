@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/model/comment.dart';
-import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 
 class CommentCard extends StatefulWidget {
   final CommentReport comment;
@@ -26,7 +27,7 @@ class _CommentCardState extends State<CommentCard> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 8),
-                child: getCircleImageFromUrl(url: widget.comment.photoURL, radius: 16)
+                child: getCircleImageFromUrl(widget.comment.photoURL, radius: 16)
               ),
               const SizedBox(
                 width: 8,
@@ -38,7 +39,7 @@ class _CommentCardState extends State<CommentCard> {
                     constraints: const BoxConstraints(maxWidth: 200),
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                        color: darkblueAppbarColor,
+                        color: darkblueColor,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: focusBlueColor)),
                     child: Column(
@@ -66,12 +67,8 @@ class _CommentCardState extends State<CommentCard> {
                       ? Container()
                       : Padding(
                         padding: const EdgeInsets.all(4.0),
-                        child: Image.network(
-                            widget.comment.photoComment,
-                            height: 120,
-                            width: 120,
-                            fit: BoxFit.cover,
-                          ),
+                        child: getCircleImageFromUrl(widget.comment.photoComment, width: 140, height: 120),
+                        
                       ),
                   Padding(
                     padding: const EdgeInsets.only(left: 8),

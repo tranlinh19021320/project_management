@@ -5,13 +5,10 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/timetracking/time_keeping_table.dart';
 import 'package:project_management/home/widgets/group_dropdown_button.dart';
-import 'package:project_management/home/widgets/button.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/notify_dialog.dart';
-import 'package:project_management/utils/colors.dart';
-import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/paths.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 
 class StaffCard extends StatefulWidget {
   final CurrentUser staff;
@@ -46,8 +43,6 @@ class _StaffCardState extends State<StaffCard> {
         builder: (_) => AlertDialog(
               scrollable: true,
               backgroundColor: darkblueAppbarColor,
-              iconPadding: const EdgeInsets.only(bottom: 8),
-              icon: loudspeakerIcon,
               title: Column(
                 children: [
                   Text("Bạn chắc muốn xóa tài khoản ${widget.staff.username} ?",
@@ -64,23 +59,23 @@ class _StaffCardState extends State<StaffCard> {
               actionsAlignment: MainAxisAlignment.center,
               actionsPadding: const EdgeInsets.only(bottom: 14),
               actions: [
-                TextBoxButton(
+                textBoxButton(
                     color: focusBlueColor,
                     text: "Ok",
                     fontSize: 14,
-                    width: 64,
+                    width: 50,
                     height: 36,
-                    funtion: () => Navigator.of(context).pop(true)),
-                TextBoxButton(
+                    function: () => Navigator.of(context).pop(true)),
+                textBoxButton(
                     color: textErrorRedColor,
                     text: "Hủy",
                     fontSize: 14,
-                    width: 64,
+                    width: 50,
                     height: 36,
-                    funtion: () => Navigator.of(context).pop(false)),
+                    function: () => Navigator.of(context).pop(false)),
               ],
             ));
-    if (comfirm) {
+    if (comfirm != null && comfirm) {
       FirebaseMethods().deleteUser(deleteUserId: widget.staff.userId);
       if (context.mounted) {
         showNotify(context: context, content: "Xóa thành công!",);
@@ -155,11 +150,11 @@ Nhóm: $userGroup''';
                           leading: userGroup == 'Manager'
                               ? Padding(
                                   padding: const EdgeInsets.all(0),
-                                  child: resizedIcon(keyImage, 18),
+                                  child: resizedIcon(keyImagePath, size: 18),
                                 )
                               : Padding(
                                   padding: const EdgeInsets.all(0),
-                                  child: resizedIcon(staffImage, 18),
+                                  child: resizedIcon(staffImagePath, size: 18),
                                 ),
                           title: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8),
@@ -177,7 +172,7 @@ Nhóm: $userGroup''';
                       children: [
                         Expanded(
                           child: ListTile(
-                            leading: getCircleImageFromUrl(url: widget.staff.photoURL, radius: 22),
+                            leading: getCircleImageFromUrl(widget.staff.photoURL, radius: 22),
                             title: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,13 +215,11 @@ Nhóm: $userGroup''';
                                                     const SizedBox(
                                                       width: 8,
                                                     ),
-                                                    TextBoxButton(
+                                                    textBoxButton(
                                                         color: focusBlueColor,
                                                         text: "Ok",
                                                         fontSize: 11,
-                                                        width: 30,
-                                                        height: 30,
-                                                        funtion: updateGroup),
+                                                        function: updateGroup),
                                                     InkWell(
                                                       onTap: () {
                                                         setState(() {
@@ -303,15 +296,13 @@ Nhóm: $userGroup''';
                                 ),
                                 (userGroup == "Manager")
                                     ? Container()
-                                    : TextBoxButton(
-                                        color: focusBlueColor,
+                                    : textBoxButton(
+                                        color: darkblueColor,
                                         text: "Bảng chấm công",
                                         fontSize: 12,
                                         width: 100,
-                                        height: 20,
-                                        padding: 0,
-                                        radius: 2,
-                                        funtion: () {
+                                        padding: 2,
+                                        function: () {
                                           Navigator.of(context)
                                               .push(MaterialPageRoute(
                                                   builder: (_) => Container(

@@ -2,15 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/admin/utils/drawer_bar.dart';
 import 'package:project_management/home/projects/project_card.dart';
 import 'package:project_management/home/projects/project_detail.dart';
-import 'package:project_management/home/widgets/page_list.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/model/user.dart';
-import 'package:project_management/utils/colors.dart';
-import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/paths.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 
 class ProjectsScreen extends StatefulWidget {
   const ProjectsScreen({
@@ -56,28 +53,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               backgroundColor: Colors.transparent,
             ),
           )
-        : Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(backgroundImage), fit: BoxFit.fill),
-            ),
-            child: Scaffold(
-                backgroundColor: Colors.transparent,
-                drawerEnableOpenDragGesture: false,
-                appBar: AppBar(
-                  backgroundColor: darkblueAppbarColor,
-                  leading: Builder(
-                    builder: (context) => IconButton(
-                        onPressed: () => Scaffold.of(context).openDrawer(),
-                        icon: menuIcon()),
-                  ),
-                  title: const Text("Dự án"),
-                  
-                ),
-                drawer: const DrawerMenu(
-                  selectedPage: IS_PROJECTS_PAGE,
-                ),
-                body: StreamBuilder(
+        : mainScreen(IS_PROJECTS_PAGE, body: StreamBuilder(
                     stream: FirebaseFirestore.instance
                         .collection('companies')
                         .doc(companyId)
@@ -95,10 +71,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                           itemBuilder: (context, index) => ProjectCard(
                               project: Project.fromSnap(
                                   snapshot.data!.docs[index])));
-                    }),
-                floatingActionButtonLocation:
-                    FloatingActionButtonLocation.endFloat,
-                floatingActionButton: FloatingActionButton(
+                    }), floatingActionButton: FloatingActionButton(
                   heroTag: "createProjectButton",
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
@@ -121,7 +94,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                   },
                   tooltip: 'Tạo mới dự án',
                   child: const Icon(Icons.add),
-                )),
-          );
+                ));
+        
   }
 }

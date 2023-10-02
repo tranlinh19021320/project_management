@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/home/missions/missions_list.dart';
-import 'package:project_management/home/staff/utils/staff_drawer.dart';
-import 'package:project_management/home/widgets/page_list.dart';
-import 'package:project_management/utils/colors.dart';
-import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/paths.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 
 
 class StaffHomeScreen extends StatefulWidget {
@@ -18,25 +15,6 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-            image: AssetImage(backgroundImage), fit: BoxFit.fill),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: darkblueAppbarColor,
-          title: const Text("Nhiệm vụ"),
-          leading: Builder(
-                    builder: (context) => IconButton(
-                        onPressed: () => Scaffold.of(context).openDrawer(),
-                        icon: menuIcon()),
-                  ),
-        ),
-        drawer:const StaffDrawerMenu(selectedPage: IS_QUEST_PAGE,),
-        body: const MissionsScreen(),
-      ),
-    );
+    return mainScreen(IS_QUEST_PAGE, body: const MissionsScreen());
   }
 }

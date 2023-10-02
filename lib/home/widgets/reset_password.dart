@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/model/user.dart';
-import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/icons.dart';
-import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
+
 class ResetPasswordScreen extends StatefulWidget {
   final String userId;
   const ResetPasswordScreen({super.key, required this.userId});
@@ -59,7 +58,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   init() async {
-    user = await FirebaseMethods().getCurrentUserByUserId(userId: widget.userId);
+    user =
+        await FirebaseMethods().getCurrentUserByUserId(userId: widget.userId);
     setState(() {
       usernameController.text = user.username;
     });
@@ -82,24 +82,26 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   updatePassword() async {
     if (isPasswordState == IS_CORRECT_STATE) {
-    showNotify(context: context, isLoading: true);
-    String res = await FirebaseMethods().changePassword(
-        userId: widget.userId,
-        oldpassword: oldPasswordController.text,
-        newpassword: newPasswordController.text);
-    // Navigator.pop(context);
-    if (res == "success") {
-      if (context.mounted) {
-        Navigator.pop(context);
-        Navigator.pop(context);
-        showNotify(context: context, content: "Đổi mật khẩu thành công!",);
-        
+      showNotify(context: context, isLoading: true);
+      String res = await FirebaseMethods().changePassword(
+          userId: widget.userId,
+          oldpassword: oldPasswordController.text,
+          newpassword: newPasswordController.text);
+      // Navigator.pop(context);
+      if (res == "success") {
+        if (context.mounted) {
+          Navigator.pop(context);
+          Navigator.pop(context);
+          showNotify(
+            context: context,
+            content: "Đổi mật khẩu thành công!",
+          );
+        }
+      } else {
+        if (context.mounted) {
+          showNotify(context: context, content: res, isError: true);
+        }
       }
-    } else {
-      if (context.mounted) {
-        showNotify(context: context, content: res, isError: true);
-      }
-    }
     }
   }
 
@@ -158,13 +160,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       ? "Nhập mật khẩu cũ để xác thực"
                       : "Đã xác thực mật khẩu",
               helperStyle: TextStyle(
-                  color: notifyColor(state: isPasswordState),
-                  fontSize: 11),
+                  color: notifyColor(state: isPasswordState), fontSize: 11),
 
               //outline border
               enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                    color: notifyColor(state: isPasswordState)),
+                borderSide:
+                    BorderSide(color: notifyColor(state: isPasswordState)),
               ),
               border:
                   OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
@@ -219,40 +220,21 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         ],
       )),
       actions: [
-        InkWell(
-          onTap: updatePassword,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              color: buttonGreenColor,
-            ),
-            width: 80,
-            height: 36,
-            child: const Center(
-                child: Text(
-              "Cập nhật",
-            )),
-          ),
+        textBoxButton(
+          color: buttonGreenColor,
+          text: "Cập nhật",
+          width: 80,
+          fontSize: 14,
+          height: 36,
+          function: updatePassword,
         ),
-        InkWell(
-          onTap: () => Navigator.of(context).pop(),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-              color: textErrorRedColor,
-            ),
+        textBoxButton(
+            color: textErrorRedColor,
+            text: "Hủy",
             width: 64,
+            fontSize: 14,
             height: 36,
-            child: const Center(
-                child: Text(
-              "Hủy",
-            )),
-          ),
-        ),
+            function: () => Navigator.of(context).pop()),
       ],
     );
   }

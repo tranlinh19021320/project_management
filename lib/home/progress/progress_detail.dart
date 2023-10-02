@@ -5,11 +5,9 @@ import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/progress.dart';
 import 'package:project_management/provider/group_provider.dart';
-import 'package:project_management/utils/colors.dart';
 import 'package:project_management/utils/functions.dart';
-import 'package:project_management/utils/notify_dialog.dart';
 import 'package:project_management/utils/parameters.dart';
-import 'package:project_management/utils/paths.dart';
+import 'package:project_management/utils/widgets.dart';
 import 'package:provider/provider.dart';
 
 class ProgressDetailScreen extends StatefulWidget {

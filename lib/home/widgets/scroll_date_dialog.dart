@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:project_management/home/widgets/button.dart';
-import 'package:project_management/utils/colors.dart';
+import 'package:project_management/utils/parameters.dart';
+import 'package:project_management/utils/widgets.dart';
 import 'package:scroll_date_picker/scroll_date_picker.dart';
 
 class ScrollDateDialog extends StatefulWidget {
@@ -55,13 +55,8 @@ class _ScrollDateDialogState extends State<ScrollDateDialog> {
       ),
       actionsAlignment: MainAxisAlignment.center,
       actions: [
-        TextBoxButton(
-            color: focusBlueColor,
-            text: "Ok",
-            fontSize: 13,
-            width: 40,
-            height: 40,
-            funtion: submit)
+        textBoxButton(
+            color: focusBlueColor, text: "Ok", fontSize: 13, function: submit)
       ],
     );
   }
