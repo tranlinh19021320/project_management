@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:project_management/home/notifications/notification_card.dart';
+import 'package:project_management/home/widgets/notifications/notification_card.dart';
 import 'package:project_management/utils/parameters.dart';
 
 class NotificationsScreen extends StatefulWidget {

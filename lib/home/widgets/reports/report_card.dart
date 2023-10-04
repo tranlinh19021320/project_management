@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/reports/report_detail.dart';
+import 'package:project_management/home/widgets/reports/report_detail.dart';
 import 'package:project_management/model/report.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';

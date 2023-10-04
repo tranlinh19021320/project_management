@@ -4,7 +4,7 @@ import 'package:project_management/utils/widgets.dart';
 import '../../../firebase/firebase_methods.dart';
 import '../../../start_screen/login.dart';
 import 'package:project_management/utils/functions.dart';
-import '../../widgets/user_profile.dart';
+import '../../widgets/utils/user_profile.dart';
 
 class DrawerMenu extends StatefulWidget {
   final int selectedPage;

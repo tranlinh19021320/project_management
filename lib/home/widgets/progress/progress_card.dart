@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:project_management/home/progress/progress_detail.dart';
+import 'package:project_management/home/widgets/progress/progress_detail.dart';
 import 'package:project_management/model/progress.dart';
 import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/functions.dart';

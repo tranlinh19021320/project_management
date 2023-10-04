@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:project_management/home/progress/progress_card.dart';
+import 'package:project_management/home/widgets/progress/progress_card.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/progress.dart';
 import 'package:project_management/provider/group_provider.dart';

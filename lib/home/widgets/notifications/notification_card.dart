@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/missions/mission.dart';
+import 'package:project_management/home/widgets/missions/mission.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/notification.dart';
 import 'package:project_management/provider/group_provider.dart';

@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/reports/report_card.dart';
+import 'package:project_management/home/widgets/reports/report_card.dart';
 import 'package:project_management/model/report.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/provider/group_provider.dart';

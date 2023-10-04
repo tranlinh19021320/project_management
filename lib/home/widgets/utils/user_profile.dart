@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:project_management/home/widgets/reset_password.dart';
+import 'package:project_management/home/widgets/utils/reset_password.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/widgets.dart';
-import '../../firebase/firebase_methods.dart';
+import '../../../firebase/firebase_methods.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({

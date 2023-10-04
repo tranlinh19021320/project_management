@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:project_management/home/comments/comment_card.dart';
+import 'package:project_management/home/widgets/comments/comment_card.dart';
 import 'package:project_management/model/comment.dart';
 import 'package:project_management/model/report.dart';
 import 'package:project_management/utils/parameters.dart';

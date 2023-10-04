@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:project_management/home/notifications/notifications_list.dart';
+import 'package:project_management/home/widgets/notifications/notifications_list.dart';
 import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/widgets.dart';
 class NotifyScreen extends StatefulWidget {

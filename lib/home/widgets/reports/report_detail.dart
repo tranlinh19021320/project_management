@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/comments/comments_list.dart';
+import 'package:project_management/home/widgets/comments/comments_list.dart';
 import 'package:project_management/model/report.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/functions.dart';

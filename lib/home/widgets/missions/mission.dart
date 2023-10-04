@@ -1,23 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/missions/missions_list.dart';
-import 'package:project_management/home/projects/project_detail.dart';
-import 'package:project_management/model/project.dart';
+import 'package:project_management/home/widgets/missions/mission_detail.dart';
+import 'package:project_management/home/widgets/progress/progress_screen.dart';
+import 'package:project_management/model/mission.dart';
+import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/utils/widgets.dart';
+import 'package:provider/provider.dart';
 
-class ProjectHomeScreen extends StatefulWidget {
-  final Project project;
-  const ProjectHomeScreen({super.key, required this.project});
+class MissionHomeScreen extends StatefulWidget {
+  final Mission mission;
+  const MissionHomeScreen({super.key, required this.mission});
 
   @override
-  State<ProjectHomeScreen> createState() => _ProjectHomeScreenState();
+  State<MissionHomeScreen> createState() => _MissionHomeScreenState();
 }
 
-class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
+class _MissionHomeScreenState extends State<MissionHomeScreen> {
   int page = 0;
   PageController pageController = PageController();
+  late bool isManager;
+  @override
+  void initState() {
+    super.initState();
+    GroupProvider groupProvider = Provider.of<GroupProvider>(context, listen: false);
+    isManager = groupProvider.getIsManager;
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -29,11 +39,10 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
         builder: (_) => AlertDialog(
               scrollable: true,
               backgroundColor: darkblueColor,
-              
               title: Column(
                 children: [
                   Text(
-                      "Bạn chắc muốn xóa dự án '' ${widget.project.nameProject} '' ?",
+                      "Bạn chắc muốn xóa nhiem vu '' ${widget.mission.nameMission} '' ?",
                       style: const TextStyle(fontSize: 18)),
                   const SizedBox(
                     height: 8,
@@ -50,14 +59,15 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
                 textBoxButton(
                     color: errorRedColor,
                     text: "Ok",
-                    fontSize: 14,
                     width: 60,
+                    fontSize: 14,
                     function: () => Navigator.of(context).pop(true)),
                 textBoxButton(
                     color: darkblueAppbarColor,
                     text: "Hủy",
-                    fontSize: 14,
                     width: 60,
+                    fontSize: 14,
+                    
                     function: () => Navigator.of(context).pop(false)),
               ],
             ));
@@ -66,16 +76,14 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
       if (context.mounted) {
         showNotify(context: context, isLoading: true);
       }
-      String res = await FirebaseMethods().deleteProject(
-          companyId: widget.project.companyId,
-          projectId: widget.project.projectId);
+      String res = await FirebaseMethods().deleteMission(
+          mission: widget.mission);
 
       if (res == 'success') {
         if (context.mounted) {
           Navigator.pop(context);
           Navigator.pop(context);
-          showNotify(context: context,content: "Đã xóa dự án thành công!",);
-         
+          showNotify(context: context, content: "Đã xóa nhiem vu thành công!",);
         }
       } else {
         if (context.mounted) {
@@ -103,9 +111,9 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: darkblueAppbarColor,
-          title: const Text('Dự án'),
+          title: const Text('Nhiệm vụ'),
           actions: [
-            IconButton(
+            (!isManager) ? Container() : IconButton(
                 onPressed: delete,
                 tooltip: "Xóa vĩnh viễn",
                 icon: const Icon(
@@ -118,18 +126,16 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
           controller: pageController,
           onPageChanged: onPageChanged,
           children: [
-            MissionsScreen(project: widget.project),
-            ProjectDetailScreen(project: widget.project,),
-            
+            MissionDetailScreen(mission: widget.mission,),
+            ProgressScreen(mission: widget.mission),
           ],
         ),
        bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.transparent,
         currentIndex: page,
         items: [
-          BottomNavigationBarItem(icon: missionIcon, label: "Nhiệm vụ",),
           BottomNavigationBarItem(icon: projectIcon, label: "Chi tiết", ),
-          
+          BottomNavigationBarItem(icon: missionIcon, label: "Tiến độ",),
         ],
         
         onTap: (page) => pageController.jumpToPage(page),

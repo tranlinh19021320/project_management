@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:project_management/home/projects/project.dart';
+import 'package:project_management/home/widgets/projects/project.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';

@@ -105,6 +105,7 @@ const int MISSION_CHANGE_STAFF = 6;
 const int MISSION_IS_OPEN = 5;
 const int MISSION_IS_CHANGED = 7;
 const int TIME_KEEPING = 8;
+
 // report type
 const int UPDATE_REPORT = 9;
 const int BUG_REPORT = 10;
