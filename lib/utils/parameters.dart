@@ -83,6 +83,7 @@ const int IS_STAFF_NOTIFY_PAGE = 5;
 const int IS_TIME_KEEPING_PAGE = 6;
 const int IS_REPORT_PAGE = 7;
 
+
 const int IS_DEFAULT_STATE = 2;
 const int IS_CORRECT_STATE = 1;
 const int IS_ERROR_STATE = 0;
@@ -105,6 +106,7 @@ const int MISSION_CHANGE_STAFF = 6;
 const int MISSION_IS_OPEN = 5;
 const int MISSION_IS_CHANGED = 7;
 const int TIME_KEEPING = 8;
+const int INVITE_REPORT = 9;
 
 // report type
 const int UPDATE_REPORT = 9;

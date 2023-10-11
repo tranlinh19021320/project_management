@@ -52,6 +52,7 @@
 <p align="center">
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/general_report_list_page.png" alt="Report List">
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/general_report_page.png" alt="Report">
+  <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/report_invite_member.png" alt="Report Invite Member">
   <img width="180" height="390" src="https://github.com/tranlinh19021320/project_management/blob/main/app_snapshots/all_comment.png" alt="Comment">
 </p>
 

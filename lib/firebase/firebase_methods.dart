@@ -133,6 +133,39 @@ class FirebaseMethods {
         reportNumber: (snap.data()!)['reportNumber']);
   }
 
+  // get user List
+  Future<List<CurrentUser>> getCurrentUserList(
+      {List<String>? userIdList}) async {
+    List<CurrentUser> currentUserList = [];
+    if (userIdList != null) {
+      userIdList.forEach((element) async {
+        currentUserList.add(await getCurrentUserByUserId(userId: element));
+      });
+    } else {
+      var snap = await _firestore
+          .collection('users')
+          .where('group', isNotEqualTo: manager)
+          .get();
+      snap.docs.forEach((element) {
+        currentUserList.add(CurrentUser(
+            timekeeping: (element.data())['timekeeping'],
+            email: (element.data())['email'],
+            username: (element.data())['username'],
+            password: (element.data())['password'],
+            nameDetails: (element.data())['nameDetails'],
+            photoURL: (element.data())['photoURL'],
+            group: (element.data())['group'],
+            userId: (element.data())['userId'],
+            companyId: (element.data())['companyId'],
+            companyName: (element.data())['companyName'],
+            notifyNumber: (element.data())['notifyNumber'],
+            reportNumber: (element.data())['reportNumber']));
+      });
+    }
+
+    return currentUserList;
+  }
+
   //update user profile
   Future<String> updateNameDetail(
       {required String userId, required String nameDetails}) async {
@@ -347,6 +380,39 @@ class FirebaseMethods {
     }
 
     return snap;
+  }
+
+  // type = 0 => all report
+  // type = 1 => own report
+  // type = 2 => share report
+  Stream<QuerySnapshot<Map<String, dynamic>>> reportSnapshot(
+      {required String companyId, required int type}) {
+    String userId = _auth.currentUser!.uid;
+    switch (type) {
+      case 1:
+        return _firestore
+            .collection('companies')
+            .doc(companyId)
+            .collection('reports')
+            .where('ownId', isEqualTo: userId)
+            .orderBy('createDate', descending: true)
+            .snapshots();
+      case 2:
+        return _firestore
+            .collection('companies')
+            .doc(companyId)
+            .collection('reports')
+            .where('member', arrayContains: userId)
+            .orderBy('createDate', descending: true)
+            .snapshots();
+      default:
+        return _firestore
+            .collection('companies')
+            .doc(companyId)
+            .collection('reports')
+            .orderBy('createDate', descending: true)
+            .snapshots();
+    }
   }
 
   // function to create project
@@ -725,6 +791,7 @@ class FirebaseMethods {
       String date = "",
       String? uid,
       Mission? mission,
+      Report? report,
       required int type,
       String? group,
       String username = "",
@@ -770,7 +837,8 @@ class FirebaseMethods {
           nameDetails: username,
           description: description,
           notifyId: notifyId,
-          isRead: (type == MISSION_IS_DELETED || type == TIME_KEEPING),
+          nameReport: (report == null) ? '' : report.nameReport,
+          isRead: (type == MISSION_IS_DELETED || type == TIME_KEEPING || type == INVITE_REPORT),
           missionId: (mission == null) ? "" : mission.missionId,
           nameMission: (mission == null) ? "" : mission.nameMission,
           nameProject: (mission == null) ? "" : mission.nameProject,
@@ -820,30 +888,35 @@ class FirebaseMethods {
 
     return res;
   }
+  // type = 0 => manager send all other
+  // type = 1 => send to other & manager
+  Future<void> imclementReportNumber({int type = 0,required Report report,}) async {
+    String currentUserId = _auth.currentUser!.uid;
+    List member = report.member;
+    member.add(report.ownId);
 
-  Future<void> imclementReportNumber({String? uid, String? group}) async {
-    if (uid != null) {
-      var snap = await _firestore.collection('users').doc(uid).get();
-      int number = snap.data()!['reportNumber'];
+    if (type == 0) {
 
-      await _firestore
-          .collection('users')
-          .doc(uid)
-          .update({'reportNumber': number + 1});
-    } else if (group != null) {
+    } else {
+      if (member.contains(currentUserId)) member.remove(currentUserId);
       var snapshot = await _firestore
           .collection('users')
-          .where('group', isEqualTo: group)
+          .where('group', isEqualTo: manager)
           .get();
       snapshot.docs.forEach((element) async {
         String userId = (element as dynamic)['userId'];
-        int number = (element as dynamic)['reportNumber'];
-        await _firestore
-            .collection('users')
-            .doc(userId)
-            .update({'reportNumber': number + 1});
-      });
+        member.add(userId);
+      });  
     }
+
+    member.forEach((element)async {
+      var snapshot = await _firestore.collection('users').doc(element).get();
+      int number = (snapshot.data()! as dynamic)['reportNumber'];
+      await _firestore.collection('users').doc(element).update({
+        'reportNumber' : number + 1,
+      });
+    });
+    
   }
 
   Future<String> createReport({
@@ -880,18 +953,55 @@ class FirebaseMethods {
           photoURL: photoURL,
           reportId: reportId,
           ownRead: true,
-          managerRead: false);
+          managerRead: false,
+          member: []);
       _firestore
           .collection('companies')
           .doc(user.companyId)
           .collection('reports')
           .doc(reportId)
           .set(report.toJson());
-      imclementReportNumber(group: manager);
+      imclementReportNumber(report: report, type: 1,);
       res = 'success';
     } catch (e) {
       res = e.toString();
     }
+    return res;
+  }
+
+  Future<String> updateMemberReport({
+    required Report report,
+    required String userId,
+  }) async {
+    String res = 'error';
+    try {
+      DocumentSnapshot snapshot = await _firestore
+          .collection('companies')
+          .doc(report.companyId)
+          .collection('reports')
+          .doc(report.reportId)
+          .get();
+      List member = (snapshot.data()! as dynamic)['member'];
+      await _firestore
+          .collection('companies')
+          .doc(report.companyId)
+          .collection('reports')
+          .doc(report.reportId)
+          .update((member.contains(userId))
+              ? {
+                  'member': FieldValue.arrayRemove([userId]),
+                }
+              : {
+                  'member': FieldValue.arrayUnion([userId]),
+                });
+      if (!member.contains(userId)) {
+        createNotification(type: INVITE_REPORT, report: report, username: report.ownName, uid: userId);
+      }
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+
     return res;
   }
 
@@ -959,9 +1069,12 @@ class FirebaseMethods {
           .update({
         'createDate': DateTime.now(),
       });
-      (user.group == manager)
-          ? imclementReportNumber(uid: report.ownId)
-          : imclementReportNumber(group: manager);
+      if (user.group == manager) {
+        imclementReportNumber(report: report, type: 0);
+      } else {
+        imclementReportNumber(report: report, type: 1);
+
+      }
       changeIsReadReportState(
           report: report, isManager: !(user.group == manager), isRead: false);
       res = 'success';

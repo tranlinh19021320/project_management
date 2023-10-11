@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
 import 'package:project_management/home/widgets/comments/comments_list.dart';
+import 'package:project_management/home/widgets/utils/invite_member.dart';
 import 'package:project_management/model/report.dart';
 import 'package:project_management/model/user.dart';
 import 'package:project_management/utils/functions.dart';
@@ -30,7 +31,8 @@ class _ReportDetailState extends State<ReportDetail> {
   ScrollController descriptionScroll = ScrollController();
   PageController pageController = PageController();
 
-  bool isOpenComment = false;
+  bool isOpenComment = true;
+  bool isInvite = false;
   int nameReportState = IS_DEFAULT_STATE;
 
   List<Uint8List> imageList = [];
@@ -170,6 +172,14 @@ class _ReportDetailState extends State<ReportDetail> {
           title: const Text("Report"),
           backgroundColor: darkblueAppbarColor,
           centerTitle: true,
+          actions: isNew ? null : [
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: textBoxButton(color: darkblueColor, text: "Mời", height: 20, width: 50, fontSize: 14, function: () {
+                showCupertinoModalPopup(context: context, builder: (_) => InviteMember(report: widget.report!,));
+              } ),
+            ),
+          ],
         ),
         body: Padding(
           padding: const EdgeInsets.only(top: 0, left: 8, right: 8, bottom: 20),
@@ -523,47 +533,6 @@ class _ReportDetailState extends State<ReportDetail> {
                                 setState(() {
                                   isOpenComment = !isOpenComment;
                                 });
-                                await showCupertinoModalPopup(
-                                  context: context,
-                                  builder: (_) => Container(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.8,
-                                    decoration: BoxDecoration(
-                                        color: darkblueAppbarColor,
-                                        borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(30),
-                                            topRight: Radius.circular(30)),
-                                        border:
-                                            Border.all(color: focusBlueColor)),
-                                    child: Scaffold(
-                                      backgroundColor: Colors.transparent,
-                                      body: Column(
-                                        children: [
-                                          const Center(
-                                            child: Text(
-                                              "Tất cả bình luận",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20,
-                                                  color: backgroundWhiteColor),
-                                            ),
-                                          ),
-                                          const Divider(
-                                            thickness: 1.2,
-                                            color: backgroundWhiteColor,
-                                          ),
-                                          CommentList(
-                                            report: widget.report!,
-                                            isLast: false,
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                                setState(() {
-                                  isOpenComment = !isOpenComment;
-                                });
                               },
                               child: Container(
                                 width: 110,
@@ -584,10 +553,10 @@ class _ReportDetailState extends State<ReportDetail> {
                                           RotationTransition(
                                             turns: isOpenComment
                                                 ? Tween<double>(
-                                                        begin: 0.5, end: 1)
+                                                        begin: 1, end: 0.5)
                                                     .animate(animation)
                                                 : Tween<double>(
-                                                        begin: 1, end: 0.5)
+                                                        begin: 0.5, end: 1)
                                                     .animate(animation),
                                             child: ScaleTransition(
                                               scale: animation,
@@ -606,9 +575,9 @@ class _ReportDetailState extends State<ReportDetail> {
                           const Divider(
                             color: correctGreenColor,
                           ),
-                          CommentList(
+                          isOpenComment ? CommentList(
                             report: widget.report!,
-                          )
+                          ) : Container()
                         ],
                       )
               ],

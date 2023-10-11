@@ -123,6 +123,39 @@ class TimekeepingStaffNotify extends Notify {
 // manager receive notification when staff report
 class ReceiveReportManagerNotify {}
 
+class InviteReportNotify extends Notify {
+  final String nameDetails;
+  final String nameReport;
+  InviteReportNotify(
+      {required this.nameDetails,
+      required this.nameReport,
+      required super.notifyId,
+      required super.isRead,
+      required super.userId,
+      required super.createDate,
+      required super.type});
+  @override
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = super.toJson();
+    json.addAll({
+      'nameDetails': nameDetails,
+      'nameReport': nameReport,
+    });
+    return json;
+  }
+
+  static InviteReportNotify fromSnap({required DocumentSnapshot doc}) =>
+      InviteReportNotify(
+        type: doc['type'],
+        createDate: doc['createDate'].toDate(),
+        userId: doc['userId'],
+        isRead: doc['isRead'],
+        notifyId: doc['notifyId'],
+        nameDetails: doc['nameDetails'],
+        nameReport: doc['nameReport'],
+      );
+}
+
 // staff receive notification when manager upadate mission
 class MissionNotify extends Notify {
   final String missionId;
@@ -192,6 +225,7 @@ class Notify {
     String missionId = '',
     String description = '',
     String notifyId = '',
+    String nameReport = '',
     bool isRead = true,
     String userId = '',
     DateTime? createDate,
@@ -253,7 +287,17 @@ class Notify {
                 userId: userId,
                 createDate: createDate!,
                 type: type);
-
+      case INVITE_REPORT:
+        return (doc != null)
+            ? InviteReportNotify.fromSnap(doc: doc)
+            : InviteReportNotify(
+                nameDetails: nameDetails,
+                nameReport: nameReport,
+                notifyId: notifyId,
+                isRead: isRead,
+                userId: userId,
+                createDate: createDate!,
+                type: type);
       default:
         return null;
     }

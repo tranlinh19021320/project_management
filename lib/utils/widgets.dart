@@ -264,7 +264,9 @@ Widget textBoxButton(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(radius),
         boxShadow: const [
-          BoxShadow(color: yellowColor, offset: Offset(1, 1)),
+          BoxShadow(color: Colors.transparent, offset: Offset(0.3, 0.3)),
+          BoxShadow(color: backgroundWhiteColor, offset: Offset(0.3, 0.5)),
+          BoxShadow(color: correctGreenColor, offset: Offset(0.5, 0.3)),
         ],
         color: color,
       ),
@@ -339,45 +341,44 @@ getNumberNotifications(
   );
 }
 
-Widget getCircleImageFromUrl(String url,{
+Widget getCircleImageFromUrl(
+  String url, {
   double radius = 32,
   double? width,
   double? height,
 }) {
   Widget image = Image.network(
-        url,
-        width: (width != null) ? (width - 2) : (radius * 2 - 4),
-        height: (height != null) ? (height - 2) : (radius * 2 - 4),
-        fit: BoxFit.cover,
-        loadingBuilder: (context, child, loadingProgress) {
-          int? totalSize;
-          int? downloadSize;
-  
-          totalSize = loadingProgress?.expectedTotalBytes;
-          downloadSize = loadingProgress?.cumulativeBytesLoaded;
-  
-          if (totalSize != null && downloadSize != null) {
-            var loadPercent = (downloadSize / totalSize).toDouble();
-  
-            return circularPercentIndicator(
-              percent: loadPercent,
-              radius: 15,
-              lineWidth: 5,
-            );
-          }
-  
-          return child;
-        },
-    );
-  return (width != null || height != null) ?   ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: image
-      )
-   : CircleAvatar(
-    backgroundColor: focusBlueColor,
-    radius: radius,
-    child: ClipOval(child: image),
+    url,
+    width: (width != null) ? (width - 2) : (radius * 2 - 4),
+    height: (height != null) ? (height - 2) : (radius * 2 - 4),
+    fit: BoxFit.cover,
+    loadingBuilder: (context, child, loadingProgress) {
+      int? totalSize;
+      int? downloadSize;
+
+      totalSize = loadingProgress?.expectedTotalBytes;
+      downloadSize = loadingProgress?.cumulativeBytesLoaded;
+
+      if (totalSize != null && downloadSize != null) {
+        var loadPercent = (downloadSize / totalSize).toDouble();
+
+        return circularPercentIndicator(
+          percent: loadPercent,
+          radius: 15,
+          lineWidth: 5,
+        );
+      }
+
+      return child;
+    },
   );
+  return (width != null || height != null)
+      ? ClipRRect(borderRadius: BorderRadius.circular(12), child: image)
+      : CircleAvatar(
+          backgroundColor: focusBlueColor,
+          radius: radius,
+          child: ClipOval(child: image),
+        );
 }
 
 // circle percent
@@ -421,9 +422,9 @@ Widget user1Card(
           style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold),
         ),
         Text(
-      user.group,
-      style: TextStyle(fontSize: fontsize - 2),
-    )
+          user.group,
+          style: TextStyle(fontSize: fontsize - 2),
+        )
       ],
     ),
     trailing: (user.group == manager)
@@ -432,8 +433,34 @@ Widget user1Card(
   );
 }
 
+Widget user2Card(
+    {required CurrentUser user, double size = 30, double fontsize = 14}) {
+  return Row(
+    children: [
+      getCircleImageFromUrl(user.photoURL, radius: size / 2),
+      const SizedBox(width: 8,),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            user.nameDetails,
+            style: TextStyle(fontSize: fontsize, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            user.group,
+            style: TextStyle(fontSize: fontsize - 2),
+          )
+        ],
+      )
+    ],
+  );
+}
+
 Widget userCard(
-    {required String userId, double size = 40, double fontsize = 16}) {
+    {required String userId,
+    double size = 40,
+    double fontsize = 16,
+    int type = 1}) {
   return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection('users')
@@ -449,7 +476,9 @@ Widget userCard(
 
         CurrentUser user = CurrentUser.fromSnap(user: snapshot.data!);
 
-        return user1Card(user: user, size: size, fontsize: fontsize);
+        return (type == 1)
+            ? user1Card(user: user, size: size, fontsize: fontsize)
+            : user2Card(user: user, size: size, fontsize: fontsize);
       });
 }
 

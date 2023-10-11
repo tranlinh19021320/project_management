@@ -45,38 +45,58 @@ class _ReportsScreenState extends State<ReportsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: isLoading ? Center(
-        child: LoadingAnimationWidget.inkDrop(
+        backgroundColor: Colors.transparent,
+        body: isLoading
+            ? Center(
+                child: LoadingAnimationWidget.inkDrop(
                     color: darkblueAppbarColor, size: 32),
-      ) : StreamBuilder(
-          stream: (isManager)
-              ? FirebaseFirestore.instance
-                  .collection('companies')
-                  .doc(companyId)
-                  .collection('reports')
-                  .orderBy('createDate', descending: true)
-                  .snapshots()
-              : FirebaseFirestore.instance
-                  .collection('companies')
-                  .doc(companyId)
-                  .collection('reports')
-                  .where('ownId',
-                      isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-                  .orderBy('createDate', descending: true)
-                  .snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return LoadingAnimationWidget.inkDrop(
-                  color: darkblueAppbarColor, size: 32);
-            }
-            return ListView.builder(
-                itemCount: snapshot.data!.docs.length,
-                itemBuilder: (context, index) => ReportCard(
-                      report:
-                          Report.fromSnap(doc: snapshot.data!.docs[index]),
-                    ));
-          }),
-    );
+              )
+            : isManager
+                ? StreamBuilder(
+                    stream: FirebaseMethods()
+                        .reportSnapshot(companyId: companyId, type: 0),
+                    builder: builderStream)
+                : Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Báo cáo của tôi:"),
+                        const Divider(),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.4,
+                          child: StreamBuilder(
+                              stream: FirebaseMethods()
+                                  .reportSnapshot(companyId: companyId, type: 1),
+                              builder: builderStream),
+                        ),
+                        const Text("Báo cáo chia sẻ:"),
+                        const Divider(),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.4,
+                          child: StreamBuilder(
+                              stream: FirebaseMethods()
+                                  .reportSnapshot(companyId: companyId, type: 2),
+                              builder: builderStream),
+                        )
+                      ],
+                    ),
+                ));
+  }
+
+  Widget builderStream(BuildContext context,
+      AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+    if (snapshot.connectionState == ConnectionState.waiting) {
+      return LoadingAnimationWidget.inkDrop(
+          color: darkblueAppbarColor, size: 32);
+    }
+    if (snapshot.data!.docs.isEmpty) {
+      return const Center(child: Text("Không có báo cáo nào"));
+    }
+    return ListView.builder(
+      padding: EdgeInsets.zero,
+        itemCount: snapshot.data!.docs.length,
+        itemBuilder: (context, index) => ReportCard(
+              report: Report.fromSnap(doc: snapshot.data!.docs[index]),
+            ));
   }
 }

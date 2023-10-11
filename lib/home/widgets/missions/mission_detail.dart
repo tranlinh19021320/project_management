@@ -282,11 +282,18 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                 Center(
                     child: InkWell(
                   onTap: isManager ? () {} : navigaToProject,
-                  child: Text(
-                    'Dự án: $nameProject',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        fontSize: 17, fontWeight: FontWeight.w500),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: darkblueAppbarColor,
+                      borderRadius: BorderRadius.circular(4)
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Text(
+                      'Dự án: $nameProject',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 17, fontWeight: FontWeight.w500),
+                    ),
                   ),
                 )),
                 (isLoadingProject)

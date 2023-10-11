@@ -209,7 +209,7 @@ String timeDateWithNow({
       }
     }
   }
-  return "lúc ${DateFormat('HH:mm, dd').format(date)} tháng ${DateFormat('MM, yyyy').format(date)}";
+  return "lúc ${DateFormat('HH:mm, dd').format(date)}/${DateFormat((date.year == now.year) ? 'MM':'MM/yyyy').format(date)}";
 }
 
 bool isToDay(

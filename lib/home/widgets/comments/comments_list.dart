@@ -7,8 +7,7 @@ import 'package:project_management/utils/parameters.dart';
 
 class CommentList extends StatefulWidget {
   final Report report;
-  final bool isLast;
-  const CommentList({super.key, required this.report, this.isLast = true});
+  const CommentList({super.key, required this.report,});
 
   @override
   State<CommentList> createState() => _CommentListState();
@@ -36,30 +35,16 @@ class _CommentListState extends State<CommentList> {
               child: Text("Không có Comment"),
             );
           }
-          int maxLength = snapshot.data!.docs.length;
-        
-          if (widget.isLast) {
-            String commentOwnId = snapshot.data!.docs.first['ownId'];
-            maxLength = 1;
-            bool findFirstOwnId = true;
-            while (findFirstOwnId) {
-              if (maxLength >= snapshot.data!.docs.length ||
-                  commentOwnId != snapshot.data!.docs[maxLength]['ownId']) {
-                findFirstOwnId = false;
-              } else {
-                maxLength++;
-              }
-            }
-          }
+         
           return Container(
-            constraints:BoxConstraints(maxHeight:(!widget.isLast) ? MediaQuery.of(context).size.height * 0.73 :  MediaQuery.of(context).size.height * 0.45,),
+            constraints:BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.45),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               border: Border.all(),
               color: darkblueColor
             ),
             child: ListView.builder(
-                itemCount: maxLength,
+                itemCount: snapshot.data!.docs.length,
                 
                 shrinkWrap: true,
                 itemBuilder: (context, index) => CommentCard(
