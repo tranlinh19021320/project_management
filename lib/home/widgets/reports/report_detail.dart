@@ -426,8 +426,7 @@ class _ReportDetailState extends State<ReportDetail> {
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
+                                        mainAxisAlignment: MainAxisAlignment.end,
                                         children: [
                                           (imageList.length == 1)
                                               ? const Text('')
@@ -437,7 +436,7 @@ class _ReportDetailState extends State<ReportDetail> {
                                                           seconds: 2)),
                                                   builder: (context, snapshot) {
                                                     if (snapshot.connectionState == ConnectionState.done) {
-                                                      return Container();
+                                                      return const Text('');
                                                     } else {
                                                       return Container(
                                                         decoration: BoxDecoration(

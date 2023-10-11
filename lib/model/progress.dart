@@ -7,6 +7,7 @@ class Progress {
   final DateTime createDate;
   final double percent;
   final int state;
+  final List imageList;
 
   const Progress({
     required this.createDate,
@@ -15,6 +16,7 @@ class Progress {
     required this.state,
     required this.missionId,
     required this.percent,
+    required this.imageList,
   });
 
   Map<String, dynamic> toJson() => {
@@ -23,7 +25,8 @@ class Progress {
         'createDate': createDate,
         'percent': percent,
         'date': date,
-        'state': state
+        'state': state,
+        'imageList' : imageList
       };
 
   static Progress fromSnap({required DocumentSnapshot doc}) => Progress(
@@ -33,5 +36,6 @@ class Progress {
         percent: doc['percent'],
         date: doc['date'],
         state: doc['state'],
+        imageList: doc['imageList'],
       );
 }

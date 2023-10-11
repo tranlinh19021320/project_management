@@ -670,16 +670,32 @@ class FirebaseMethods {
     required double percent,
     required String date,
     int state = IS_DOING,
+    required List<Uint8List> imageList,
   }) async {
     String res = "error";
+
     try {
+      CurrentUser user =
+          await getCurrentUserByUserId(userId: _auth.currentUser!.uid);
+      List photoURL = [];
+      if (imageList.isNotEmpty) {
+        for (int i = 0; i < imageList.length; i++) {
+          String url = await StorageMethods().uploadImageToStorage(
+              folderNamev1: 'progress',
+              folderNamev2: user.username,
+              folderNamev3: const Uuid().v1(),
+              image: imageList[i]);
+          photoURL.add(url);
+        }
+      }
       Progress progress = Progress(
           createDate: DateTime.now(),
           date: date,
           description: description,
           state: IS_DOING,
           missionId: missionId,
-          percent: percent);
+          percent: percent,
+          imageList: photoURL);
       await _firestore
           .collection('missions')
           .doc(missionId)

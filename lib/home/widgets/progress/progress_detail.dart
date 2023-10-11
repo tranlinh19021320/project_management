@@ -25,16 +25,19 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
   FocusNode percentFocus = FocusNode();
   FocusNode descriptionFocus = FocusNode();
   ScrollController descriptionScroll = ScrollController();
+  PageController pageController = PageController();
 
   late bool isManager;
   late String missionId;
   double min = 0;
   double max = 100;
+  List<Uint8List> imageList = [];
   int state = IS_SUBMIT;
   String date = dayToString(time: DateTime.now());
   bool isAutoEvaluate = true;
   int pre_state = IS_COMPLETE;
-  
+  List photoURL = [];
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -67,6 +70,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
       if (widget.progress!.state != IS_DOING) {
         state = widget.progress!.state;
       }
+      initImageList(widget.progress!);
     }
     if (widget.mission != null) {
       min = widget.mission!.percent * 100;
@@ -75,7 +79,10 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
     }
   }
 
-  
+  jumpToFirstPage() {
+    pageController.jumpToPage(0);
+    setState(() {});
+  }
 
   updateProgress() async {
     showNotify(context: context, isLoading: true);
@@ -90,7 +97,8 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
         description: description.text,
         percent: number,
         date: date,
-        state: state);
+        state: state,
+        imageList: imageList);
 
     if (context.mounted) {
       Navigator.pop(context);
@@ -122,7 +130,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
     }
     String res = await FirebaseMethods()
         .changeStateProgress(progress: widget.progress!, state: state);
-    
+
     if (context.mounted) {
       Navigator.pop(context);
     }
@@ -138,6 +146,20 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
         showSnackBar(context: context, content: res, isError: true);
       }
     }
+  }
+  initImageList(Progress progress) async {
+    setState(() {
+      isLoading = true;
+    });
+    photoURL.clear();
+    progress.imageList.forEach((element) {
+      photoURL.add(element);
+    });
+    imageList.clear();
+    imageList = await getImageList(photoURL: photoURL);
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -164,7 +186,7 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                     top: 8, left: 8, right: 8, bottom: 20),
                 child: SingleChildScrollView(
                   child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // description textfield
                         TextField(
@@ -185,7 +207,11 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                           scrollController: descriptionScroll,
                           onTapOutside: (event) => descriptionFocus.unfocus(),
                         ),
-
+                        // image List
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        imageScreen(),
                         const SizedBox(
                           height: 8,
                         ),
@@ -223,31 +249,14 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                         ),
 
                         Center(
-                          child: GestureDetector(
-                            onTap: updateProgress,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 12),
-                              decoration: BoxDecoration(
-                                color: darkblueColor,
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: defaultIconColor,
-                                    offset: Offset(1, 2),
-                                  ),
-                                  BoxShadow(
-                                    color: backgroundWhiteColor,
-                                    offset: Offset(2, 1),
-                                  ),
-                                ],
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Text(
-                                'Xác nhận',
-                              ),
-                            ),
-                          ),
-                        )
+                          child: textBoxButton(
+                              color: correctGreenColor,
+                              text: "Xác nhận",
+                              width: 80,
+                              height: 34,
+                              fontSize: 14,
+                              function: updateProgress),
+                        ),
                       ]),
                 ),
               )
@@ -271,12 +280,11 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                   } else {
                     Progress? progress;
                     progress = Progress.fromSnap(doc: snapshot.requireData);
-                    
+
                     if (description.text == "") {
                       description.text = progress.description;
                     }
                     //state
-
                     state = progress.state;
                   }
                   return Padding(
@@ -309,67 +317,115 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                               onTapOutside: (event) =>
                                   descriptionFocus.unfocus(),
                             ),
-
                             const SizedBox(
                               height: 8,
                             ),
-                            (isManager || state == IS_CLOSING || state == IS_COMPLETE || state == IS_LATE)
+                            isLoading ?  const LinearProgressIndicator(color: focusBlueColor, minHeight: 0.4,):
+                            imageScreen(),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            (isManager ||
+                                    state == IS_CLOSING ||
+                                    state == IS_COMPLETE ||
+                                    state == IS_LATE)
                                 ? Column(
                                     children: [
                                       const Text("Tiến độ: "),
-                                      const SizedBox(height: 8,),
+                                      const SizedBox(
+                                        height: 8,
+                                      ),
                                       circularPercentIndicator(
                                           percent: widget.progress!.percent,
                                           radius: 40,
                                           lineWidth: 20,
                                           fontSize: 13),
-                                          const SizedBox(height: 14,),
-                                      state != IS_DOING ? Row(
-                                        children: [
-                                          const Text("Trạng thái: "),
-                                          evaluate(state: state),
-                                        ],
-                                      ) : Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Checkbox(value: isAutoEvaluate, onChanged:(value) {
-                                                setState(() {
-                                                  isAutoEvaluate = value!;
-                                                });
-                                              }),
-                                              const Text("Đánh giá và tự động chấm công", style: TextStyle(fontSize: 16),),
-                                            ],
-                                          ),
-                                          (!isAutoEvaluate) ? Container() : Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  const SizedBox(width: 20,),
-                                                  Checkbox(value: pre_state == IS_COMPLETE, onChanged:(value) {
-                                                    setState(() {
-                                                      value! ? pre_state = IS_COMPLETE : pre_state = IS_LATE;
-                                                     });
-                                                  }),
-                                                   evaluate(state: IS_COMPLETE),
-                                                ],
-                                              ), 
-                                              Row(
-                                                children: [
-                                                  const SizedBox(width: 20,),
-                                                  Checkbox(value: pre_state == IS_LATE, onChanged:(value) {
-                                                    setState(() {
-                                                      value! ? pre_state = IS_LATE : pre_state = IS_COMPLETE;
-                                                     });
-                                                  }),
-                                                   evaluate(state: IS_LATE),
-                                                ],
-                                              )
-                                            ],
-                                          )
-                                        ],
-                                      )
-                                     
+                                      const SizedBox(
+                                        height: 14,
+                                      ),
+                                      state != IS_DOING
+                                          ? Row(
+                                              children: [
+                                                const Text("Trạng thái: "),
+                                                evaluate(state: state),
+                                              ],
+                                            )
+                                          : Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Checkbox(
+                                                        value: isAutoEvaluate,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            isAutoEvaluate =
+                                                                value!;
+                                                          });
+                                                        }),
+                                                    const Text(
+                                                      "Đánh giá và tự động chấm công",
+                                                      style: TextStyle(
+                                                          fontSize: 16),
+                                                    ),
+                                                  ],
+                                                ),
+                                                (!isAutoEvaluate)
+                                                    ? Container()
+                                                    : Column(
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              const SizedBox(
+                                                                width: 20,
+                                                              ),
+                                                              Checkbox(
+                                                                  value: pre_state ==
+                                                                      IS_COMPLETE,
+                                                                  onChanged:
+                                                                      (value) {
+                                                                    setState(
+                                                                        () {
+                                                                      value!
+                                                                          ? pre_state =
+                                                                              IS_COMPLETE
+                                                                          : pre_state =
+                                                                              IS_LATE;
+                                                                    });
+                                                                  }),
+                                                              evaluate(
+                                                                  state:
+                                                                      IS_COMPLETE),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              const SizedBox(
+                                                                width: 20,
+                                                              ),
+                                                              Checkbox(
+                                                                  value:
+                                                                      pre_state ==
+                                                                          IS_LATE,
+                                                                  onChanged:
+                                                                      (value) {
+                                                                    setState(
+                                                                        () {
+                                                                      value!
+                                                                          ? pre_state =
+                                                                              IS_LATE
+                                                                          : pre_state =
+                                                                              IS_COMPLETE;
+                                                                    });
+                                                                  }),
+                                                              evaluate(
+                                                                  state:
+                                                                      IS_LATE),
+                                                            ],
+                                                          )
+                                                        ],
+                                                      )
+                                              ],
+                                            )
                                     ],
                                   )
                                 : Row(
@@ -402,7 +458,6 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                                                     BorderRadius.circular(6),
                                               )),
                                           inputFormatters: [
-                                            
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
                                           ],
@@ -418,15 +473,18 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
 
                             Center(
                               child: GestureDetector(
-                                onTap: isManager ? changeStateProgress : updateProgress,
+                                onTap: isManager
+                                    ? changeStateProgress
+                                    : updateProgress,
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 10, horizontal: 12),
                                   decoration: BoxDecoration(
-                                    color: isManager ? (state == IS_DOING)
+                                    color: isManager
+                                        ? (state == IS_DOING)
                                             ? correctGreenColor
-                                                : blueDrawerColor
-                                                : darkblueAppbarColor,
+                                            : blueDrawerColor
+                                        : darkblueAppbarColor,
                                     boxShadow: const [
                                       BoxShadow(
                                         color: defaultIconColor,
@@ -440,7 +498,15 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    isManager ? state == IS_DOING ? "Phê duyệt" : "Mở lại" : state == IS_SUBMIT ? "Tạo mới" : state == IS_DOING ? "Lưu lại" : "Đã phê duyệt",
+                                    isManager
+                                        ? state == IS_DOING
+                                            ? "Phê duyệt"
+                                            : "Mở lại"
+                                        : state == IS_SUBMIT
+                                            ? "Tạo mới"
+                                            : state == IS_DOING
+                                                ? "Lưu lại"
+                                                : "Đã phê duyệt",
                                   ),
                                 ),
                               ),
@@ -450,6 +516,144 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
                   );
                 }),
       ),
+    );
+  }
+
+  Widget imageScreen() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            const Text("Hình ảnh minh họa:"),
+            const SizedBox(
+              width: 10,
+            ),
+            (state == IS_SUBMIT || state == IS_DOING)
+                ? InkWell(
+                    onTap: () async {
+                      List<Uint8List>? imageAddList = await pickImages(context);
+                      if (imageAddList != null) {
+                        imageList.addAll(imageAddList);
+                      }
+                      setState(() {});
+                    },
+                    child: const Icon(
+                      Icons.add_photo_alternate,
+                      size: 30,
+                    ))
+                : Container(),
+          ],
+        ),
+        (imageList.isEmpty)
+            ? const Center(
+                child: Text('Không có hình ảnh minh họa'),
+              )
+            : Container(
+                width: double.infinity,
+                height: 240,
+                decoration: BoxDecoration(
+                    border: Border.all(color: focusBlueColor, width: 2),
+                    borderRadius: BorderRadius.circular(12)),
+                child: PageView.builder(
+                    itemCount: imageList.length,
+                    controller: pageController,
+                    itemBuilder: (context, index) {
+                      return Stack(children: [
+                        SizedBox(
+                            width: double.infinity,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.memory(
+                                imageList[index],
+                                fit: BoxFit.cover,
+                              ),
+                            )),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              (imageList.length == 1)
+                                  ? const Text('')
+                                  : FutureBuilder(
+                                      future: Future.delayed(
+                                          const Duration(seconds: 2)),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.done) {
+                                          return const Text('');
+                                        } else {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                                color: darkblueAppbarColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(50)),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 4,
+                                                      horizontal: 6),
+                                              child: Text(
+                                                "${index + 1}/${imageList.length}",
+                                                style: const TextStyle(
+                                                    fontSize: 15),
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      }),
+                              const SizedBox(
+                                width: 8,
+                              ),
+                              (state == IS_DOING || state == IS_SUBMIT) ?
+                                  InkWell(
+                                      onTap: () {
+                                        imageList.removeAt(index);
+                                        jumpToFirstPage();
+                                      },
+                                      child: const Icon(
+                                        Icons.cancel,
+                                        size: 24,
+                                      )) : const SizedBox(width: 2,)
+                            ],
+                          ),
+                        ),
+                        (index == 0)
+                            ? Container()
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(4.0),
+                                    child: Center(
+                                        child: Icon(
+                                      Icons.arrow_back_ios,
+                                      size: 30,
+                                      color: defaultColor,
+                                    )),
+                                  )
+                                ],
+                              ),
+                        (index == imageList.length - 1)
+                            ? Container()
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(4.0),
+                                    child: Center(
+                                        child: Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 30,
+                                      color: defaultColor,
+                                    )),
+                                  )
+                                ],
+                              )
+                      ]);
+                    }),
+              ),
+      ],
     );
   }
 }

@@ -61,7 +61,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text("Báo cáo của tôi:"),
-                        const Divider(),
+                        const Divider(thickness: 1,),
                         SizedBox(
                           height: MediaQuery.of(context).size.height * 0.4,
                           child: StreamBuilder(
@@ -70,7 +70,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                               builder: builderStream),
                         ),
                         const Text("Báo cáo chia sẻ:"),
-                        const Divider(),
+                        const Divider(thickness: 1,),
                         SizedBox(
                           height: MediaQuery.of(context).size.height * 0.4,
                           child: StreamBuilder(
