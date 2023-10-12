@@ -31,9 +31,9 @@ class _InviteMemberState extends State<InviteMember> {
 
   init() async {
     List<String> userIdList = [];
-    widget.report.member.forEach((element) {
+    for (var element in widget.report.member) {
       userIdList.add(element as String);
-    });
+    }
     currentUserList =
         await FirebaseMethods().getCurrentUserList(userIdList: userIdList);
     allUserList = await FirebaseMethods().getCurrentUserList();
@@ -46,11 +46,11 @@ class _InviteMemberState extends State<InviteMember> {
 
   bool checkUserInUserList(CurrentUser user) {
     bool check = false;
-    currentUserList.forEach((element) {
+    for (var element in currentUserList) {
       if (element.userId == user.userId) {
         check = true;
       }
-    });
+    }
     return check;
   }
 
@@ -66,16 +66,16 @@ class _InviteMemberState extends State<InviteMember> {
   }
   refreshCurrentUserList(List member) {
     currentUserList.clear();
-    allUserList.forEach((element) {
+    for (var element in allUserList) {
       if (member.contains(element.userId)) {
         currentUserList.add(element);
       }
-    });
+    }
   }
   refreshSearchList() {
     searchList.clear();
     if (controller.text != '') {
-      allUserList.forEach((element) {
+      for (var element in allUserList) {
         if (element.nameDetails
                 .toLowerCase()
                 .startsWith(controller.text.toLowerCase()) ||
@@ -84,11 +84,11 @@ class _InviteMemberState extends State<InviteMember> {
                 .startsWith(controller.text.toLowerCase())) {
           searchList.add(element);
         }
-      });
+      }
     } else {
-      allUserList.forEach((element) {
+      for (var element in allUserList) {
         searchList.add(element);
-      });
+      }
     }
     setState(() {});
   }

@@ -172,7 +172,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
                               itemCount: documents.length,
                               itemBuilder: (context, index) => StaffCard(
                                     staff: CurrentUser.fromSnap(
-                                        user: documents[index]),
+                                        doc: documents[index]),
                                   )));
                     },
                   )

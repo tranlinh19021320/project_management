@@ -45,7 +45,7 @@ class _SearchUserState extends State<SearchUser> {
             Map<String, CurrentUser> users = {};
             for (DocumentSnapshot doc in snapshot.data!.docs) {
               usersId.add(doc['userId']);
-              users.addAll({doc['userId']: CurrentUser.fromSnap(user: doc)});
+              users.addAll({doc['userId']: CurrentUser.fromSnap(doc: doc)});
             }
             return SizedBox(
               height: 50,

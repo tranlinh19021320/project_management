@@ -41,17 +41,17 @@ class Mission {
         'staffId': staffId,
       };
 
-  static Mission fromSnap({required DocumentSnapshot mission}) => Mission(
-    nameProject: mission['nameProject'],
-        companyId: mission['companyId'],
-        projectId: mission['projectId'],
-        missionId: mission['missionId'],
-        nameMission: mission['nameMission'],
-        description: mission['description'],
-        createDate: mission['createDate'].toDate(),
-        startDate: mission['startDate'].toDate(),
-        endDate: mission['endDate'].toDate(),
-        percent: mission['percent'],
-        staffId: mission['staffId'],
+  static Mission fromSnap({required DocumentSnapshot doc}) => Mission(
+    nameProject: doc['nameProject'],
+        companyId: doc['companyId'],
+        projectId: doc['projectId'],
+        missionId: doc['missionId'],
+        nameMission: doc['nameMission'],
+        description: doc['description'],
+        createDate: doc['createDate'].toDate(),
+        startDate: doc['startDate'].toDate(),
+        endDate: doc['endDate'].toDate(),
+        percent: doc['percent'],
+        staffId: doc['staffId'],
       );
 }

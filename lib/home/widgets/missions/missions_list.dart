@@ -32,6 +32,23 @@ class _MissionsScreenState extends State<MissionsScreen> {
     isManager = groupProvider.getIsManager;
   }
 
+  createNewMission() => Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage(backgroundImage), fit: BoxFit.fill),
+            ),
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(
+                backgroundColor: darkblueAppbarColor,
+                title: const Text('Nhiệm vụ mới'),
+                centerTitle: true,
+              ),
+              body: MissionDetailScreen(project: widget.project!),
+            ),
+          )));
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,8 +59,8 @@ class _MissionsScreenState extends State<MissionsScreen> {
                   .collection('missions')
                   .where('staffId',
                       isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                  .orderBy('endDate', descending: false)
                   .orderBy('startDate', descending: false)
-                  .orderBy('endDate', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -61,7 +78,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) => MissionCard(
                           mission: Mission.fromSnap(
-                              mission: snapshot.data!.docs[index]),
+                              doc: snapshot.data!.docs[index]),
                         ));
               })
           : StreamBuilder(
@@ -69,8 +86,8 @@ class _MissionsScreenState extends State<MissionsScreen> {
                   .collection('missions')
                   .where('companyId', isEqualTo: widget.project!.companyId)
                   .where('projectId', isEqualTo: widget.project!.projectId)
+                  .orderBy('endDate', descending: false)
                   .orderBy('startDate', descending: false)
-                  .orderBy('endDate', descending: true)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -87,9 +104,8 @@ class _MissionsScreenState extends State<MissionsScreen> {
                 return ListView.builder(
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) => MissionCard(
-                          
                           mission: Mission.fromSnap(
-                              mission: snapshot.data!.docs[index]),
+                              doc: snapshot.data!.docs[index]),
                         ));
               }),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -97,23 +113,7 @@ class _MissionsScreenState extends State<MissionsScreen> {
           ? null
           : FloatingActionButton(
               heroTag: "createMissionButton",
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: AssetImage(backgroundImage),
-                              fit: BoxFit.fill),
-                        ),
-                        child: Scaffold(
-                          backgroundColor: Colors.transparent,
-                          appBar: AppBar(
-                            backgroundColor: darkblueAppbarColor,
-                            title: const Text('Nhiệm vụ mới'),
-                            centerTitle: true,
-                          ),
-                          body: MissionDetailScreen(project: widget.project!),
-                        ),
-                      ))),
+              onPressed: createNewMission,
               tooltip: "Tạo nhiệm vụ mới",
               child: const Icon(Icons.create),
             ),

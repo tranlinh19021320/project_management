@@ -44,17 +44,17 @@ class CurrentUser {
         'reportNumber':reportNumber
       };
 
-  static CurrentUser fromSnap({required DocumentSnapshot user}) => CurrentUser(
-    timekeeping: user['timekeeping'] ,
-      notifyNumber: user['notifyNumber'],
-      email: user['email'],
-      username: user['username'],
-      password: user['password'],
-      nameDetails: user['nameDetails'],
-      photoURL: user['photoURL'],
-      group: user['group'],
-      userId: user['userId'],
-      companyId: user['companyId'],
-      companyName: user['companyName'],
-      reportNumber : user['reportNumber']);
+  static CurrentUser fromSnap({required DocumentSnapshot doc}) => CurrentUser(
+    timekeeping: doc['timekeeping'] ,
+      notifyNumber: doc['notifyNumber'],
+      email: doc['email'],
+      username: doc['username'],
+      password: doc['password'],
+      nameDetails: doc['nameDetails'],
+      photoURL: doc['photoURL'],
+      group: doc['group'],
+      userId: doc['userId'],
+      companyId: doc['companyId'],
+      companyName: doc['companyName'],
+      reportNumber : doc['reportNumber']);
 }

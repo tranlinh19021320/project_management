@@ -21,18 +21,39 @@ class MissionCard extends StatefulWidget {
 
 class _MissionCardState extends State<MissionCard> {
   late bool isManager;
+  late int state;
   @override
   void initState() {
     super.initState();
     GroupProvider groupProvider =
         Provider.of<GroupProvider>(context, listen: false);
     isManager = groupProvider.getIsManager;
+    state = stateOfMission(
+      percent: widget.mission.percent,
+      startDate: widget.mission.startDate,
+      endDate: widget.mission.endDate);
   }
-
+  String progress() {
+    String progress = "Tiến độ: ";
+    switch (state) {
+      case IS_SUBMIT: 
+      progress += '${widget.mission.percent * 100}% (Mới)';
+      case IS_COMPLETE:
+      progress += '100% (Hoàn thành)';
+      case IS_DOING:
+      progress += '${widget.mission.percent * 100}% (Đang thực hiện)';
+      case IS_LATE:
+      progress += '${widget.mission.percent * 100}% (Chậm tiến độ - ${DateTime.now().difference(widget.mission.endDate).inDays + 1} ngày)';
+    }
+    return progress;
+  }
   @override
   Widget build(BuildContext context) {
     return card(
-      color: dateInTime(startDate: widget.mission.startDate, endDate: widget.mission.endDate) ? darkblueAppbarColor : darkblueColor,
+        color: colorStateOfMission(
+            percent: widget.mission.percent,
+            startDate: widget.mission.startDate,
+            endDate: widget.mission.endDate),
         onTap: () => Navigator.of(context).push(MaterialPageRoute(
             builder: (_) => MissionHomeScreen(
                   mission: widget.mission,
@@ -60,37 +81,27 @@ class _MissionCardState extends State<MissionCard> {
                   )
                 : Container(
                     constraints:
-                        const BoxConstraints(maxWidth: 200, maxHeight: 45),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.transparent,
-                      border: Border.all(),
-                    ),
+                        const BoxConstraints(maxWidth: 200, maxHeight: 30),
                     child: userCard(
-                        userId: widget.mission.staffId, size: 28, fontsize: 14),
+                        userId: widget.mission.staffId,
+                        size: 28,
+                        fontsize: 14,
+                        type: 2),
                   ),
-            const SizedBox(
-              height: 4,
-            ),
-            Text(
-              "Thời gian:  ${DateFormat('dd/MM/yyy').format(
+            Text(progress(), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
+            
+            
+            
+          ],
+        ),
+        subtitle:Text(
+              "${DateFormat('dd/MM/yyy').format(
                 widget.mission.startDate,
               )} - ${DateFormat('dd/MM/yyy').format(
                 widget.mission.endDate,
-              )} ",
+              )} (${widget.mission.endDate.difference(widget.mission.startDate).inDays + 1} ngày) ",
               style: const TextStyle(fontSize: 13),
             ),
-            const SizedBox(
-              height: 4,
-            ),
-          ],
-        ),
-        subtitle: Text(
-          "Chỉnh sửa lúc: ${DateFormat('HH:mm EEEE, dd/MM/yyy', 'vi').format(
-            widget.mission.createDate,
-          )}",
-          style: const TextStyle(fontSize: 11),
-        ),
         trailing: const SizedBox(
           width: 30,
         ));

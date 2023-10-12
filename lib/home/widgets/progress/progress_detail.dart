@@ -152,9 +152,9 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
       isLoading = true;
     });
     photoURL.clear();
-    progress.imageList.forEach((element) {
+    for (var element in progress.imageList) {
       photoURL.add(element);
-    });
+    }
     imageList.clear();
     imageList = await getImageList(photoURL: photoURL);
     setState(() {
@@ -276,7 +276,6 @@ class _ProgressDetailScreenState extends State<ProgressDetailScreen> {
 
                   if (!snapshot.data!.exists) {
                     state = IS_SUBMIT;
-                    print(state);
                   } else {
                     Progress? progress;
                     progress = Progress.fromSnap(doc: snapshot.requireData);

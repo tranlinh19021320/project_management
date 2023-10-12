@@ -121,7 +121,7 @@ class _TimeKeepingTableState extends State<TimeKeepingTable> {
           );
         }
 
-        CurrentUser user = CurrentUser.fromSnap(user: snapshot.data!);
+        CurrentUser user = CurrentUser.fromSnap(doc: snapshot.data!);
         isClosingStateDays = 0;
         isCompleteStateDays = 0;
         isLateStateDays = 0;

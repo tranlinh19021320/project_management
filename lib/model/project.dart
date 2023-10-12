@@ -9,9 +9,10 @@ class Project {
   final DateTime startDate;
   final DateTime endDate;
   final int missions;
-
+  final int title;
   const Project({
     this.missions = 0,
+    this.title = 0,
     required this.companyId,
     required this.projectId,
     required this.nameProject,
@@ -30,18 +31,20 @@ class Project {
         'startDate': startDate,
         'endDate': endDate,
         'missions': missions,
+        'title' : title,
       };
 
-  static Project fromSnap(DocumentSnapshot project) {
+  static Project fromSnap(DocumentSnapshot doc) {
     return Project(
-      missions: project['missions'],
-      companyId: project['companyId'],
-      projectId: project['projectId'],
-      nameProject: project['nameProject'],
-      description: project['description'],
-      createDate: project['createDate'].toDate(),
-      startDate: project['startDate'].toDate(),
-      endDate: project['endDate'].toDate(),
+      missions: doc['missions'],
+      companyId: doc['companyId'],
+      projectId: doc['projectId'],
+      nameProject: doc['nameProject'],
+      description: doc['description'],
+      createDate: doc['createDate'].toDate(),
+      startDate: doc['startDate'].toDate(),
+      endDate: doc['endDate'].toDate(),
+      title: doc['title'],
     );
   }
 }

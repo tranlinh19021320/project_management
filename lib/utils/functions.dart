@@ -268,3 +268,25 @@ bool dateInTime(
       ? true
       : !(time.isBefore(start) || time.isAfter(end));
 }
+
+int stateOfMission({required double percent, required DateTime startDate, required DateTime endDate})  {
+  if (percent == 1) return IS_COMPLETE;
+  if (dateInTime(startDate: startDate, endDate: endDate)) return IS_DOING;
+  DateTime now = DateTime.now();
+  DateTime start = DateTime(startDate.year, startDate.month, startDate.day);
+
+  if (now.isBefore(start)) return IS_SUBMIT;
+  return IS_LATE;
+}
+
+Color colorStateOfMission({required double percent, required DateTime startDate, required DateTime endDate}) {
+  if (percent == 1) return buttonGreenColor;
+  if (dateInTime(startDate: startDate, endDate: endDate)) return darkblueAppbarColor;
+  DateTime now = DateTime.now();
+  DateTime start = DateTime(startDate.year, startDate.month, startDate.day);
+
+  if (now.isBefore(start)) return darkblueColor;
+  
+  return textErrorRedColor;
+  
+}

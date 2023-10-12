@@ -146,7 +146,7 @@ class FirebaseMethods {
           .collection('users')
           .where('group', isNotEqualTo: manager)
           .get();
-      snap.docs.forEach((element) {
+      for (var element in snap.docs) {
         currentUserList.add(CurrentUser(
             timekeeping: (element.data())['timekeeping'],
             email: (element.data())['email'],
@@ -160,7 +160,7 @@ class FirebaseMethods {
             companyName: (element.data())['companyName'],
             notifyNumber: (element.data())['notifyNumber'],
             reportNumber: (element.data())['reportNumber']));
-      });
+      }
     }
 
     return currentUserList;
@@ -569,7 +569,7 @@ class FirebaseMethods {
           date: date));
 
       if (docs.isNotEmpty) {
-        return Mission.fromSnap(mission: docs.first);
+        return Mission.fromSnap(doc: docs.first);
       }
     } catch (e) {
       print(e.toString());
@@ -707,7 +707,7 @@ class FirebaseMethods {
             .collection('missions')
             .doc(progress.missionId)
             .get();
-        Mission mission = Mission.fromSnap(mission: snap);
+        Mission mission = Mission.fromSnap(doc: snap);
         CurrentUser user =
             await getCurrentUserByUserId(userId: mission.staffId);
         createNotification(
@@ -732,7 +732,7 @@ class FirebaseMethods {
     try {
       var snap =
           await _firestore.collection('missions').doc(progress.missionId).get();
-      Mission mission = Mission.fromSnap(mission: snap);
+      Mission mission = Mission.fromSnap(doc: snap);
       await _firestore
           .collection('missions')
           .doc(progress.missionId)

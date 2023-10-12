@@ -474,7 +474,7 @@ Widget userCard(
           return const Text("Not User");
         }
 
-        CurrentUser user = CurrentUser.fromSnap(user: snapshot.data!);
+        CurrentUser user = CurrentUser.fromSnap(doc: snapshot.data!);
 
         return (type == 1)
             ? user1Card(user: user, size: size, fontsize: fontsize)

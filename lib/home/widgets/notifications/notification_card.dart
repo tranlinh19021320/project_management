@@ -85,7 +85,7 @@ class _NotificationCardState extends State<NotificationCard> {
         });
       }
       if (snap.exists) {
-        mission = Mission.fromSnap(mission: snap);
+        mission = Mission.fromSnap(doc: snap);
       }
       res = 'success';
     } catch (e) {

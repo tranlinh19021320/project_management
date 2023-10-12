@@ -96,7 +96,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
       percent = widget.mission!.percent;
       missionState = IS_CORRECT_STATE;
       isMissionTime =
-          startDate.isBefore(DateTime.now()) && endDate.isAfter(DateTime.now());
+          startDate.isBefore(DateTime.now());
     }
 
     groupDropdownButton = GroupDropdownButton(
@@ -122,7 +122,6 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
       onSelectValue: (value) {
         setState(() {
           selectuserId = value;
-          print(selectuserId);
         });
       },
     );
