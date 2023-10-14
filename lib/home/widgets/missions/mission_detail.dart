@@ -12,6 +12,7 @@ import 'package:project_management/home/widgets/utils/search_user.dart';
 import 'package:project_management/model/mission.dart';
 import 'package:project_management/model/progress.dart';
 import 'package:project_management/model/project.dart';
+import 'package:project_management/model/title.dart';
 import 'package:project_management/provider/group_provider.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';
@@ -22,7 +23,8 @@ import 'package:uuid/uuid.dart';
 class MissionDetailScreen extends StatefulWidget {
   final Project? project;
   final Mission? mission;
-  const MissionDetailScreen({super.key, this.project, this.mission});
+  final TitleProject? title;
+  const MissionDetailScreen({super.key, this.project, this.title, this.mission});
 
   @override
   State<MissionDetailScreen> createState() => _MissionDetailScreenState();
@@ -166,6 +168,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
       String missionId = const Uuid().v1();
       String res = await FirebaseMethods().createMission(
           project: widget.project!,
+          title: widget.title!,
           missionId: missionId,
           nameMission: nameMission.text,
           description: description.text,
@@ -310,6 +313,7 @@ class _MissionDetailScreenState extends State<MissionDetailScreen> {
                 const SizedBox(
                   height: 8,
                 ),
+                
                 // misson name
                 const Text(
                   "Tên nhiệm vụ",

@@ -8,6 +8,7 @@ import 'package:project_management/model/notification.dart';
 import 'package:project_management/model/progress.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/model/report.dart';
+import 'package:project_management/model/title.dart';
 import 'package:project_management/utils/functions.dart';
 import 'package:project_management/utils/parameters.dart';
 import 'package:project_management/model/user.dart';
@@ -495,8 +496,100 @@ class FirebaseMethods {
     return res;
   }
 
+  Future<String> createTitle(
+      {required Project project, required String titleContent}) async {
+    String res = 'error';
+    try {
+      String titleId = const Uuid().v1();
+      TitleProject title = TitleProject(
+        companyId: project.companyId,
+        projectId: project.projectId,
+        titleId: titleId,
+        title: titleContent,
+        createDate: DateTime.now(),
+        startDate: DateTime.now(),
+        endDate: DateTime.now(),
+      );
+      await _firestore
+          .collection('companies')
+          .doc(project.companyId)
+          .collection('projects')
+          .doc(project.projectId)
+          .collection('title')
+          .doc(titleId)
+          .set(title.toJson());
+      var snap = await _firestore
+          .collection('companies')
+          .doc(project.companyId)
+          .collection('projects')
+          .doc(project.projectId)
+          .get();
+      int numberTitle = snap.data()!['title'];
+      await _firestore
+          .collection('companies')
+          .doc(project.companyId)
+          .collection('projects')
+          .doc(project.projectId)
+          .update({
+        'title': numberTitle + 1,
+      });
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+    return res;
+  }
+
+  Future<String> updateTitleContent(
+      {required TitleProject titleProject,
+      required String titleContent}) async {
+    String res = 'error';
+
+    try {
+      await _firestore
+          .collection('companies')
+          .doc(titleProject.companyId)
+          .collection('projects')
+          .doc(titleProject.projectId)
+          .collection('title')
+          .doc(titleProject.titleId)
+          .update({
+        'title': titleContent,
+      });
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+
+    return res;
+  }
+
+  Future<String> deleteTitle(
+      {required TitleProject titleProject}) async {
+    String res = 'error';
+
+    try {
+      await _firestore
+          .collection('companies')
+          .doc(titleProject.companyId)
+          .collection('projects')
+          .doc(titleProject.projectId)
+          .collection('title')
+          .doc(titleProject.titleId)
+          .delete();
+      res = 'success';
+    } catch (e) {
+      res = e.toString();
+    }
+
+    return res;
+  }
+
+  
+
   Future<String> createMission(
       {required Project project,
+      required TitleProject title,
       required String missionId,
       required String nameMission,
       required String description,
@@ -509,6 +602,7 @@ class FirebaseMethods {
           nameProject: project.nameProject,
           companyId: project.companyId,
           projectId: project.projectId,
+          titleId: title.titleId,
           missionId: missionId,
           nameMission: nameMission,
           description: description,
@@ -521,6 +615,23 @@ class FirebaseMethods {
           .collection('missions')
           .doc(missionId)
           .set(mission.toJson());
+      DateTime startTitle = startDate;
+      DateTime endTitle = endDate;
+      if (title.missions != 0) {
+        if (title.startDate.isBefore(startDate)) startTitle = title.startDate;
+        if (title.endDate.isAfter(endDate)) startTitle = title.endDate;
+      }
+      await _firestore
+          .collection('companies')
+          .doc(title.companyId)
+          .collection('projects')
+          .doc(title.projectId)
+          .collection('title')
+          .doc(title.titleId)
+          .update({
+        'startDate': startTitle,
+        'endDate': endTitle,
+      });
       var snap = await _firestore
           .collection('companies')
           .doc(mission.companyId)
@@ -535,6 +646,25 @@ class FirebaseMethods {
           .doc(mission.projectId)
           .update({
         'missions': missions + 1,
+      });
+      var snapshot = await _firestore
+          .collection('companies')
+          .doc(mission.companyId)
+          .collection('projects')
+          .doc(mission.projectId)
+          .collection('title')
+          .doc(mission.titleId)
+          .get();
+      int missionsTitle = snapshot.data()!['missions'];
+      await _firestore
+          .collection('companies')
+          .doc(mission.companyId)
+          .collection('projects')
+          .doc(mission.projectId)
+          .collection('title')
+          .doc(mission.titleId)
+          .update({
+        'missions': missionsTitle + 1,
       });
       await createNotification(
           uid: staffId, mission: mission, type: STAFF_RECIEVE_MISSION);
@@ -593,6 +723,31 @@ class FirebaseMethods {
         'startDate': startDate,
         'endDate': endDate,
         'createDate': DateTime.now(),
+      });
+      var snap = await _firestore
+          .collection('companies')
+          .doc(mission.companyId)
+          .collection('projects')
+          .doc(mission.projectId)
+          .collection('title')
+          .doc(mission.titleId).get();
+      TitleProject title = TitleProject.fromSnap(doc: snap);
+      DateTime startTitle = startDate;
+      DateTime endTitle = endDate;
+      if (title.missions != 0) {
+        if (title.startDate.isBefore(startDate)) startTitle = title.startDate;
+        if (title.endDate.isAfter(endDate)) startTitle = title.endDate;
+      }
+      await _firestore
+          .collection('companies')
+          .doc(title.companyId)
+          .collection('projects')
+          .doc(title.projectId)
+          .collection('title')
+          .doc(title.titleId)
+          .update({
+        'startDate': startTitle,
+        'endDate': endTitle,
       });
       if (staffId != mission.staffId) {
         await createNotification(
@@ -653,6 +808,25 @@ class FirebaseMethods {
           .doc(mission.projectId)
           .update({
         'missions': missions - 1,
+      });
+      var snapshot = await _firestore
+          .collection('companies')
+          .doc(mission.companyId)
+          .collection('projects')
+          .doc(mission.projectId)
+          .collection('title')
+          .doc(mission.titleId)
+          .get();
+      int missionsTitle = snapshot.data()!['missions'];
+      await _firestore
+          .collection('companies')
+          .doc(mission.companyId)
+          .collection('projects')
+          .doc(mission.projectId)
+          .collection('title')
+          .doc(mission.titleId)
+          .update({
+        'missions': missionsTitle - 1,
       });
       await createNotification(
           uid: mission.staffId, mission: mission, type: MISSION_IS_DELETED);
@@ -854,7 +1028,9 @@ class FirebaseMethods {
           description: description,
           notifyId: notifyId,
           nameReport: (report == null) ? '' : report.nameReport,
-          isRead: (type == MISSION_IS_DELETED || type == TIME_KEEPING || type == INVITE_REPORT),
+          isRead: (type == MISSION_IS_DELETED ||
+              type == TIME_KEEPING ||
+              type == INVITE_REPORT),
           missionId: (mission == null) ? "" : mission.missionId,
           nameMission: (mission == null) ? "" : mission.nameMission,
           nameProject: (mission == null) ? "" : mission.nameProject,
@@ -904,15 +1080,18 @@ class FirebaseMethods {
 
     return res;
   }
+
   // type = 0 => manager send all other
   // type = 1 => send to other & manager
-  Future<void> imclementReportNumber({int type = 0,required Report report,}) async {
+  Future<void> imclementReportNumber({
+    int type = 0,
+    required Report report,
+  }) async {
     String currentUserId = _auth.currentUser!.uid;
     List member = report.member;
     member.add(report.ownId);
 
     if (type == 0) {
-
     } else {
       if (member.contains(currentUserId)) member.remove(currentUserId);
       var snapshot = await _firestore
@@ -922,17 +1101,16 @@ class FirebaseMethods {
       snapshot.docs.forEach((element) async {
         String userId = (element as dynamic)['userId'];
         member.add(userId);
-      });  
+      });
     }
 
-    member.forEach((element)async {
+    member.forEach((element) async {
       var snapshot = await _firestore.collection('users').doc(element).get();
       int number = (snapshot.data()! as dynamic)['reportNumber'];
       await _firestore.collection('users').doc(element).update({
-        'reportNumber' : number + 1,
+        'reportNumber': number + 1,
       });
     });
-    
   }
 
   Future<String> createReport({
@@ -977,7 +1155,10 @@ class FirebaseMethods {
           .collection('reports')
           .doc(reportId)
           .set(report.toJson());
-      imclementReportNumber(report: report, type: 1,);
+      imclementReportNumber(
+        report: report,
+        type: 1,
+      );
       res = 'success';
     } catch (e) {
       res = e.toString();
@@ -1011,7 +1192,11 @@ class FirebaseMethods {
                   'member': FieldValue.arrayUnion([userId]),
                 });
       if (!member.contains(userId)) {
-        createNotification(type: INVITE_REPORT, report: report, username: report.ownName, uid: userId);
+        createNotification(
+            type: INVITE_REPORT,
+            report: report,
+            username: report.ownName,
+            uid: userId);
       }
       res = 'success';
     } catch (e) {
@@ -1089,7 +1274,6 @@ class FirebaseMethods {
         imclementReportNumber(report: report, type: 0);
       } else {
         imclementReportNumber(report: report, type: 1);
-
       }
       changeIsReadReportState(
           report: report, isManager: !(user.group == manager), isRead: false);

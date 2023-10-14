@@ -112,14 +112,14 @@ class _MissionHomeScreenState extends State<MissionHomeScreen> {
         appBar: AppBar(
           backgroundColor: darkblueAppbarColor,
           title: const Text('Nhiệm vụ'),
-          actions: [
-            (!isManager) ? Container() : IconButton(
+          actions: (!isManager) ? null :[
+             IconButton(
                 onPressed: delete,
                 tooltip: "Xóa vĩnh viễn",
                 icon: const Icon(
                   Icons.delete_forever,
                   color: errorRedColor,
-                ))
+                )),
           ],
         ),
         body: PageView(

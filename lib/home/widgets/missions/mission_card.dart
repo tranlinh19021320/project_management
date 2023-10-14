@@ -22,6 +22,7 @@ class MissionCard extends StatefulWidget {
 class _MissionCardState extends State<MissionCard> {
   late bool isManager;
   late int state;
+  bool isOpen = false;
   @override
   void initState() {
     super.initState();
@@ -29,27 +30,33 @@ class _MissionCardState extends State<MissionCard> {
         Provider.of<GroupProvider>(context, listen: false);
     isManager = groupProvider.getIsManager;
     state = stateOfMission(
-      percent: widget.mission.percent,
-      startDate: widget.mission.startDate,
-      endDate: widget.mission.endDate);
+        percent: widget.mission.percent,
+        startDate: widget.mission.startDate,
+        endDate: widget.mission.endDate);
+    isOpen = dateInTime(startDate: widget.mission.startDate, endDate: widget.mission.endDate);
   }
+
   String progress() {
     String progress = "Tiến độ: ";
     switch (state) {
-      case IS_SUBMIT: 
-      progress += '${widget.mission.percent * 100}% (Mới)';
+      case IS_SUBMIT:
+        progress += '${widget.mission.percent * 100}% (Mới)';
       case IS_COMPLETE:
-      progress += '100% (Hoàn thành)';
+        progress += '100% (Hoàn thành)';
       case IS_DOING:
-      progress += '${widget.mission.percent * 100}% (Đang thực hiện)';
+        progress += '${widget.mission.percent * 100}% (Đang thực hiện)';
       case IS_LATE:
-      progress += '${widget.mission.percent * 100}% (Chậm tiến độ - ${DateTime.now().difference(widget.mission.endDate).inDays + 1} ngày)';
+        progress +=
+            '${widget.mission.percent * 100}% (Chậm tiến độ - ${DateTime.now().difference(widget.mission.endDate).inDays + 1} ngày)';
     }
     return progress;
   }
+
   @override
   Widget build(BuildContext context) {
-    return card(
+    return Padding(
+      padding: const EdgeInsets.only(left: 50),
+      child: card(
         color: colorStateOfMission(
             percent: widget.mission.percent,
             startDate: widget.mission.startDate,
@@ -62,48 +69,84 @@ class _MissionCardState extends State<MissionCard> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.mission.nameMission,
-              textAlign: TextAlign.center,
-              softWrap: true,
-              style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  fontStyle: FontStyle.italic),
-            ),
-            const SizedBox(
-              height: 4,
-            ),
-            (!isManager)
-                ? Text(
-                    'Dự án: ${widget.mission.nameProject}',
-                    style: const TextStyle(fontSize: 14),
-                  )
-                : Container(
-                    constraints:
-                        const BoxConstraints(maxWidth: 200, maxHeight: 30),
-                    child: userCard(
-                        userId: widget.mission.staffId,
-                        size: 28,
-                        fontsize: 14,
-                        type: 2),
+            InkWell(
+              onTap: () {
+                setState(() {
+                  isOpen = !isOpen;
+                });
+              },
+              child: Row(
+                children: [
+                  AnimatedSwitcher(
+                    duration: const Duration(seconds: 2),
+                    transitionBuilder: ((child, animation) => RotationTransition(
+                          turns: isOpen
+                              ? Tween<double>(begin: 0.25, end: 0.5)
+                                  .animate(animation)
+                              : Tween<double>(begin: 0.5, end: 0.25)
+                                  .animate(animation),
+                          child: ScaleTransition(
+                            scale: animation,
+                            child: child,
+                          ),
+                        )),
+                    child: const Icon(Icons.arrow_drop_up_sharp),
                   ),
-            Text(progress(), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),),
-            
-            
-            
+                  Text(
+                    widget.mission.nameMission,
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        fontStyle: FontStyle.italic),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(
+              height: 0.5,
+              thickness: 0.5,
+              color: backgroundWhiteColor,
+            ),
+            !isOpen
+                ? Container()
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      (!isManager)
+                          ? Text(
+                              'Dự án: ${widget.mission.nameProject}',
+                              style: const TextStyle(fontSize: 14),
+                            )
+                          : Container(
+                              constraints: const BoxConstraints(
+                                  maxWidth: 200, maxHeight: 30),
+                              child: userCard(
+                                  userId: widget.mission.staffId,
+                                  size: 28,
+                                  fontsize: 14,
+                                  type: 2),
+                            ),
+                      Text(
+                        progress(),
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  )
           ],
         ),
-        subtitle:Text(
-              "${DateFormat('dd/MM/yyy').format(
-                widget.mission.startDate,
-              )} - ${DateFormat('dd/MM/yyy').format(
-                widget.mission.endDate,
-              )} (${widget.mission.endDate.difference(widget.mission.startDate).inDays + 1} ngày) ",
-              style: const TextStyle(fontSize: 13),
-            ),
-        trailing: const SizedBox(
-          width: 30,
-        ));
+        subtitle: Text(
+          "${DateFormat('dd/MM/yyy').format(
+            widget.mission.startDate,
+          )} - ${DateFormat('dd/MM/yyy').format(
+            widget.mission.endDate,
+          )} (${widget.mission.endDate.difference(widget.mission.startDate).inDays + 1} ngày) ",
+          style: const TextStyle(fontSize: 13),
+        ),
+        trailing: const Icon(Icons.arrow_circle_right_sharp),
+      ),
+    );
   }
 }

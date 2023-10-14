@@ -1,41 +1,45 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Title {
+class TitleProject {
   final String companyId;
   final String projectId;
+  final String titleId;
   final String title;
-  final int number;
+  final int missions;
   final DateTime createDate;
   final DateTime startDate;
   final DateTime endDate;
 
-  const Title({
+  const TitleProject({
     required this.companyId,
     required this.projectId,
+    required this.titleId,
     required this.title,
     required this.createDate,
     required this.startDate,
     required this.endDate,
-    required this.number,
+    this.missions = 0,
   });
 
   Map<String, dynamic> toJson() => {
         'companyId': companyId,
         'projectId': projectId,
+        'titleId' : titleId,
         'title': title,
         'createDate': createDate,
         'startDate': startDate,
         'endDate': endDate,
-        'number' : number,
+        'missions' : missions,
       };
 
-  static Title fromSnap({required DocumentSnapshot doc}) => Title(
+  static TitleProject fromSnap({required DocumentSnapshot doc}) => TitleProject(
         companyId: doc['companyId'],
         projectId: doc['projectId'],
+        titleId : doc['titleId'],
         title: doc['title'],
         createDate: doc['createDate'].toDate(),
         startDate: doc['startDate'].toDate(),
         endDate: doc['endDate'].toDate(),
-        number : doc['number']
+        missions : doc['missions']
       );
 }

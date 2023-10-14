@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Mission {
   final String companyId;
   final String projectId;
+  final String titleId;
   final String missionId;
   final String nameProject;
   final String nameMission;
@@ -17,6 +18,7 @@ class Mission {
     required this.nameProject,
     required this.companyId,
     required this.projectId,
+    required this.titleId,
     required this.missionId,
     required this.nameMission,
     required this.description,
@@ -31,6 +33,7 @@ class Mission {
     'nameProject' : nameProject,
         'companyId': companyId,
         'projectId': projectId,
+        'titleId' : titleId,
         'missionId': missionId,
         'nameMission': nameMission,
         'description': description,
@@ -45,6 +48,7 @@ class Mission {
     nameProject: doc['nameProject'],
         companyId: doc['companyId'],
         projectId: doc['projectId'],
+        titleId: doc['titleId'],
         missionId: doc['missionId'],
         nameMission: doc['nameMission'],
         description: doc['description'],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_management/firebase/firebase_methods.dart';
-import 'package:project_management/home/widgets/missions/missions_list.dart';
+import 'package:project_management/home/widgets/project_titles/title_content.dart';
+import 'package:project_management/home/widgets/project_titles/title_list.dart';
 import 'package:project_management/home/widgets/projects/project_detail.dart';
 import 'package:project_management/model/project.dart';
 import 'package:project_management/utils/functions.dart';
@@ -23,13 +24,13 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
     super.dispose();
     pageController.dispose();
   }
+
   delete() async {
     bool? comfirm = await showDialog(
         context: context,
         builder: (_) => AlertDialog(
               scrollable: true,
               backgroundColor: darkblueColor,
-              
               title: Column(
                 children: [
                   Text(
@@ -74,8 +75,10 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
         if (context.mounted) {
           Navigator.pop(context);
           Navigator.pop(context);
-          showNotify(context: context,content: "Đã xóa dự án thành công!",);
-         
+          showNotify(
+            context: context,
+            content: "Đã xóa dự án thành công!",
+          );
         }
       } else {
         if (context.mounted) {
@@ -86,12 +89,12 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
     }
   }
 
-
   onPageChanged(int pageNumber) {
     setState(() {
       page = pageNumber;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -105,6 +108,13 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
           backgroundColor: darkblueAppbarColor,
           title: const Text('Dự án'),
           actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 0),
+              child: textBoxButton(
+                  color: focusBlueColor, text: 'Tạo mới', height: 20, width: 70, fontSize: 13,function: () {
+                    showDialog(context: context, builder: (_) =>  TitleContent(project: widget.project,));
+                  },),
+            ),
             IconButton(
                 onPressed: delete,
                 tooltip: "Xóa vĩnh viễn",
@@ -118,22 +128,26 @@ class _ProjectHomeScreenState extends State<ProjectHomeScreen> {
           controller: pageController,
           onPageChanged: onPageChanged,
           children: [
-            MissionsScreen(project: widget.project),
-            ProjectDetailScreen(project: widget.project,),
-            
+            TitleList(project: widget.project),
+            ProjectDetailScreen(
+              project: widget.project,
+            ),
           ],
         ),
-       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.transparent,
-        currentIndex: page,
-        items: [
-          BottomNavigationBarItem(icon: missionIcon, label: "Nhiệm vụ",),
-          BottomNavigationBarItem(icon: projectIcon, label: "Chi tiết", ),
-          
-        ],
-        
-        onTap: (page) => pageController.jumpToPage(page),
-        
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: Colors.transparent,
+          currentIndex: page,
+          items: [
+            BottomNavigationBarItem(
+              icon: missionIcon,
+              label: "Tiêu đề",
+            ),
+            BottomNavigationBarItem(
+              icon: projectIcon,
+              label: "Chi tiết",
+            ),
+          ],
+          onTap: (page) => pageController.jumpToPage(page),
         ),
       ),
     );
