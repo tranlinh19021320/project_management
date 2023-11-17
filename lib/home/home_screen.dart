@@ -23,15 +23,20 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   init() async {
-    setState(() {
-      isLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+    
     GroupProvider groupProvider = Provider.of<GroupProvider>(context, listen: false);
     await groupProvider.refresh();
     isManager = groupProvider.getIsManager;
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
   @override
   void dispose() {

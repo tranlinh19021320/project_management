@@ -55,7 +55,7 @@ class _MissionCardState extends State<MissionCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 50),
+      padding:   EdgeInsets.only(left: isManager ? 50 : 0),
       child: card(
         color: colorStateOfMission(
             percent: widget.mission.percent,
